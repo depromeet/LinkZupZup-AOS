@@ -1,0 +1,83 @@
+ext {
+    kotlinVersion = '1.4.32'
+    composeVersion = '1.0.0-beta01'
+    koinVersion = '2.2.0'
+    rxjava2Version = "2.0.1"
+    retrofit2Version = "2.1.0"
+    retrofit2Rxjava2AdapterVersion = '1.0.0'
+    okhttp3Version = '3.4.2'
+    recyclerviewVersion = '1.1.0'
+    glideVersion = '4.12.0'
+    tedPermissionVersion = '2.2.3'
+    multidexVersion = "2.0.1"
+}
+ext.lib = [:]
+
+
+def lib = [:]
+
+/* Kotlin */
+def kotlin = [:]
+kotlin.plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+kotlin.stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+kotlin.test = "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
+lib.kotlin = kotlin
+
+/* Koin */
+def koin = [:]
+koin.core = "org.koin:koin-core:$koinVersion"
+// Koin extended & experimental features
+koin.coreExt = "org.koin:koin-core-ext:$koinVersion"
+//안드로이드 context 주입, 안드로이드 log 지원 기능을 제공
+koin.android = "org.koin:koin-android:$koinVersion"
+//LifecycleOwner 들에서 scope 생성-삭제를 자동화하는 기능을 제공
+koin.scope = "org.koin:koin-androidx-scope:$koinVersion"
+//AAC의 ViewModel 을 Actiity나 Fragment에서 손쉽게 주입받을 수 있는 기능을 제공
+koin.architecture = "org.koin:koin-androidx-viewmodel:$koinVersion"
+//테스트용 유틸리티
+koin.test = "org.koin:koin-test:$koinVersion"
+// Needed JUnit version
+koin.testJunit = "org.koin:koin-test-junit4:$koinVersion"
+lib.koin = koin
+
+/* RxJava2 */
+def rxJava2 = [:]
+rxJava2.runtime = "io.reactivex.rxjava2:rxjava:$rxjava2Version"
+rxJava2.rxAndroid = "io.reactivex.rxjava2:rxandroid:$rxjava2Version"
+lib.rxJava2 = rxJava2
+
+/* Retrofit2 */
+def retrofit2 = [:]
+retrofit2.runtime = "com.squareup.retrofit2:retrofit:$retrofit2Version"
+retrofit2.gson = "com.squareup.retrofit2:converter-gson:$retrofit2Version"
+retrofit2.rxJava2 = "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:$retrofit2Rxjava2AdapterVersion"
+lib.retrofit2 = retrofit2
+
+/* Okhttp3 */
+def okhttp3 = [:]
+okhttp3.runtime = "com.squareup.okhttp3:okhttp:$okhttp3Version"
+okhttp3.interceptor = "com.squareup.okhttp3:logging-interceptor:$okhttp3Version"
+okhttp3.urlconnection = "com.squareup.okhttp3:okhttp-urlconnection:$okhttp3Version"
+lib.okhttp3 = okhttp3
+
+/* Recyclerview */
+def recyclerView = [:]
+recyclerView.runtime = "androidx.recyclerview:recyclerview:$recyclerviewVersion"
+lib.recyclerView = recyclerView
+
+/* Glide */
+def glide = [:]
+glide.runtime = "com.github.bumptech.glide:glide:$glideVersion"
+glide.annotation = "com.github.bumptech.glide:compiler:$glideVersion"
+lib.glide = glide
+
+/* TedPermission */
+def tedPermission = [:]
+tedPermission.runtime = "gun0912.ted:tedpermission:$tedPermissionVersion"
+lib.tedPermission = tedPermission
+
+def multidex = [:]
+multidex.runtime = "androidx.multidex:multidex:$multidexVersion"
+lib.multidex = multidex
+
+ext.lib = lib
