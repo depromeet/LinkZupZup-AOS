@@ -38,23 +38,46 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion compose_version
-        kotlinCompilerVersion '1.4.32'
+        kotlinCompilerExtensionVersion composeVersion
+        kotlinCompilerVersion kotlinVersion
     }
 }
 
 dependencies {
 
+    implementation lib.kotlin.stdlib
     implementation 'androidx.core:core-ktx:1.3.2'
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.3.0'
-    implementation "androidx.compose.ui:ui:$compose_version"
-    implementation "androidx.compose.material:material:$compose_version"
-    implementation "androidx.compose.ui:ui-tooling:$compose_version"
+    implementation "androidx.compose.ui:ui:$composeVersion"
+    implementation "androidx.compose.material:material:$composeVersion"
+    implementation "androidx.compose.ui:ui-tooling:$composeVersion"
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
     implementation 'androidx.activity:activity-compose:1.3.0-alpha06'
+
+    // Koin
+    implementation lib.koin.core
+    implementation lib.koin.coreExt
+    implementation lib.koin.android
+    implementation lib.koin.scope
+    implementation lib.koin.architecture
+
+    implementation lib.rxJava2.runtime
+    implementation lib.rxJava2.rxAndroid
+    implementation lib.retrofit2.runtime
+    implementation lib.retrofit2.gson
+    implementation lib.retrofit2.rxJava2
+    implementation lib.okhttp3.runtime
+    implementation lib.okhttp3.interceptor
+    implementation lib.okhttp3.urlconnection
+    implementation lib.recyclerView.runtime
+    implementation lib.glide.runtime
+    implementation lib.glide.annotation
+    implementation lib.tedPermission.runtime
+    implementation lib.multidex.runtime
+
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$composeVersion"
 }
