@@ -1,7 +1,7 @@
 package com.depromeet.linkzupzup.domains
 
 import com.depromeet.linkzupzup.extensions.mapToPresenter
-import com.depromeet.linkzupzup.repositories.UserRepositoryImpl
+import com.depromeet.linkzupzup.dataSources.repositories.UserRepositoryImpl
 import com.depromeet.linkzupzup.presenter.model.User
 import io.reactivex.Single
 

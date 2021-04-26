@@ -5,9 +5,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,8 +28,14 @@ import androidx.compose.ui.unit.sp
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.presenter.ScrapDetailViewModel
+import com.depromeet.linkzupzup.presenter.model.TagColor
 import com.depromeet.linkzupzup.ui.theme.LinkZupZupTheme
+import com.depromeet.linkzupzup.utils.CommonUtil
 import com.depromeet.linkzupzup.utils.DLog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.util.*
 
 class ScrapDetailUI: BaseView<ScrapDetailViewModel>() {
 
@@ -32,7 +43,7 @@ class ScrapDetailUI: BaseView<ScrapDetailViewModel>() {
     override fun onCreateViewContent() {
         LinkZupZupTheme {
             Surface(color = MaterialTheme.colors.background) {
-                BodyContent()
+                BodyContent(vm)
             }
         }
     }
@@ -41,7 +52,7 @@ class ScrapDetailUI: BaseView<ScrapDetailViewModel>() {
 
 
 @Composable
-fun BodyContent() {
+fun BodyContent(viewModel: ScrapDetailViewModel? = null) {
     val middleTopPadding = 20.dp
     Box(
         modifier = Modifier
@@ -124,28 +135,9 @@ fun BodyContent() {
                             style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = Color(0xFF878D91)),
                             modifier = Modifier.fillMaxWidth(), maxLines = 3)
 
-                        Row(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(20.dp)) {
+                        Spacer(modifier = Modifier.height(20.dp))
 
-                        }
-
-                        Column(
-                            Modifier
-                                .fillMaxWidth()
-                                .absolutePadding(0.dp, 0.dp, 0.dp, 0.dp)) {
-
-                            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-
-                                TagView("#디자인", Color(0xFFFFECEC), Color(0xFFE88484))
-
-                                Spacer(Modifier.width(4.dp))
-
-                                TagView("#포트폴리오", Color(0xFFD9F8F4), Color(0xFF57B9AF))
-
-                            }
-
-                        }
+                        MultiLineTagList(viewModel?.getTagList() ?: arrayListOf())
 
                         Spacer(Modifier.weight(1f))
 
@@ -213,15 +205,64 @@ fun BodyContent() {
 }
 
 @Composable
-fun TagView(tagStr: String, backgroundColor: Color, color: Color) {
-    Card(Modifier.clickable { DLog.e("Jackson", "click, Tag")  },
+fun MultiLineTagList(tags: List<String>, horizontalItemLimit: Int = 10, backgroundColor: Color = Color(0xFFAAAAAA), textColor: Color = Color(0xFFAAAAAA)) {
+
+    val colors = remember { mutableStateOf(arrayListOf<TagColor>().apply {
+        tags.forEach { TagColor(backgroundColor, textColor) }
+    }) }
+
+    val firstLineLen = remember {
+        mutableStateOf(
+            if (tags.size <= horizontalItemLimit) tags.size
+            else horizontalItemLimit)
+    }
+
+    val secondLineLen = remember {
+        mutableStateOf(
+            if (horizontalItemLimit < tags.size && tags.size >= horizontalItemLimit * 2) horizontalItemLimit * 2
+            else tags.size)
+    }
+
+    Column {
+
+        CoroutineScope(Dispatchers.Main).launch {
+            arrayListOf<TagColor>().apply {
+                tags.forEach { add(CommonUtil.getRandomeTagColor()) }
+            }.let { colors.value = it }
+        }
+
+        TagList(tags.subList(0, firstLineLen.value), colors)
+        if (secondLineLen.value > 0) {
+            Spacer(Modifier.height(12.dp))
+            TagList(tags.subList(horizontalItemLimit, secondLineLen.value), colors)
+        }
+    }
+}
+
+
+@Composable
+fun TagList(tags: List<String>, colors: MutableState<ArrayList<TagColor>>) {
+    if (colors.value.size > 0) LazyRow(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        itemsIndexed(tags) { idx, tag ->
+            colors.value[idx].let { tagColor ->
+                TagView(idx, tag, tagColor.bgColor, tagColor.textColor)
+            }
+        }
+    }
+}
+
+@Composable
+fun TagView(idx: Int, tagStr: String, backgroundColor: Color = Color(0xFFAAAAAA), textColor: Color = Color(0xFFAAAAAA)) {
+
+    val colors = remember { mutableStateOf(TagColor(backgroundColor, textColor)) }
+    Card(Modifier.clickable { DLog.e("Jackson", "idx: $idx, click, Tag: $tagStr")  },
         shape = RoundedCornerShape(2.dp),
         elevation = 0.dp,
-        backgroundColor = backgroundColor) {
+        backgroundColor = colors.value.bgColor) {
         Column(modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp)) {
             Text(tagStr,
                 style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 10.sp, lineHeight = 2.sp, color = Color(0xFFE88484)),
-                color = color,
+                color = colors.value.textColor,
                 modifier = Modifier
                     .height(12.dp)
                     .absolutePadding(0.dp, 0.dp, 0.dp, 0.dp), maxLines = 1)

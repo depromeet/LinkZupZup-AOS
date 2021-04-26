@@ -1,4 +1,4 @@
-package com.depromeet.linkzupzup.repositories
+package com.depromeet.linkzupzup.dataSources.repositories
 
 import com.depromeet.linkzupzup.domains.entities.UserEntity
 import io.reactivex.Single
