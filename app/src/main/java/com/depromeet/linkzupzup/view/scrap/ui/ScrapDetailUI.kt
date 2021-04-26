@@ -77,13 +77,15 @@ fun BodyContent(viewModel: ScrapDetailViewModel? = null) {
             Box(modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .padding(horizontal = 24.dp)
+                // .padding(horizontal = 24.dp)
                 .absoluteOffset(y = -middleTopPadding)) {
 
-                Image(painter= painterResource(id = R.drawable.ic_scrap_profile_img),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(48.dp))
+                Box(Modifier.padding(horizontal = 24.dp)) {
+                    Image(painter= painterResource(id = R.drawable.ic_scrap_profile_img),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(48.dp))
+                }
 
                 Box(modifier = Modifier
                     .fillMaxWidth()
@@ -92,7 +94,7 @@ fun BodyContent(viewModel: ScrapDetailViewModel? = null) {
 
                     Row(modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 48.dp)
+                        .padding(start = 72.dp, end = 24.dp)
                         .height(44.dp)) {
 
                         Text("글쓴이",
@@ -127,31 +129,29 @@ fun BodyContent(viewModel: ScrapDetailViewModel? = null) {
 
                         Text("스타트업과 안맞는 대기업 임원 DNA는 어떻게 찾아낼까?",
                             style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700)), fontSize = 18.sp, lineHeight = 22.5.sp, color = Color(0xFF292A2B)),
-                            modifier = Modifier.fillMaxWidth())
+                            modifier = Modifier.fillMaxWidth()
+                                .padding(horizontal = 24.dp))
 
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text("IT 기업을 중심으로 빠르게 사업을 실행을 하는 것이 사업의 중요한 경쟁력이 된다는 것은 이미 공감대가 만들어져 있다. 그리고 서바이벌을 고민해야 하는 스타트업에서는 그 중요성은 더욱더 크게 받...",
                             style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = Color(0xFF878D91)),
-                            modifier = Modifier.fillMaxWidth(), maxLines = 3)
+                            maxLines = 3,
+                            modifier = Modifier.fillMaxWidth()
+                                .padding(horizontal = 24.dp))
 
                         Spacer(modifier = Modifier.height(20.dp))
 
-                        MultiLineTagList(viewModel?.getTagList() ?: arrayListOf())
+                        MultiLineTagList(viewModel?.getTagList() ?: arrayListOf(), contentPadding = PaddingValues(24.dp, 0.dp))
 
                         Spacer(Modifier.weight(1f))
 
-                        Row (
-                            Modifier
-                                .fillMaxWidth()
-                                .height(21.dp)
-                                .padding(top = 5.dp)
-                                .clickable {
-                                    DLog.e(
-                                        "Jackson",
-                                        "click link alram setting!"
-                                    )
-                                }) {
+                        Row (Modifier.fillMaxWidth()
+                            .height(21.dp)
+                            .padding(start = 24.dp, top = 5.dp, end = 24.dp)
+                            .clickable {
+                                DLog.e("Jackson", "click link alram setting!")
+                            }) {
 
                             Image(painter = painterResource(id = R.drawable.ic_link_alram_img),
                                 contentDescription = null,
@@ -170,12 +170,12 @@ fun BodyContent(viewModel: ScrapDetailViewModel? = null) {
                         Spacer(Modifier.height(20.dp))
 
                         Button(onClick = { DLog.e("Jackson", "click read button") },
-                            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.Blue,
-                                contentColor = Color.White),
+                            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.Blue, contentColor = Color.White),
                             shape = RoundedCornerShape(4.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(52.dp)) {
+                                .height(52.dp)
+                                .padding(horizontal = 24.dp)) {
                             Text("바로 읽기!",
                                 style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_regular, weight = FontWeight.W700)), fontSize = 14.sp, lineHeight = 17.5.sp),
                                 textAlign = TextAlign.Center)
@@ -205,7 +205,7 @@ fun BodyContent(viewModel: ScrapDetailViewModel? = null) {
 }
 
 @Composable
-fun MultiLineTagList(tags: List<String>, horizontalItemLimit: Int = 10, backgroundColor: Color = Color(0xFFAAAAAA), textColor: Color = Color(0xFFAAAAAA)) {
+fun MultiLineTagList(tags: List<String>, horizontalItemLimit: Int = 10, backgroundColor: Color = Color(0xFFAAAAAA), textColor: Color = Color(0xFFAAAAAA), contentPadding: PaddingValues = PaddingValues(0.dp)) {
 
     val colors = remember { mutableStateOf(arrayListOf<TagColor>().apply {
         tags.forEach { TagColor(backgroundColor, textColor) }
@@ -231,18 +231,18 @@ fun MultiLineTagList(tags: List<String>, horizontalItemLimit: Int = 10, backgrou
             }.let { colors.value = it }
         }
 
-        TagList(tags.subList(0, firstLineLen.value), colors)
+        TagList(tags.subList(0, firstLineLen.value), colors, contentPadding)
         if (secondLineLen.value > 0) {
             Spacer(Modifier.height(12.dp))
-            TagList(tags.subList(horizontalItemLimit, secondLineLen.value), colors)
+            TagList(tags.subList(horizontalItemLimit, secondLineLen.value), colors, contentPadding)
         }
     }
 }
 
 
 @Composable
-fun TagList(tags: List<String>, colors: MutableState<ArrayList<TagColor>>) {
-    if (colors.value.size > 0) LazyRow(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+fun TagList(tags: List<String>, colors: MutableState<ArrayList<TagColor>>, contentPadding: PaddingValues = PaddingValues(0.dp)) {
+    if (colors.value.size > 0) LazyRow(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), contentPadding = contentPadding) {
         itemsIndexed(tags) { idx, tag ->
             colors.value[idx].let { tagColor ->
                 TagView(idx, tag, tagColor.bgColor, tagColor.textColor)
