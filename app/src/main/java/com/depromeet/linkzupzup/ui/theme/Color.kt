@@ -1,11 +1,12 @@
 package com.depromeet.linkzupzup.ui.theme
 
 import androidx.compose.ui.graphics.Color
+import com.depromeet.linkzupzup.R
 
-val Purple200 = Color(0xFFFFFFFF)
-val Purple500 = Color(0xFFDFDFDF)
-val Purple700 = Color(0xFFBFBFBF)
-val Teal200 = Color(0xFF03DAC5)
+val Gray200 = Color(R.color.gray_200)
+val Gray500 = Color(R.color.gray_500)
+val Gray700 = Color(R.color.gray_700)
+val Teal200 = Color(R.color.teal_200)
 
 val TagBgColor01 = Color(0xFFFFECEC)
 val TagTextColor01 = Color(0xFFE88484)

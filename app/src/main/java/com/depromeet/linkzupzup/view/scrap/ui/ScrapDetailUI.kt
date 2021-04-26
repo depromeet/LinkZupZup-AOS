@@ -205,9 +205,9 @@ fun BodyContent(viewModel: ScrapDetailViewModel? = null) {
             }
         }
 
-
         // close
         Box(modifier= Modifier
+            .size(64.dp)
             .padding(16.dp)
             .align(Alignment.TopEnd)
             .clickable { DLog.e("Jackson", "Click close button") }) {

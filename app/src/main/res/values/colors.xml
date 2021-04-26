@@ -4,9 +4,9 @@
     <color name="status_bar_color">#FFFFFFFF</color>
     <color name="navigation_bar_color">#BFBFBF</color>
 
-    <color name="purple_200">#FFFFFFFF</color>
-    <color name="purple_500">#DDDDDD</color>
-    <color name="purple_700">#BFBFBF</color>
+    <color name="gray_200">#FFFFFFFF</color>
+    <color name="gray_500">#DDDDDD</color>
+    <color name="gray_700">#BFBFBF</color>
     <color name="teal_200">#4076F6</color>
     <color name="teal_700">#2B68F8</color>
     <color name="black">#FF000000</color>
