@@ -6,6 +6,7 @@ import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.component.BackPressCloseHandler
@@ -32,6 +33,11 @@ abstract class BaseActivity<VIEW: BaseView<VIEWMODEL>, VIEWMODEL: BaseViewModel>
     override fun onCreate(savedInstanceState: Bundle?) {
         overridePendingTransition(R.anim.act_slide_right_in, R.anim.stay)
         super.onCreate(savedInstanceState)
+        // top status bar color
+        window.statusBarColor = ContextCompat.getColor(this, R.color.status_bar_color)
+        // bottom navigation bar color
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.navigation_bar_color)
+
         // TimeZone Asia/Seoul로 지정
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"))
         viewModel = onCreateViewModel().apply {
