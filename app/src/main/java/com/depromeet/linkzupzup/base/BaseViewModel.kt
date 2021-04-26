@@ -4,10 +4,15 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.depromeet.linkzupzup.component.PreferencesManager
+import com.depromeet.linkzupzup.utils.DLog
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 
 open class BaseViewModel : ViewModel() {
+
+    companion object {
+        var TAG = BaseViewModel::class.java.simpleName
+    }
 
     var preference: PreferencesManager? = null
     var lifecycleOwner: LifecycleOwner? = null
@@ -40,6 +45,10 @@ open class BaseViewModel : ViewModel() {
     override fun onCleared() {
         disposables.clear()
         super.onCleared()
+    }
+
+    fun defaultThrowable(throwable: Throwable) {
+        DLog.e(TAG, "${throwable.message}")
     }
 
 }

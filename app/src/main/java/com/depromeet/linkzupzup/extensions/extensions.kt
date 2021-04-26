@@ -1,9 +1,13 @@
 package com.depromeet.linkzupzup.extensions
 
+import androidx.compose.ui.graphics.Color
+import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.component.SSLHelper
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import okhttp3.OkHttpClient
 import java.text.ParseException
@@ -19,6 +23,10 @@ fun <T> Single<T>.schedulers(subscribeOnScheduler: Scheduler = Schedulers.io(),
     return this
 }
 
+fun <T> Single<T>.subSimple(onSuccess: Consumer<in T>?, baseView: BaseView<*>): Disposable {
+    return subscribe(onSuccess, { baseView.defaultThrowable(it) })
+}
+
 /**
  * 참고 : https://meetup.toast.com/posts/130
  */
@@ -30,4 +38,11 @@ fun String.toDate(formatStr: String = "yyyy-MM-dd'T'HH:mm:ss'Z'", timeZone: Time
 }
 fun Date.dateFormat(toFormatStr: String, locale: Locale = Locale.KOREAN) = with(SimpleDateFormat(toFormatStr, locale)) {
     this.format(this@dateFormat)
+}
+
+fun Color.isEquals(target: Color): Boolean {
+    return alpha == target.alpha &&
+            red == target.red &&
+            blue == target.blue &&
+            green == target.green
 }
