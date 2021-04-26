@@ -146,26 +146,44 @@ fun BodyContent(viewModel: ScrapDetailViewModel? = null) {
 
                         Spacer(Modifier.weight(1f))
 
-                        Row (Modifier.fillMaxWidth()
-                            .height(21.dp)
-                            .padding(start = 24.dp, top = 5.dp, end = 24.dp)
-                            .clickable {
-                                DLog.e("Jackson", "click link alram setting!")
-                            }) {
+                        Card(elevation = 0.dp, modifier = Modifier.height(26.dp)
+                            .padding(start = 24.dp, end = 24.dp)
+                            .clickable { DLog.e("Jackson", "click link alram setting!")  }) {
+                            Column {
+                                Spacer(Modifier.height(5.dp))
+                                Row (Modifier.fillMaxWidth()
+                                    .height(21.dp)
+                                ) {
 
-                            Image(painter = painterResource(id = R.drawable.ic_link_alram_img),
-                                contentDescription = null,
-                                modifier = Modifier.size(16.dp))
+                                    Image(painter = painterResource(id = R.drawable.ic_link_alram_img),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp))
 
-                            Spacer(Modifier.width(4.dp))
+                                    Spacer(Modifier.width(4.dp))
 
-                            Text("이 링크는 따로 알람을 받고싶어요!",
-                                style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_regular, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = Color(0xFF292A2B)),
-                                modifier = Modifier
-                                    .align(Alignment.CenterVertically)
-                                    .clickable { DLog.e("Jackson", "click setting link alram ") })
+                                    Text("이 링크는 따로 알람을 받고싶어요!",
+                                        style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_regular, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = Color(0xFF292A2B)))
 
+                                }
+                            }
                         }
+//                        Row (Modifier.fillMaxWidth()
+//                            .height(26.dp)
+//                            .padding(start = 24.dp, top = 5.dp, end = 24.dp)
+//                            .clickable {
+//                                DLog.e("Jackson", "click link alram setting!")
+//                            }, verticalAlignment = Alignment.Bottom) {
+//
+//                            Image(painter = painterResource(id = R.drawable.ic_link_alram_img),
+//                                contentDescription = null,
+//                                modifier = Modifier.size(16.dp))
+//
+//                            Spacer(Modifier.width(4.dp))
+//
+//                            Text("이 링크는 따로 알람을 받고싶어요!",
+//                                style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_regular, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = Color(0xFF292A2B)))
+//
+//                        }
 
                         Spacer(Modifier.height(20.dp))
 
