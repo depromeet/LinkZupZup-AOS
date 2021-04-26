@@ -188,7 +188,7 @@ fun BodyContent(viewModel: ScrapDetailViewModel? = null) {
                         Spacer(Modifier.height(20.dp))
 
                         Button(onClick = { DLog.e("Jackson", "click read button") },
-                            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.Blue, contentColor = Color.White),
+                            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color(0xFF4076F6), contentColor = Color.White),
                             shape = RoundedCornerShape(4.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
