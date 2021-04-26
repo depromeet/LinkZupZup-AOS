@@ -4,9 +4,12 @@ package com.depromeet.linkzupzup.view.scrap.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -65,7 +68,11 @@ fun BodyContent(viewModel: ScrapDetailViewModel? = null) {
         // content
         Column(modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight()) {
+            .fillMaxHeight()
+            .scrollable(
+                state = rememberScrollState(),
+                orientation = Orientation.Vertical
+            )) {
 
             // top header
             Image(painter = painterResource(id = R.drawable.ic_scrap_detail_top_bg),
@@ -146,13 +153,16 @@ fun BodyContent(viewModel: ScrapDetailViewModel? = null) {
 
                         Spacer(Modifier.weight(1f))
 
-                        Card(elevation = 0.dp, modifier = Modifier.height(26.dp)
+                        Card(elevation = 0.dp, modifier = Modifier
+                            .height(26.dp)
                             .padding(start = 24.dp, end = 24.dp)
-                            .clickable { DLog.e("Jackson", "click link alram setting!")  }) {
+                            .clickable { DLog.e("Jackson", "click link alram setting!") }) {
                             Column {
                                 Spacer(Modifier.height(5.dp))
-                                Row (Modifier.fillMaxWidth()
-                                    .height(21.dp)
+                                Row (
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .height(21.dp)
                                 ) {
 
                                     Image(painter = painterResource(id = R.drawable.ic_link_alram_img),
@@ -167,23 +177,6 @@ fun BodyContent(viewModel: ScrapDetailViewModel? = null) {
                                 }
                             }
                         }
-//                        Row (Modifier.fillMaxWidth()
-//                            .height(26.dp)
-//                            .padding(start = 24.dp, top = 5.dp, end = 24.dp)
-//                            .clickable {
-//                                DLog.e("Jackson", "click link alram setting!")
-//                            }, verticalAlignment = Alignment.Bottom) {
-//
-//                            Image(painter = painterResource(id = R.drawable.ic_link_alram_img),
-//                                contentDescription = null,
-//                                modifier = Modifier.size(16.dp))
-//
-//                            Spacer(Modifier.width(4.dp))
-//
-//                            Text("이 링크는 따로 알람을 받고싶어요!",
-//                                style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_regular, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = Color(0xFF292A2B)))
-//
-//                        }
 
                         Spacer(Modifier.height(20.dp))
 
