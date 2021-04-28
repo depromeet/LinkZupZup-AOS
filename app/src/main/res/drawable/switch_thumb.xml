@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Thumb 여백 -->
+    <item
+        android:width="22dp"
+        android:height="22dp"
+        android:gravity="center">
+
+        <shape android:shape="oval">
+
+            <solid android:color="@android:color/transparent" />
+
+            <stroke
+                android:width="1.5dp"
+                android:color="@android:color/transparent" />
+
+        </shape>
+
+    </item>
+
+    <!-- Thumb -->
+    <item
+        android:width="22dp"
+        android:height="22dp"
+        android:left="1.5dp"
+        android:top="1.5dp"
+        android:right="1.5dp"
+        android:bottom="1.5dp"
+        android:gravity="center">
+
+        <shape android:shape="oval">
+
+            <solid android:color="#ffffff" />
+
+            <!-- Thumb Outside color -->
+            <stroke android:width="0.5dp"
+                android:color="#19000000" />
+        </shape>
+
+    </item>
+
+</layer-list>
