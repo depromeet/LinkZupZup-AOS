@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LinkZupZup">
         <activity
-            android:name=".view.scrap.ScrapDetailActivity"
+            android:name=".view.alarm.AlarmDetailActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.LinkZupZup.NoActionBar">
@@ -25,6 +25,9 @@
         </activity>
 
         <activity android:name=".view.main.MainActivity" />
+        <activity android:name=".view.scrap.ScrapDetailActivity" />
+        <!--<activity android:name=".view.alarm.AlarmDetailActivity" />-->
+
     </application>
 
 </manifest>

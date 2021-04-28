@@ -188,7 +188,7 @@ fun BodyContent(viewModel: ScrapDetailViewModel? = null) {
                                 .height(52.dp)
                                 .padding(horizontal = 24.dp)) {
                             Text("바로 읽기!",
-                                style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_regular, weight = FontWeight.W700)), fontSize = 14.sp, lineHeight = 17.5.sp),
+                                style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W700)), fontSize = 14.sp, lineHeight = 17.5.sp),
                                 textAlign = TextAlign.Center)
                         }
 

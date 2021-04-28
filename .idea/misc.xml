@@ -12,6 +12,13 @@
         <entry key="../../../../layout/compose-model-1619257206281.xml" value="1.0" />
         <entry key="../../../../layout/compose-model-1619257279126.xml" value="0.29814814814814816" />
         <entry key="../../../../layout/compose-model-1619257488165.xml" value="0.75" />
+        <entry key="..\:/Users/Jackson/AndroidStudioProjects/LinkZupZup/app/src/main/res/drawable/bg_default_switch_thumb.xml" value="0.30185185185185187" />
+        <entry key="..\:/Users/Jackson/AndroidStudioProjects/LinkZupZup/app/src/main/res/drawable/bg_default_switch_thumb_checked.xml" value="0.30185185185185187" />
+        <entry key="..\:/Users/Jackson/AndroidStudioProjects/LinkZupZup/app/src/main/res/drawable/bg_default_switch_track.xml" value="0.30185185185185187" />
+        <entry key="..\:/Users/Jackson/AndroidStudioProjects/LinkZupZup/app/src/main/res/drawable/bg_default_switch_track_checked.xml" value="0.30185185185185187" />
+        <entry key="..\:/Users/Jackson/AndroidStudioProjects/LinkZupZup/app/src/main/res/drawable/bg_default_switch_track_normal.xml" value="0.30185185185185187" />
+        <entry key="..\:/Users/Jackson/AndroidStudioProjects/LinkZupZup/app/src/main/res/drawable/switch_track_selector.xml" value="0.30185185185185187" />
+        <entry key="..\:/Users/Jackson/AndroidStudioProjects/LinkZupZup/app/src/main/res/layout/switch_compat.xml" value="0.22" />
         <entry key="app/src/main/res/drawable/ic_black_close.xml" value="0.29814814814814816" />
       </map>
     </option>
