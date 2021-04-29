@@ -28,6 +28,10 @@
         <activity android:name=".view.scrap.ScrapDetailActivity" />
         <!--<activity android:name=".view.alarm.AlarmDetailActivity" />-->
 
+        <receiver
+            android:name=".component.AlarmReceiver"
+            android:exported="false" />
+
     </application>
 
 </manifest>
