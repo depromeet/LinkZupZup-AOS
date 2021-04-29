@@ -1,6 +1,5 @@
 package com.depromeet.linkzupzup.view.alarm.ui
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,7 +40,9 @@ class AlarmDetailUI: BaseView<AlarmDetailViewModel>() {
         LinkZupZupTheme {
             Surface(color = MaterialTheme.colors.background) {
                 vm?.getWeeklyAlarmList()?.let { alarmList ->
-                    BodyContent(alarmList)
+                    BodyContent(alarmList) {
+                        // click, add alarm
+                    }
                 }
             }
         }
@@ -71,7 +72,7 @@ fun AppBar() {
 }
 
 @Composable
-fun BodyContent(alarms: ArrayList<WeeklyAlarm>) {
+fun BodyContent(alarms: ArrayList<WeeklyAlarm>, alarmClickListener: ()->Unit) {
     val alarmList = remember { mutableStateOf(alarms) }
     Scaffold(topBar = { AppBar() },
         backgroundColor = Color(0xFFE5E5E5)) {
@@ -99,7 +100,10 @@ fun BodyContent(alarms: ArrayList<WeeklyAlarm>) {
                 .height(68.dp)
                 .padding(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 16.dp)) {
 
-                Button(onClick = { DLog.e("Jackson", "click read button") },
+                Button(onClick = {
+                        DLog.e("Jackson", "click read button")
+                        alarmClickListener.invoke()
+                    },
                     colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color(0xFF4076F6), contentColor = Color.White),
                     shape = RoundedCornerShape(4.dp),
                     modifier = Modifier
@@ -247,7 +251,7 @@ fun previewSample() {
 
     LinkZupZupTheme {
         Surface(color = MaterialTheme.colors.background) {
-            BodyContent(listDatas)
+            BodyContent(listDatas) { /* alarm add Click listener */ }
         }
     }
 }
