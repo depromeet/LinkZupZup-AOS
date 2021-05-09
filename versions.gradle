@@ -1,5 +1,5 @@
 ext {
-    kotlinVersion = '1.4.32'
+    kotlinVersion = '1.4.30'
     composeVersion = '1.0.0-beta01'
     koinVersion = '2.2.0'
     rxjava2Version = "2.0.1"
