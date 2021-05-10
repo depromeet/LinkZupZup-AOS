@@ -1,5 +1,9 @@
 package com.depromeet.linkzupzup.extensions
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.component.SSLHelper
@@ -26,6 +30,9 @@ fun <T> Single<T>.schedulers(subscribeOnScheduler: Scheduler = Schedulers.io(),
 fun <T> Single<T>.subSimple(onSuccess: Consumer<in T>?, baseView: BaseView<*>): Disposable {
     return subscribe(onSuccess, { baseView.defaultThrowable(it) })
 }
+
+@Composable
+fun <T> T.mutableStateValue(): MutableState<T> = remember { mutableStateOf(this) }
 
 /**
  * 참고 : https://meetup.toast.com/posts/130
