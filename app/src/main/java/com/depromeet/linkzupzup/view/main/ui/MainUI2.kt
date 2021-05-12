@@ -63,7 +63,6 @@ class MainUI2: BaseView<MainViewModel>() {
                     }
 
                     MainBodyUI(mainContentList)
-
                 }
             }
         }
@@ -81,12 +80,12 @@ fun PreViewComposable() {
         // 스크랩 링크 리스트
         addAll(MainContentData.mockMainContentList(5))
     }
-    MainBodyUI(mainContentList)
+    MainBodyUI2(mainContentList)
 }
 
 @ExperimentalMaterialApi
 @Composable
-fun MainBodyUI(contentDataList: ArrayList<MainContentData<*>>) {
+fun MainBodyUI2(contentDataList: ArrayList<MainContentData<*>>) {
 
     val coroutineScope = rememberCoroutineScope()
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
@@ -124,7 +123,7 @@ fun MainBodyUI(contentDataList: ArrayList<MainContentData<*>>) {
                         )
                         onDrawWithContent {
                             drawContent()
-                            drawRect(gradient, blendMode = BlendMode.Plus)
+                            drawRect(gradient)
                         }
                     }) {
 
@@ -174,7 +173,7 @@ fun MainBodyUI(contentDataList: ArrayList<MainContentData<*>>) {
 
 // 상단 툴바
 @Composable
-fun MainAppBar(appBarColor: MutableState<Color> = remember { mutableStateOf(Gray10) }){
+fun MainAppBar2(appBarColor: MutableState<Color> = remember { mutableStateOf(Gray10) }){
     val ctx = LocalContext.current
     TopAppBar(title = { },
         actions = {
@@ -507,7 +506,7 @@ fun BottomSheet2(bottomSheetScaffoldState: BottomSheetScaffoldState, coroutineSc
                             resId = R.font.spoqa_hansansneo_regular,
                             weight = FontWeight.W700)),
                         fontSize = 12.sp,
-                    color = Gray70)
+                        color = Gray70)
                 )
                 Text(
                     text = "/3",
@@ -515,8 +514,8 @@ fun BottomSheet2(bottomSheetScaffoldState: BottomSheetScaffoldState, coroutineSc
                         fontFamily = FontFamily(Font(
                             resId = R.font.spoqa_hansansneo_regular,
                             weight = FontWeight.W700)),
-                    fontSize = 12.sp,
-                    color = Gray70)
+                        fontSize = 12.sp,
+                        color = Gray70)
                 )
             }
         }

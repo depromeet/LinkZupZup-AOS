@@ -13,6 +13,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -29,6 +32,8 @@ import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.presenter.model.User
 import com.depromeet.linkzupzup.presenter.MainViewModel
+import com.depromeet.linkzupzup.presenter.model.LinkData
+import com.depromeet.linkzupzup.presenter.model.MainContentData
 import com.depromeet.linkzupzup.presenter.model.TagColor2
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.DLog
@@ -41,18 +46,25 @@ class MainUI: BaseView<MainViewModel>() {
     @Composable
     override fun onCreateViewContent() {
         LinkZupZupTheme {
-            Surface(color = MaterialTheme.colors.background) {
+            Surface(color = Gray10) {
+                vm?.let{ viewModel -> UserUI(vm = viewModel)}
+
+                /*Column(modifier = Modifier.fillMaxWidth()) {
+                    Button(onClick = {
+                        vm?.getUserInfo()
+                    }, modifier = Modifier.fillMaxWidth()) {
+                        Text("로그인하기", textAlign = TextAlign.Center)
+                    }
+                }*/
+
                 Column(modifier = Modifier.fillMaxWidth()) {
-
-//                    vm?.let { viewModel -> UserUI(viewModel) }
-//
-//                    Button(onClick = {
-//                        vm?.getUserInfo()
-//                    }, modifier = Modifier.fillMaxWidth()) {
-//                        Text("클릭", textAlign = TextAlign.Center)
-//                    }
-                    AfterLoginMainUI()
-
+                    val mainContentList : ArrayList<MainContentData<*>> = arrayListOf<MainContentData<*>>().apply{
+                        // 상단 영역
+                        add(MainContentData<Any>(MainContentData.MAIN_TOP_HEADER))
+                        // 링크 스크랩 리스트
+                        addAll(MainContentData.mockMainContentList(5))
+                    }
+                    MainBodyUI2(contentDataList = mainContentList)
                 }
             }
         }
@@ -89,97 +101,85 @@ fun NeedUserLoginUI() {
 
 @ExperimentalMaterialApi
 @Composable
-@Preview
-fun AfterLoginMainUI(){
-
-    val linkList : List<String> = listOf("gg","Gg","Gg","gg")
-
+fun MainBodyUI(contentDataList : ArrayList<MainContentData<*>>){
     // 로그인 성공
+    val coroutineScope = rememberCoroutineScope()
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
     )
-    val coroutineScope = rememberCoroutineScope()
 
 
     BottomSheetScaffold(
+        topBar = { MainAppBar() },
         scaffoldState = bottomSheetScaffoldState,
         sheetContent = { BottomSheet(bottomSheetScaffoldState,coroutineScope) },   // sheetContent -  Column scope
-        sheetShape = RoundedCornerShape(5,5,0,0),
+        sheetShape = RoundedCornerShape(topStartPercent = 5,topEndPercent = 5),
         sheetPeekHeight = 0.dp,
         sheetBackgroundColor = Gray0t,
         sheetGesturesEnabled = false,
-        modifier = Modifier
+        backgroundColor = Color.Transparent,
+        modifier = Modifier.fillMaxSize()){
+
+        Column(modifier = Modifier
             .fillMaxSize()
-    ){
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = Gray10)
-                .padding(15.dp)
-        ) {
-            AppBar()
-            TopHeaderCard("김나경")
-            ReadProgress()
+            .background(color = Color.Transparent)
+            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
 
-            // for gradient overlay
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f)
-                    .padding(0.dp, 15.dp)
-            ){
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(24.dp),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(linkList) { link->
-                        LinkCard()
-                    }
-                }
-                // gradient overlay
-                Spacer(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                        .alpha(1f)
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.Transparent,
-                                    Gray10
-                                )
-                            )
-                        )
-                        .align(Alignment.BottomCenter)
-                )
-            }
-
-
-            Button(
-                onClick = {
-                        DLog.e("MainUI", "click add link button")
-                        coroutineScope.launch {
-                            bottomSheetScaffoldState.bottomSheetState.expand()
-//                        if (bottomSheetScaffoldState.bottomSheetState.isCollapsed)
-//                            bottomSheetScaffoldState.bottomSheetState.expand()
-//                        else
-//                            // 들어올 일 없음
-//                            bottomSheetScaffoldState.bottomSheetState.collapse()
-                        } },
-                colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Blue50, contentColor = Color.White),
-                shape = RoundedCornerShape(4.dp),
+            // 메인 리스트
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(24.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp)) {
+                    .weight(1f)
+                    .padding(bottom = 16.dp)
+                    .drawWithCache {
+                        val gradient = Brush.linearGradient(
+                            colors = listOf(Color.Transparent, Gray10),
+                            start = Offset(0f, size.height - 100.dp.toPx()),
+                            end = Offset(0f, size.height)
+                        )
+                        onDrawWithContent {
+                            drawContent()
+                            drawRect(gradient)
+                        }
+                    }) {
+
+                items(contentDataList) {contentData ->
+                    when(contentData.type){
+
+                        // 상단 영역 ( 환영 문구 + 스크랩 링크 읽은 횟수 )
+                        MainContentData.MAIN_TOP_HEADER -> {
+                            MainHeaderCard(name = "김나경")
+                        }
+
+                        // 스크랩한 링크 아이템
+                        MainContentData.MAIN_LINK_ITEM -> (contentData.data as? LinkData)?.let{ linkData ->
+                            MainLinkCard(linkData = linkData)
+                        }
+
+                        else -> DLog.e("TEST","empty")
+                    }
+                }
+            }
+
+            Button(shape = RoundedCornerShape(4.dp),
+                colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Blue50, contentColor = Color.White),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                onClick = {
+                    coroutineScope.launch {
+                        bottomSheetScaffoldState.bottomSheetState.expand()
+                    }
+                }) {
+
                 Text("링크 줍기",
-                    style = TextStyle(
-                        fontFamily = FontFamily(Font(
-                                resId = R.font.spoqa_hansansneo_bold,
-                                weight = FontWeight.W700)),
-                        fontSize = 14.sp,
-                        lineHeight = 17.5.sp),
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth())
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        lineHeight = 17.5.sp,
+                        fontFamily = FontFamily(Font(
+                            resId = R.font.spoqa_hansansneo_bold,
+                            weight = FontWeight.W700))))
             }
         }
 
@@ -187,7 +187,7 @@ fun AfterLoginMainUI(){
 }
 
 @Composable
-fun AppBar(){
+fun MainAppBar(appBarColor : MutableState<Color> = remember { mutableStateOf(Gray10) }){
     // in ColumnScope
     Row(
         modifier = Modifier
@@ -228,8 +228,8 @@ fun TopHeaderCard(name : String){
             color = Gray100t,
             style = TextStyle(
                 fontFamily = FontFamily(Font(
-                        resId = R.font.spoqa_hansansneo_bold,
-                        weight = FontWeight.W700)),
+                    resId = R.font.spoqa_hansansneo_bold,
+                    weight = FontWeight.W700)),
                 fontSize = 24.sp,
                 lineHeight = 32.4.sp,
                 color = Gray100t)
@@ -264,17 +264,21 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
             .height(580.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(20.dp,20.dp,20.dp,0.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp, 20.dp, 20.dp, 0.dp),
             horizontalArrangement = Arrangement.End
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_close),
                 contentDescription = null,
-                modifier = Modifier.size(24.dp).clickable {
-                    coroutineScope.launch {
-                        bottomSheetScaffoldState.bottomSheetState.collapse()
-                    }
-                })
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable {
+                        coroutineScope.launch {
+                            bottomSheetScaffoldState.bottomSheetState.collapse()
+                        }
+                    })
         }
 
         Text(
@@ -284,16 +288,20 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
                     resId = R.font.spoqa_hansansneo_bold,
                     weight = FontWeight.W700)),
                 fontSize = 24.sp,),
-            modifier = Modifier.fillMaxWidth().padding(20.dp,0.dp))
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp, 0.dp))
 
-        Spacer(modifier = Modifier.height(10.dp).padding(20.dp,0.dp))
+        Spacer(modifier = Modifier
+            .height(10.dp)
+            .padding(20.dp, 0.dp))
 
         TextField(
             value = inputLink.value,
             onValueChange = { inputLink.value = it },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp,0.dp),
+                .padding(20.dp, 0.dp),
             textStyle = TextStyle(
                 fontFamily = FontFamily(Font(
                     resId = R.font.spoqa_hansansneo_regular,
@@ -327,10 +335,14 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
             )
         )
 
-        Spacer(modifier = Modifier.height(20.dp).padding(20.dp,0.dp))
+        Spacer(modifier = Modifier
+            .height(20.dp)
+            .padding(20.dp, 0.dp))
 
         Row(
-            modifier = Modifier.fillMaxWidth().padding(20.dp,0.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp, 0.dp)
         ){
             Text(
                 text = "해시태그를 선택해주세요.",
@@ -352,7 +364,7 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
                             resId = R.font.spoqa_hansansneo_regular,
                             weight = FontWeight.W700)),
                         fontSize = 12.sp,
-                    color = Gray70)
+                        color = Gray70)
                 )
                 Text(
                     text = "/3",
@@ -360,17 +372,21 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
                         fontFamily = FontFamily(Font(
                             resId = R.font.spoqa_hansansneo_regular,
                             weight = FontWeight.W700)),
-                    fontSize = 12.sp,
-                    color = Gray70)
+                        fontSize = 12.sp,
+                        color = Gray70)
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp).padding(20.dp,0.dp))
+        Spacer(modifier = Modifier
+            .height(10.dp)
+            .padding(20.dp, 0.dp))
 
 
         LazyRow(
-            modifier = Modifier.fillMaxWidth().padding(20.dp,0.dp,0.dp,0.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp, 0.dp, 0.dp, 0.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ){
             items(tc1) { tag ->
@@ -378,22 +394,28 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp).padding(20.dp,0.dp))
+        Spacer(modifier = Modifier
+            .height(10.dp)
+            .padding(20.dp, 0.dp))
 
         LazyRow(
-            modifier = Modifier.fillMaxWidth().padding(20.dp,0.dp,0.dp,0.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp, 0.dp, 0.dp, 0.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ){
             items(tc2) { tag ->
                 BottomSheetHashtagCard(tagName = tag.tagName, backColor = tag.bgColor, textColor = tag.textColor)
             }
         }
-        Spacer(modifier = Modifier.height(15.dp).padding(20.dp,0.dp))
+        Spacer(modifier = Modifier
+            .height(15.dp)
+            .padding(20.dp, 0.dp))
 
         Column(modifier = Modifier
             .fillMaxWidth()
             .weight(1f)
-            .padding(20.dp,0.dp)){
+            .padding(20.dp, 0.dp)){
             Text(
                 text = "원하시는 해시태그가 없으신가요?",
                 style = TextStyle(
@@ -474,14 +496,14 @@ fun LinkCard(){
         shape = RoundedCornerShape(0),
         modifier = Modifier.clickable {}
     ) {
-        
+
         Row(modifier = Modifier
             .fillMaxWidth()
             .height(96.dp)) {
             Image(
-               painter = painterResource(id = R.drawable.ic_link_profile_img),
-               contentDescription = null,
-               modifier = Modifier.size(96.dp)
+                painter = painterResource(id = R.drawable.ic_link_profile_img),
+                contentDescription = null,
+                modifier = Modifier.size(96.dp)
             )
             Spacer(modifier = Modifier.width(10.dp))
             Column(
