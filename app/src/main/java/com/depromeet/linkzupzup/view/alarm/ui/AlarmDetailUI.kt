@@ -34,10 +34,12 @@ import com.depromeet.linkzupzup.presenter.model.WeeklyAlarm
 import com.depromeet.linkzupzup.ui.theme.LinkZupZupTheme
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.CustomSwitchCompat
+import com.google.accompanist.pager.ExperimentalPagerApi
 import java.util.*
 
 class AlarmDetailUI: BaseView<AlarmDetailViewModel>() {
 
+    @ExperimentalPagerApi
     @Composable
     override fun onCreateViewContent() {
         LinkZupZupTheme {
@@ -74,6 +76,7 @@ fun AppBar() {
     }
 }
 
+@ExperimentalPagerApi
 @Composable
 fun BodyContent(alarms: ArrayList<WeeklyAlarm>, alarmClickListener: ()->Unit) {
     val alarmList = remember { mutableStateOf(alarms) }
@@ -85,6 +88,25 @@ fun BodyContent(alarms: ArrayList<WeeklyAlarm>, alarmClickListener: ()->Unit) {
 
             TopHeaderCard()
 
+//            CustomTimePicker() { amPm, hour, minute ->
+//                DLog.e("TEST", "amPm: $amPm, hour: $hour, minute: $minute")
+//            }
+//
+//            val toogleValues = arrayListOf("주중", "주말")
+//            CustomToogle(modifier = Modifier.height(28.dp), datas = toogleValues, onChangeListener = {
+//                DLog.e("TEST", toogleValues[it])
+//            })
+//
+//            CustomTextCheckBox(modifier = Modifier.height(20.dp),
+//                text = "공휴일엔 알람 끄기",
+//                enableImg = R.drawable.ic_holiday_on,
+//                disableImg = R.drawable.ic_holiday_off,
+//                enableColor = Color(0xFF4076F6),
+//                disableColor = Color(0xFF878D91),
+//                onChangeListener = {
+//                DLog.e("TEST", if (it) "공휴일 알람 비활성" else "공휴일 알람 활성")
+//            })
+
             LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 modifier = Modifier
@@ -95,7 +117,6 @@ fun BodyContent(alarms: ArrayList<WeeklyAlarm>, alarmClickListener: ()->Unit) {
                     WeeklyAlarmCard(alarmList, index)
                 }
             }
-
             
             Column(modifier = Modifier
                 .fillMaxWidth()
@@ -239,7 +260,7 @@ fun WeeklyAlarmCard(list: MutableState<ArrayList<WeeklyAlarm>>, index: Int) {
                         .height(110.dp)
                         .padding(top = 29.dp, end = 24.dp)) {
 
-                    CustomSwitchCompat(switchCompatInstance = { it.isChecked = enableAlarm.value },
+                    CustomSwitchCompat(instanceCallback = { it.isChecked = enableAlarm.value },
                         checkedOnChangeListener = { view, isChecked ->
                             enableAlarm.value = isChecked
                         })
@@ -251,6 +272,7 @@ fun WeeklyAlarmCard(list: MutableState<ArrayList<WeeklyAlarm>>, index: Int) {
     }
 }
 
+@ExperimentalPagerApi
 @Preview
 @Composable
 fun previewSample() {

@@ -75,6 +75,9 @@ dependencies {
     implementation lib.glide.runtime
     implementation lib.glide.annotation
     implementation lib.tedPermission.runtime
+    implementation lib.recyclerView.runtime
+    implementation lib.insets.runtime
+    implementation lib.pager.runtime
     implementation lib.multidex.runtime
 
     testImplementation 'junit:junit:4.+'

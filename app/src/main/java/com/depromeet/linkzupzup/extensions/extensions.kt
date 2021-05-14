@@ -1,9 +1,16 @@
 package com.depromeet.linkzupzup.extensions
 
+import android.content.Context
+import android.view.View
+import androidx.annotation.DimenRes
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.component.SSLHelper
@@ -17,6 +24,34 @@ import okhttp3.OkHttpClient
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+
+
+//returns dip(dp) dimension value in pixels
+fun Context.dip(value: Int): Int = (value * resources.displayMetrics.density).toInt()
+fun Context.dip(value: Float): Int = (value * resources.displayMetrics.density).toInt()
+//return sp dimension value in pixels
+fun Context.sp(value: Int): Int = (value * resources.displayMetrics.scaledDensity).toInt()
+fun Context.sp(value: Float): Int = (value * resources.displayMetrics.scaledDensity).toInt()
+//converts px value into dip or sp
+fun Context.px2dip(px: Int): Float = px.toFloat() / resources.displayMetrics.density
+fun Context.px2sp(px: Int): Float = px.toFloat() / resources.displayMetrics.scaledDensity
+fun Context.dimen(@DimenRes resource: Int): Int = resources.getDimensionPixelSize(resource)
+
+//the same for the views
+fun View.dip(value: Int): Int = context.dip(value)
+fun View.dip(value: Float): Int = context.dip(value)
+fun View.sp(value: Int): Int = context.sp(value)
+fun View.sp(value: Float): Int = context.sp(value)
+fun View.px2dip(px: Int): Float = context.px2dip(px)
+fun View.px2sp(px: Int): Float = context.px2sp(px)
+fun View.dimen(@DimenRes resource: Int): Int = context.dimen(resource)
+
+inline fun Modifier.noRippleClickable(crossinline onClick: ()->Unit): Modifier = composed {
+    clickable(indication = null,
+    interactionSource = remember { MutableInteractionSource() }) {
+        onClick()
+    }
+}
 
 fun OkHttpClient.Builder.applySSL(): OkHttpClient.Builder = SSLHelper.configureClient(this)
 
