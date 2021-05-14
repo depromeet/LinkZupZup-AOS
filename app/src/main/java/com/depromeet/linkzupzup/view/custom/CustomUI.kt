@@ -229,7 +229,8 @@ fun CustomTimePicker(modifier: Modifier = Modifier
             arrayListOf("오후", "오전").let { amPms ->
                 CustomImgTextPicker(imgs = arrayListOf(R.drawable.ic_sun_img, R.drawable.ic_sun_img),
                     txts = amPms,
-                    spaceSize = 4.dp) { str, idx ->
+                    spaceSize = 4.dp,
+                    modifier = Modifier.fillMaxHeight()) { str, idx ->
                     amPmVal.value = idx
                     onChangeListener.invoke(amPmVal.value, hourVal.value, minuteVal.value)
                 }
