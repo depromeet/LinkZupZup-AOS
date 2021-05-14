@@ -1,12 +1,13 @@
 ext {
-    kotlinVersion = '1.4.30'
-    composeVersion = '1.0.0-beta01'
+    kotlinVersion = '1.4.32'
+    composeVersion = '1.0.0-beta06'
     koinVersion = '2.2.0'
     rxjava2Version = "2.0.1"
     retrofit2Version = "2.1.0"
     retrofit2Rxjava2AdapterVersion = '1.0.0'
     okhttp3Version = '3.4.2'
     recyclerviewVersion = '1.1.0'
+    accompanistVersion = '0.9.1'
     glideVersion = '4.12.0'
     tedPermissionVersion = '2.2.3'
     multidexVersion = "2.0.1"
@@ -20,6 +21,7 @@ def lib = [:]
 def kotlin = [:]
 kotlin.plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
 kotlin.stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+kotlin.extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$kotlinVersion"
 kotlin.test = "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
 lib.kotlin = kotlin
 
@@ -64,6 +66,14 @@ lib.okhttp3 = okhttp3
 def recyclerView = [:]
 recyclerView.runtime = "androidx.recyclerview:recyclerview:$recyclerviewVersion"
 lib.recyclerView = recyclerView
+
+def pager = [:]
+pager.runtime = "com.google.accompanist:accompanist-pager:$accompanistVersion"
+lib.pager = pager
+
+def insets = [:]
+insets.runtime = "com.google.accompanist:accompanist-insets:$accompanistVersion"
+lib.insets = insets
 
 /* Glide */
 def glide = [:]

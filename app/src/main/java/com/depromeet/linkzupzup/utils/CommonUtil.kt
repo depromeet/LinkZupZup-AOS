@@ -25,4 +25,12 @@ object CommonUtil {
         }
     }
 
+    fun lerp(startValue: Float, endValue: Float, fraction: Float): Float {
+        return startValue + fraction * (endValue - startValue)
+    }
+
+    /** Linear interpolation between `startValue` and `endValue` by `fraction`.  */
+    fun lerp(startValue: Int, endValue: Int, fraction: Float): Int {
+        return startValue + Math.round(fraction * (endValue - startValue))
+    }
 }
