@@ -248,25 +248,27 @@ fun MainAppBarBtn(painter: Painter, onClick: ()->Unit) {
 @Composable
 fun MainHeaderCard(name : String, padding: PaddingValues = PaddingValues(0.dp)){
     // in ColumnScope
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(96.dp)
-            .background(Color.Transparent)
-            .padding(padding)) {
+    Column(modifier = Modifier.fillMaxWidth()) {
 
-        Text("${name}님,\n어서오세요. 반갑습니다!",
-            color = Gray100t,
-            style = TextStyle(fontSize = 24.sp,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(96.dp)
+                .background(Color.Transparent)
+                .padding(padding)) {
+
+            Text("${name}님,\n어서오세요. 반갑습니다!",
                 color = Gray100t,
-                lineHeight = 32.4.sp,
-                fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold,
-                    weight = FontWeight.W700))))
+                style = TextStyle(fontSize = 24.sp,
+                    color = Gray100t,
+                    lineHeight = 32.4.sp,
+                    fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold,
+                        weight = FontWeight.W700))))
+        }
 
         // 유저 링크 읽은 횟수
-        ReadProgress(5)
-
+        ReadProgress2(5)
     }
 }
 
@@ -308,6 +310,94 @@ fun ReadProgress(readCnt: Int, padding: PaddingValues = PaddingValues(0.dp)){
         }
     }
 }
+
+@Composable
+fun MainLinkCard(linkData: LinkData){
+
+    val ctx = LocalContext.current
+    val tagList : ArrayList<LinkHashData> = linkData.hashtags
+
+    Card(elevation = 0.dp,
+        shape = RoundedCornerShape(0),
+        backgroundColor = Color.Transparent,
+        modifier = Modifier.clickable {
+            Toast.makeText(ctx, "스크랩 링크 클릭", Toast.LENGTH_SHORT).show()
+        }) {
+
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.Transparent)
+            .height(96.dp)) {
+
+            // 링크 썸네일 이미지
+            Image(painter = painterResource(id = R.drawable.ic_link_profile_img),
+                contentDescription = null,
+                modifier = Modifier.size(96.dp))
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Column(Modifier.fillMaxSize()){
+
+                // 링크 해시태그
+                LazyRow(modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)){
+                    items(tagList) { tag ->
+                        MainHashtagCard(tagName = tag.hashtagName, backColor = tag.tagColor.bgColor, textColor = tag.tagColor.textColor)
+                    }
+                }
+
+                Spacer(Modifier.height(8.dp))
+
+                // 링크 타이틀
+                Text(text="스타트업과 안맞는 대기업 임원 DNA는 어떻게 찾아낼까?",
+                    modifier = Modifier.fillMaxSize().weight(1f),
+                    style = TextStyle(fontSize = 12.sp,
+                        color = Gray100t,
+                        fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700))), maxLines = 2, overflow = TextOverflow.Ellipsis)
+
+                // 작성자
+                Row(Modifier.fillMaxWidth().height(16.dp)) {
+
+                    Image(painter = painterResource(id = R.drawable.ic_link_user_img),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(16.dp)
+                            .clip(CircleShape))
+
+                    Spacer(Modifier.width(4.dp))
+
+                    Text(text="글쓴이",
+                        modifier = Modifier.fillMaxHeight(),
+                        lineHeight = 16.8.sp,
+                        style = TextStyle(fontSize = 12.sp,
+                            color = Gray70,
+                            fontFamily = FontFamily(Font(
+                                resId = R.font.spoqa_hansansneo_light,
+                                weight = FontWeight.W300))), textAlign = TextAlign.Start)
+
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MainHashtagCard(tagName : String, backColor : Color, textColor : Color){
+    Card(elevation = 0.dp,
+        backgroundColor = backColor,
+        modifier = Modifier.height(20.dp)) {
+
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(horizontal = 6.dp)){
+            Text(text = "#$tagName",
+                style = TextStyle(
+                    fontSize = 10.sp,
+                    color = textColor,
+                    fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_light, weight = FontWeight.W300))))
+        }
+    }
+}
+
+
 
 @ExperimentalMaterialApi
 @Composable
@@ -525,93 +615,6 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
     }
 }
 
-
-
-@Composable
-fun MainLinkCard(linkData: LinkData){
-
-    val ctx = LocalContext.current
-    val tagList : ArrayList<LinkHashData> = linkData.hashtags
-
-    Card(elevation = 0.dp,
-        shape = RoundedCornerShape(0),
-        backgroundColor = Color.Transparent,
-        modifier = Modifier.clickable {
-            Toast.makeText(ctx, "스크랩 링크 클릭", Toast.LENGTH_SHORT).show()
-        }) {
-
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.Transparent)
-            .height(96.dp)) {
-
-            // 링크 썸네일 이미지
-            Image(painter = painterResource(id = R.drawable.ic_link_profile_img),
-                contentDescription = null,
-                modifier = Modifier.size(96.dp))
-
-            Spacer(modifier = Modifier.width(10.dp))
-
-            Column(Modifier.fillMaxSize()){
-
-                // 링크 해시태그
-                LazyRow(modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)){
-                    items(tagList) { tag ->
-                        MainHashtagCard(tagName = tag.hashtagName, backColor = tag.tagColor.bgColor, textColor = tag.tagColor.textColor)
-                    }
-                }
-
-                Spacer(Modifier.height(8.dp))
-
-                // 링크 타이틀
-                Text(text="스타트업과 안맞는 대기업 임원 DNA는 어떻게 찾아낼까?",
-                    modifier = Modifier.fillMaxSize().weight(1f),
-                    style = TextStyle(fontSize = 12.sp,
-                        color = Gray100t,
-                        fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700))), maxLines = 2, overflow = TextOverflow.Ellipsis)
-
-                // 작성자
-                Row(Modifier.fillMaxWidth().height(16.dp)) {
-
-                    Image(painter = painterResource(id = R.drawable.ic_link_user_img),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(16.dp)
-                            .clip(CircleShape))
-
-                    Spacer(Modifier.width(4.dp))
-
-                    Text(text="글쓴이",
-                        modifier = Modifier.fillMaxHeight(),
-                        lineHeight = 16.8.sp,
-                        style = TextStyle(fontSize = 12.sp,
-                            color = Gray70,
-                            fontFamily = FontFamily(Font(
-                                resId = R.font.spoqa_hansansneo_light,
-                                weight = FontWeight.W300))), textAlign = TextAlign.Start)
-
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun MainHashtagCard(tagName : String, backColor : Color, textColor : Color){
-    Card(elevation = 0.dp,
-        backgroundColor = backColor,
-        modifier = Modifier.height(20.dp)) {
-
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(horizontal = 6.dp)){
-            Text(text = "#$tagName",
-                style = TextStyle(
-                    fontSize = 10.sp,
-                    color = textColor,
-                    fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_light, weight = FontWeight.W300))))
-        }
-    }
-}
 
 
 @Composable
