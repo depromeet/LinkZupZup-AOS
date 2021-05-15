@@ -204,7 +204,7 @@ fun MainAppBar2(appBarColor: MutableState<Color> = remember { mutableStateOf(Gra
 
 // 상단 툴바 버튼
 @Composable
-fun MainAppBarBtn(painter: Painter, onClick: ()->Unit) {
+fun MainAppBarBtn2(painter: Painter, onClick: ()->Unit) {
     Card(elevation = 0.dp,
         shape = RoundedCornerShape(0),
         backgroundColor = Color.Transparent,
@@ -227,7 +227,7 @@ fun MainAppBarBtn(painter: Painter, onClick: ()->Unit) {
 }
 
 @Composable
-fun MainHeaderCard(name : String, padding: PaddingValues = PaddingValues(0.dp)){
+fun MainHeaderCard2(name : String, padding: PaddingValues = PaddingValues(0.dp)){
     // in ColumnScope
     Column(modifier = Modifier.fillMaxWidth()) {
 
@@ -294,7 +294,7 @@ fun ReadProgress2(readCnt: Int, padding: PaddingValues = PaddingValues(0.dp)){
 }
 
 @Composable
-fun MainLinkCard(linkData: LinkData){
+fun MainLinkCard2(linkData: LinkData){
 
     val ctx = LocalContext.current
     val tagList : ArrayList<LinkHashData> = linkData.hashtags
@@ -365,7 +365,7 @@ fun MainLinkCard(linkData: LinkData){
 
 
 @Composable
-fun MainHashtagCard(tagName : String, backColor : Color, textColor : Color){
+fun MainHashtagCard2(tagName : String, backColor : Color, textColor : Color){
     Card(elevation = 0.dp,
         backgroundColor = backColor,
         modifier = Modifier.height(20.dp)) {

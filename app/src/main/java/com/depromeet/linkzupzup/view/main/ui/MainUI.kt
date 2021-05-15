@@ -1,5 +1,6 @@
 package com.depromeet.linkzupzup.view.main.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -7,17 +8,21 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -25,16 +30,14 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
-import com.depromeet.linkzupzup.presenter.model.User
 import com.depromeet.linkzupzup.presenter.MainViewModel
-import com.depromeet.linkzupzup.presenter.model.LinkData
-import com.depromeet.linkzupzup.presenter.model.MainContentData
-import com.depromeet.linkzupzup.presenter.model.TagColor2
+import com.depromeet.linkzupzup.presenter.model.*
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.DLog
 import kotlinx.coroutines.CoroutineScope
@@ -188,53 +191,121 @@ fun MainBodyUI(contentDataList : ArrayList<MainContentData<*>>){
 
 @Composable
 fun MainAppBar(appBarColor : MutableState<Color> = remember { mutableStateOf(Gray10) }){
+    val ctx = LocalContext.current
     // in ColumnScope
-    Row(
+    
+    TopAppBar(title = {},
+        actions = {
+
+            // 알람
+            MainAppBarBtn(painterResource(id = R.drawable.ic_alram)) {
+                Toast.makeText(ctx, "알람", Toast.LENGTH_SHORT).show()
+            }
+
+            // 랭킹
+            MainAppBarBtn(painterResource(id = R.drawable.ic_ranking)) {
+                Toast.makeText(ctx, "랭킹", Toast.LENGTH_SHORT).show()
+            }
+
+            // 마이페이지
+            MainAppBarBtn(painterResource(id = R.drawable.ic_mypage)) {
+                Toast.makeText(ctx, "마이페이지", Toast.LENGTH_SHORT).show()
+            }
+            
+        },
+        backgroundColor = appBarColor.value,
+        elevation = 0.dp,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp, 0.dp),
-        horizontalArrangement = Arrangement.End
-    ){
-        Image(
-            painter = painterResource(id = R.drawable.ic_alram),
-            contentDescription = null,
-            Modifier.size(24.dp)
-        )
-        Spacer(modifier = Modifier.width(15.dp))
-        Image(
-            painter = painterResource(id = R.drawable.ic_ranking),
-            contentDescription = null,
-            Modifier.size(24.dp)
-        )
-        Spacer(modifier = Modifier.width(15.dp))
-        Image(
-            painter = painterResource(id = R.drawable.ic_mypage),
-            contentDescription = null,
-            Modifier.size(24.dp)
-        )
+            .height(52.dp))
+}
+
+// 상단 툴바 버튼
+@Composable
+fun MainAppBarBtn(painter: Painter, onClick: ()->Unit) {
+    Card(elevation = 0.dp,
+        shape = RoundedCornerShape(0),
+        backgroundColor = Color.Transparent,
+        modifier = Modifier
+            .wrapContentSize()
+            .clickable(onClick = onClick)) {
+
+        Row(verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .size(40.dp)) {
+
+            Image(
+                painter = painter,
+                contentDescription = null,
+                Modifier.size(24.dp)
+            )
+        }
     }
 }
 
+
 @Composable
-fun TopHeaderCard(name : String){
+fun MainHeaderCard(name : String, padding: PaddingValues = PaddingValues(0.dp)){
     // in ColumnScope
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .height(96.dp)) {
+            .height(96.dp)
+            .background(Color.Transparent)
+            .padding(padding)) {
 
         Text("${name}님,\n어서오세요. 반갑습니다!",
             color = Gray100t,
-            style = TextStyle(
-                fontFamily = FontFamily(Font(
-                    resId = R.font.spoqa_hansansneo_bold,
-                    weight = FontWeight.W700)),
-                fontSize = 24.sp,
+            style = TextStyle(fontSize = 24.sp,
+                color = Gray100t,
                 lineHeight = 32.4.sp,
-                color = Gray100t)
-        )
+                fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold,
+                    weight = FontWeight.W700))))
 
+        // 유저 링크 읽은 횟수
+        ReadProgress(5)
+
+    }
+}
+
+@Composable
+fun ReadProgress(readCnt: Int, padding: PaddingValues = PaddingValues(0.dp)){
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(padding)) {
+
+        Card(elevation = 0.dp,
+            backgroundColor = Gray0t,
+            shape = RoundedCornerShape(10),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { }) {
+
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)) {
+
+                Text(text = "오늘 ${readCnt}개만 읽어도 뿌듯! \uD83D\uDC4D\uD83D\uDC4D",
+                    lineHeight = 17.5.sp,
+                    style = TextStyle(fontSize = 12.sp,
+                        color = Gray100t,
+                        fontFamily = FontFamily(
+                            Font(resId = R.font.spoqa_hansansneo_regular, weight = FontWeight.W300))))
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                LinearProgressIndicator(
+                    progress = 0.7f,
+                    backgroundColor = Gray20,
+                    color = Blue50,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(16.dp))
+            }
+
+        }
     }
 }
 
@@ -454,130 +525,94 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
     }
 }
 
-@Composable
-fun ReadProgress(){
-    // in ColumnScope
-    Column(
-        modifier = Modifier
-            .background(
-                color = Gray0t,
-                shape = RoundedCornerShape(10)
-            )
-            .fillMaxWidth()
-            .padding(15.dp)
-    ) {
-        Text(
-            text = "오늘 5개만 읽어도 뿌듯! \uD83D\uDC4D\uD83D\uDC4D",
-            style = TextStyle(
-                fontFamily = FontFamily(Font(
-                    resId = R.font.spoqa_hansansneo_regular,
-                    weight = FontWeight.W300)),
-                fontSize = 12.sp,
-                color = Gray100t)
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-        LinearProgressIndicator(
-            progress = 0.7f,
-            modifier = Modifier
-                .fillMaxWidth(),
-            color = Blue50,
-            backgroundColor = Gray20,
-        )
-    }
-}
 
-@Preview
+
 @Composable
-fun LinkCard(){
-    val tagList : List<String> = listOf("gg","gg","gg")
-    Card(
-        backgroundColor = Color.Transparent,
-        elevation = 0.dp,
+fun MainLinkCard(linkData: LinkData){
+
+    val ctx = LocalContext.current
+    val tagList : ArrayList<LinkHashData> = linkData.hashtags
+
+    Card(elevation = 0.dp,
         shape = RoundedCornerShape(0),
-        modifier = Modifier.clickable {}
-    ) {
+        backgroundColor = Color.Transparent,
+        modifier = Modifier.clickable {
+            Toast.makeText(ctx, "스크랩 링크 클릭", Toast.LENGTH_SHORT).show()
+        }) {
 
         Row(modifier = Modifier
             .fillMaxWidth()
+            .background(Color.Transparent)
             .height(96.dp)) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_link_profile_img),
+
+            // 링크 썸네일 이미지
+            Image(painter = painterResource(id = R.drawable.ic_link_profile_img),
                 contentDescription = null,
-                modifier = Modifier.size(96.dp)
-            )
+                modifier = Modifier.size(96.dp))
+
             Spacer(modifier = Modifier.width(10.dp))
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ){
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(5.dp)
-                ){
+
+            Column(Modifier.fillMaxSize()){
+
+                // 링크 해시태그
+                LazyRow(modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)){
                     items(tagList) { tag ->
-                        HashtagCard(tagName = "디자인", backColor = TagBgColor01, textColor = TagTextColor01)
+                        MainHashtagCard(tagName = tag.hashtagName, backColor = tag.tagColor.bgColor, textColor = tag.tagColor.textColor)
                     }
                 }
 
-                Text(
-                    text="스타트업과 안맞는 대기업 임원 DNA는 어떻게 찾아낼까?",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f),
-                    style = TextStyle(
-                        fontFamily = FontFamily(Font(
-                            resId = R.font.spoqa_hansansneo_bold,
-                            weight = FontWeight.W700)),
-                        fontSize = 12.sp,
-                        color = Gray100t))
+                Spacer(Modifier.height(8.dp))
 
-                Row{
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_link_user_img),
+                // 링크 타이틀
+                Text(text="스타트업과 안맞는 대기업 임원 DNA는 어떻게 찾아낼까?",
+                    modifier = Modifier.fillMaxSize().weight(1f),
+                    style = TextStyle(fontSize = 12.sp,
+                        color = Gray100t,
+                        fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700))), maxLines = 2, overflow = TextOverflow.Ellipsis)
+
+                // 작성자
+                Row(Modifier.fillMaxWidth().height(16.dp)) {
+
+                    Image(painter = painterResource(id = R.drawable.ic_link_user_img),
                         contentDescription = null,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier=Modifier.size(10.dp))
-                    Text(
-                        text="글쓴이",
-                        style = TextStyle(
+                        modifier = Modifier
+                            .size(16.dp)
+                            .clip(CircleShape))
+
+                    Spacer(Modifier.width(4.dp))
+
+                    Text(text="글쓴이",
+                        modifier = Modifier.fillMaxHeight(),
+                        lineHeight = 16.8.sp,
+                        style = TextStyle(fontSize = 12.sp,
+                            color = Gray70,
                             fontFamily = FontFamily(Font(
                                 resId = R.font.spoqa_hansansneo_light,
-                                weight = FontWeight.W300)),
-                            fontSize = 12.sp,
-                            color = Gray70)
-                    )
+                                weight = FontWeight.W300))), textAlign = TextAlign.Start)
+
                 }
             }
         }
     }
 }
 
-
 @Composable
-fun HashtagCard(tagName : String, backColor : Color, textColor : Color){
-    Card(
-        modifier = Modifier
-            .height(20.dp),
-        elevation = 0.dp,
-        backgroundColor = backColor
-    ){
-        Box(
-            contentAlignment = Alignment.Center
-        ){
-            Text(
-                text = "#$tagName",
-                style = TextStyle(
-                    fontFamily = FontFamily(Font(
-                        resId = R.font.spoqa_hansansneo_light,
-                        weight = FontWeight.W300)),
-                    fontSize = 10.sp,
-                    color = textColor),
-                modifier = Modifier.padding(5.dp,0.dp)
-            )
-        }
+fun MainHashtagCard(tagName : String, backColor : Color, textColor : Color){
+    Card(elevation = 0.dp,
+        backgroundColor = backColor,
+        modifier = Modifier.height(20.dp)) {
 
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(horizontal = 6.dp)){
+            Text(text = "#$tagName",
+                style = TextStyle(
+                    fontSize = 10.sp,
+                    color = textColor,
+                    fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_light, weight = FontWeight.W300))))
+        }
     }
 }
+
 
 @Composable
 fun BottomSheetHashtagCard(tagName : String, backColor : Color, textColor : Color){
