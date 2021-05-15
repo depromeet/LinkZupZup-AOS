@@ -67,7 +67,7 @@ class MainUI: BaseView<MainViewModel>() {
                         // 링크 스크랩 리스트
                         addAll(MainContentData.mockMainContentList(5))
                     }
-                    MainBodyUI2(contentDataList = mainContentList)
+                    MainBodyUI(contentDataList = mainContentList)
                 }
             }
         }
@@ -424,14 +424,14 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
 
     // in Column Scope
     Column(modifier = Modifier
-            .fillMaxSize()
-            .offset(y = 52.dp)
-            .padding(20.dp)) {
+            .fillMaxWidth()
+            .height(580.dp)
+            .padding(start = 23.dp, end = 23.dp, bottom= 23.dp)) {
+
         // 닫기 버튼
         Row(horizontalArrangement = Arrangement.End,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom=16.dp)) {
+                .fillMaxWidth()) {
 
             BottomSheetCloseBtn(painterResource(id = R.drawable.ic_close)){
                 coroutineScope.launch {
@@ -439,16 +439,25 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
                 } }
         }
 
-        BottomHeaderCard()
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f),
+            verticalArrangement = Arrangement.spacedBy(10.dp)){
 
-        /* Text field */
-        BottomSheetLinkInput()
+            /* title */
+            BottomHeaderCard()
 
-        /* 해시태그 선택 */
-        BottomSheetSelect()
+            /* Text field */
+            BottomSheetLinkInput()
 
-        /* 커스텀 태그 입력 화면 */
-        ButtomSheetInputTag()
+            /* 해시태그 선택 */
+            BottomSheetSelect()
+
+            /* 커스텀 태그 입력 화면 */
+            ButtomSheetInputTag()
+        }
+
+
 
         /* 하단 저장하기 버튼 */
         Button(shape = RoundedCornerShape(4.dp),
@@ -601,29 +610,21 @@ fun BottomSheetSelect(){
         }
     }
 
-    Spacer(modifier = Modifier.height(10.dp))
-
     LazyRow(modifier = Modifier
-            .fillMaxWidth()
-            .padding(20.dp, 0.dp, 0.dp, 0.dp),
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(10.dp)){
         items(tc1) { tag ->
             BottomSheetHashtagCard(tagName = tag.tagName, backColor = tag.bgColor, textColor = tag.textColor)
         }
     }
 
-    Spacer(modifier = Modifier.height(10.dp))
-
     LazyRow(modifier = Modifier
-            .fillMaxWidth()
-            .padding(20.dp, 0.dp, 0.dp, 0.dp),
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(10.dp)){
         items(tc2) { tag ->
             BottomSheetHashtagCard(tagName = tag.tagName, backColor = tag.bgColor, textColor = tag.textColor)
         }
     }
-
-    Spacer(modifier = Modifier.height(15.dp))
 }
 
 @Composable
@@ -634,7 +635,6 @@ fun ButtomSheetInputTag(){
         Text(
             text = beforeClickStr,
             modifier = Modifier
-                .fillMaxWidth()
                 .clickable(onClick = { }),
             style = TextStyle(
                 fontSize = 12.sp,
@@ -646,22 +646,38 @@ fun ButtomSheetInputTag(){
 }
 
 @Composable
-fun BottomSheetHashtagCard(tagName : String, backColor : Color, textColor : Color){
+fun BottomSheetHashtagCard(tagName : String, backColor : Color, textColor : Color, isSelected : Boolean = false){
+    val ctx = LocalContext.current
     Card(
         modifier = Modifier.height(32.dp),
         elevation = 0.dp,
         backgroundColor = backColor){
 
         Box(contentAlignment = Alignment.Center){
-            Text(
-                text = "#$tagName",
-                modifier = Modifier.padding(8.dp,0.dp),
-                style = TextStyle(
-                    fontSize = 12.sp,
-                    color = textColor,
-                    fontFamily = FontFamily(Font(
-                        resId = R.font.spoqa_hansansneo_regular,
-                        weight = FontWeight.W300))))
+
+            Row(modifier = Modifier.padding(8.dp,0.dp),
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            verticalAlignment = Alignment.CenterVertically){
+
+                Text(
+                    text = "#$tagName",
+                    style = TextStyle(
+                        fontSize = 12.sp,
+                        color = textColor,
+                        fontFamily = FontFamily(Font(
+                            resId = R.font.spoqa_hansansneo_regular,
+                            weight = FontWeight.W300))))
+
+                // 선택된 해시태그는 닫기버튼 필요 -> 현재 클릭 영역이 너무 작음
+                if(isSelected){
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_close),
+                        contentDescription = null,
+                        modifier = Modifier.size(12.dp)
+                            .clickable(onClick = { Toast.makeText(ctx,"삭제버튼 클릭", Toast.LENGTH_SHORT).show()}))
+                }
+            }
+
         }
     }
 }

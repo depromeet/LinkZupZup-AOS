@@ -62,7 +62,7 @@ class MainUI2: BaseView<MainViewModel>() {
                         addAll(MainContentData.mockMainContentList(5))
                     }
 
-                    MainBodyUI(mainContentList)
+                    MainBodyUI2(mainContentList)
                 }
             }
         }
