@@ -75,6 +75,19 @@ class MainUI: BaseView<MainViewModel>() {
 
 }
 
+@ExperimentalMaterialApi
+@Preview
+@Composable
+fun MainPreview() {
+    val mainContentList : ArrayList<MainContentData<*>> = arrayListOf<MainContentData<*>>().apply {
+        // 상단 영역
+        add(MainContentData<Any>(MainContentData.MAIN_TOP_HEADER))
+        // 스크랩 링크 리스트
+        addAll(MainContentData.mockMainContentList(5))
+    }
+    MainBodyUI(mainContentList)
+}
+
 @Composable
 fun UserUI(vm: MainViewModel) {
     val userInfo: MutableState<User?> = remember { mutableStateOf(null)}
@@ -102,6 +115,7 @@ fun NeedUserLoginUI() {
         .height(60.dp))
 }
 
+/* MainUI */
 @ExperimentalMaterialApi
 @Composable
 fun MainBodyUI(contentDataList : ArrayList<MainContentData<*>>){
@@ -172,8 +186,7 @@ fun MainBodyUI(contentDataList : ArrayList<MainContentData<*>>){
                 onClick = {
                     coroutineScope.launch {
                         bottomSheetScaffoldState.bottomSheetState.expand()
-                    }
-                }) {
+                    } }) {
 
                 Text("링크 줍기",
                     textAlign = TextAlign.Center,
@@ -268,7 +281,7 @@ fun MainHeaderCard(name : String, padding: PaddingValues = PaddingValues(0.dp)){
         }
 
         // 유저 링크 읽은 횟수
-        ReadProgress2(5)
+        ReadProgress(5)
     }
 }
 
@@ -350,13 +363,18 @@ fun MainLinkCard(linkData: LinkData){
 
                 // 링크 타이틀
                 Text(text="스타트업과 안맞는 대기업 임원 DNA는 어떻게 찾아낼까?",
-                    modifier = Modifier.fillMaxSize().weight(1f),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f),
                     style = TextStyle(fontSize = 12.sp,
                         color = Gray100t,
                         fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700))), maxLines = 2, overflow = TextOverflow.Ellipsis)
 
                 // 작성자
-                Row(Modifier.fillMaxWidth().height(16.dp)) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(16.dp)) {
 
                     Image(painter = painterResource(id = R.drawable.ic_link_user_img),
                         contentDescription = null,
@@ -399,10 +417,146 @@ fun MainHashtagCard(tagName : String, backColor : Color, textColor : Color){
 
 
 
+/* BottomSheet */
 @ExperimentalMaterialApi
 @Composable
 fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineScope : CoroutineScope){
+
+    // in Column Scope
+    Column(modifier = Modifier
+            .fillMaxSize()
+            .offset(y = 52.dp)
+            .padding(20.dp)) {
+        // 닫기 버튼
+        Row(horizontalArrangement = Arrangement.End,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom=16.dp)) {
+
+            BottomSheetCloseBtn(painterResource(id = R.drawable.ic_close)){
+                coroutineScope.launch {
+                    bottomSheetScaffoldState.bottomSheetState.collapse()
+                } }
+        }
+
+        BottomHeaderCard()
+
+        /* Text field */
+        BottomSheetLinkInput()
+
+        /* 해시태그 선택 */
+        BottomSheetSelect()
+
+        /* 커스텀 태그 입력 화면 */
+        ButtomSheetInputTag()
+
+        /* 하단 저장하기 버튼 */
+        Button(shape = RoundedCornerShape(4.dp),
+            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Gray50t, contentColor = Gray70),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            onClick = { DLog.e("MainUI", "BottomSheet/click save link button") }) {
+
+            Text("저장하기",
+                textAlign = TextAlign.Center,
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    lineHeight = 17.5.sp,
+                    fontFamily = FontFamily(Font(
+                        resId = R.font.spoqa_hansansneo_bold,
+                        weight = FontWeight.W700))))
+        }
+
+    }
+}
+
+@Composable
+fun BottomSheetCloseBtn(painter: Painter, onClick: ()->Unit){
+    Card(elevation = 0.dp,
+        shape = RoundedCornerShape(0),
+        backgroundColor = Color.Transparent,
+        modifier = Modifier
+            .wrapContentSize()
+            .clickable(onClick = onClick)) {
+
+        Row(verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .size(44.dp)) {
+
+            Image(
+                painter = painter,
+                contentDescription = null,
+                Modifier.size(24.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun BottomHeaderCard(padding: PaddingValues = PaddingValues(0.dp)){
+    // in ColumnScope
+    Column(modifier = Modifier.fillMaxWidth()) {
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(96.dp)
+                .background(Color.Transparent)
+                .padding(padding)) {
+
+            Text(
+                text = "읽고 싶은 링크를\n추가해주세요!",
+                color = Gray100t,
+                style = TextStyle(fontSize = 24.sp,
+                    color = Gray100t,
+                    lineHeight = 32.4.sp,
+                    fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold,
+                        weight = FontWeight.W700))))
+        }
+    }
+}
+
+@Composable
+fun BottomSheetLinkInput(){
     val inputLink = remember { mutableStateOf(TextFieldValue()) }
+
+    TextField(
+        value = inputLink.value,
+        onValueChange = { inputLink.value = it },
+        modifier = Modifier.fillMaxWidth(),
+        textStyle = TextStyle(
+            fontSize = 12.sp,
+            color = Gray100t,
+            fontFamily = FontFamily(Font(
+                resId = R.font.spoqa_hansansneo_regular,
+                weight = FontWeight.W500))),
+        placeholder = {
+            Text(text = "링크주소를 여기에 붙여넣기 해주세요.",
+                lineHeight = 17.5.sp,
+                style = TextStyle(
+                    fontSize = 12.sp,
+                    color = Gray70),
+                fontFamily = FontFamily(Font(
+                    resId = R.font.spoqa_hansansneo_regular,
+                    weight = FontWeight.W500))) },
+        leadingIcon = {
+            Text(text = "\uD83D\uDC49",
+                style = TextStyle(
+                    fontSize = 12.sp,
+                    fontFamily = FontFamily(Font(
+                        resId = R.font.spoqa_hansansneo_regular,
+                        weight = FontWeight.W500)))) },
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = Gray20,
+            textColor = Gray100t))
+}
+
+@Composable
+fun BottomSheetSelect(){
+
     val inputTag = remember { mutableStateOf(TextFieldValue()) }
     val tc1 : List<TagColor2> = listOf(
         TagColor2("디자인",TagBgColor01, TagTextColor01),
@@ -418,246 +572,96 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
         TagColor2("스타트업",TagBgColor02, TagTextColor02),
         TagColor2("ios",TagBgColor04, TagTextColor04))
 
-    // in Column Scope
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(580.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp, 20.dp, 20.dp, 0.dp),
-            horizontalArrangement = Arrangement.End
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_close),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable {
-                        coroutineScope.launch {
-                            bottomSheetScaffoldState.bottomSheetState.collapse()
-                        }
-                    })
-        }
-
-        Text(
-            text = "읽고 싶은 링크를\n추가해주세요!",
+    Row(modifier = Modifier
+        .fillMaxWidth()){
+        Text(text = "해시태그를 선택해주세요.",
+            modifier = Modifier.weight(1f),
             style = TextStyle(
+                fontSize = 14.sp,
                 fontFamily = FontFamily(Font(
                     resId = R.font.spoqa_hansansneo_bold,
-                    weight = FontWeight.W700)),
-                fontSize = 24.sp,),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp, 0.dp))
+                    weight = FontWeight.W700))))
 
-        Spacer(modifier = Modifier
-            .height(10.dp)
-            .padding(20.dp, 0.dp))
-
-        TextField(
-            value = inputLink.value,
-            onValueChange = { inputLink.value = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp, 0.dp),
-            textStyle = TextStyle(
-                fontFamily = FontFamily(Font(
-                    resId = R.font.spoqa_hansansneo_regular,
-                    weight = FontWeight.W500)),
-                fontSize = 12.sp,
-                color = Gray100t),
-            placeholder = {
-                Text(
-                    text = "링크주소를 여기에 붙여넣기 해주세요.",
-                    style = TextStyle(
-                        fontFamily = FontFamily(Font(
-                            resId = R.font.spoqa_hansansneo_regular,
-                            weight = FontWeight.W500)),
-                        fontSize = 12.sp,
-                        color = Gray70),
-                    lineHeight = 17.5.sp
-                ) },
-
-
-            leadingIcon = {
-                Text(
-                    text = "\uD83D\uDC49",
-                    style = TextStyle(
-                        fontFamily = FontFamily(Font(
-                            resId = R.font.spoqa_hansansneo_regular,
-                            weight = FontWeight.W500)),
-                        fontSize = 12.sp)) },
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Gray20,
-                textColor = Gray100t
-            )
-        )
-
-        Spacer(modifier = Modifier
-            .height(20.dp)
-            .padding(20.dp, 0.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp, 0.dp)
-        ){
-            Text(
-                text = "해시태그를 선택해주세요.",
+        Row(horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically){
+            Text(text = "0",
                 style = TextStyle(
-                    fontFamily = FontFamily(Font(
-                        resId = R.font.spoqa_hansansneo_bold,
-                        weight = FontWeight.W700)),
-                    fontSize = 14.sp,),
-                modifier = Modifier.weight(1f))
-
-            Row(
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Text(
-                    text = "0",
-                    style = TextStyle(
-                        fontFamily = FontFamily(Font(
-                            resId = R.font.spoqa_hansansneo_regular,
-                            weight = FontWeight.W700)),
-                        fontSize = 12.sp,
-                        color = Gray70)
-                )
-                Text(
-                    text = "/3",
-                    style = TextStyle(
-                        fontFamily = FontFamily(Font(
-                            resId = R.font.spoqa_hansansneo_regular,
-                            weight = FontWeight.W700)),
-                        fontSize = 12.sp,
-                        color = Gray70)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier
-            .height(10.dp)
-            .padding(20.dp, 0.dp))
-
-
-        LazyRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp, 0.dp, 0.dp, 0.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ){
-            items(tc1) { tag ->
-                BottomSheetHashtagCard(tagName = tag.tagName, backColor = tag.bgColor, textColor = tag.textColor)
-            }
-        }
-
-        Spacer(modifier = Modifier
-            .height(10.dp)
-            .padding(20.dp, 0.dp))
-
-        LazyRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp, 0.dp, 0.dp, 0.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ){
-            items(tc2) { tag ->
-                BottomSheetHashtagCard(tagName = tag.tagName, backColor = tag.bgColor, textColor = tag.textColor)
-            }
-        }
-        Spacer(modifier = Modifier
-            .height(15.dp)
-            .padding(20.dp, 0.dp))
-
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f)
-            .padding(20.dp, 0.dp)){
-            Text(
-                text = "원하시는 해시태그가 없으신가요?",
-                style = TextStyle(
+                    fontSize = 12.sp,
+                    color = Gray70,
                     fontFamily = FontFamily(Font(
                         resId = R.font.spoqa_hansansneo_regular,
-                        weight = FontWeight.W700)),
+                        weight = FontWeight.W700))))
+            Text(text = "/3",
+                style = TextStyle(
                     fontSize = 12.sp,
-                    color = Gray70),
-                modifier = Modifier.fillMaxWidth()
-            )
+                    color = Gray70,
+                    fontFamily = FontFamily(Font(
+                        resId = R.font.spoqa_hansansneo_regular,
+                        weight = FontWeight.W700))))
         }
-
-        Row(
-            modifier = Modifier.padding(20.dp)
-        ){
-            Button(
-                onClick = {
-                    DLog.e("MainUI", "BottomSheet/click save link button") },
-                colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Gray50t, contentColor = Gray70),
-                shape = RoundedCornerShape(4.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp)) {
-                Text("저장하기",
-                    style = TextStyle(
-                        fontFamily = FontFamily(Font(
-                            resId = R.font.spoqa_hansansneo_bold,
-                            weight = FontWeight.W700)),
-                        fontSize = 14.sp,
-                        lineHeight = 17.5.sp),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth())
-            }
-        }
-
     }
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    LazyRow(modifier = Modifier
+            .fillMaxWidth()
+            .padding(20.dp, 0.dp, 0.dp, 0.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)){
+        items(tc1) { tag ->
+            BottomSheetHashtagCard(tagName = tag.tagName, backColor = tag.bgColor, textColor = tag.textColor)
+        }
+    }
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    LazyRow(modifier = Modifier
+            .fillMaxWidth()
+            .padding(20.dp, 0.dp, 0.dp, 0.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)){
+        items(tc2) { tag ->
+            BottomSheetHashtagCard(tagName = tag.tagName, backColor = tag.bgColor, textColor = tag.textColor)
+        }
+    }
+
+    Spacer(modifier = Modifier.height(15.dp))
 }
 
-
+@Composable
+fun ButtomSheetInputTag(){
+    val beforeClickStr : String = "원하시는 해시태그가 없으신가요?"
+    val afterClickStr : String = "원하는 해시태그가 없다면 적어주세요!"
+    Column(modifier = Modifier.fillMaxWidth()){
+        Text(
+            text = beforeClickStr,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = { }),
+            style = TextStyle(
+                fontSize = 12.sp,
+                color = Gray70,
+                fontFamily = FontFamily(Font(
+                    resId = R.font.spoqa_hansansneo_regular,
+                    weight = FontWeight.W700))))
+    }
+}
 
 @Composable
 fun BottomSheetHashtagCard(tagName : String, backColor : Color, textColor : Color){
     Card(
-        modifier = Modifier
-            .height(32.dp),
+        modifier = Modifier.height(32.dp),
         elevation = 0.dp,
-        backgroundColor = backColor
-    ){
-        Box(
-            contentAlignment = Alignment.Center
-        ){
+        backgroundColor = backColor){
+
+        Box(contentAlignment = Alignment.Center){
             Text(
                 text = "#$tagName",
+                modifier = Modifier.padding(8.dp,0.dp),
                 style = TextStyle(
+                    fontSize = 12.sp,
+                    color = textColor,
                     fontFamily = FontFamily(Font(
                         resId = R.font.spoqa_hansansneo_regular,
-                        weight = FontWeight.W300)),
-                    fontSize = 12.sp,
-                    color = textColor),
-                modifier = Modifier.padding(8.dp,0.dp)
-            )
-        }
-
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-
-    /**
-     * 참고 : Preview하려는 Composable은 ViewModel을 참조할 수 없습니다.
-     */
-    LinkZupZupTheme {
-        Surface(color = MaterialTheme.colors.background) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                val isLoginState = true
-                val user = User("Jackson", 31)
-                if (isLoginState) UserLoginStateUI(user)
-                else NeedUserLoginUI()
-            }
+                        weight = FontWeight.W300))))
         }
     }
 }

@@ -41,6 +41,6 @@ val Gray80 = Color(0xff4D5256)
 val Gray90 = Color(0xff363A3C)
 val Gray100t = Color(0xff292A2B)
 
-val Blue50 = Color(0xff2C5AE9)
+val Blue50 = Color(0xff4076f6)
 val Blue60 = Color(0xff315BDD)
 val Blue20 = Color(0xffEAF1FE)
