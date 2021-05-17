@@ -8,17 +8,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
@@ -34,8 +33,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.MutableLiveData
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
+import com.depromeet.linkzupzup.dataSources.repositories.UserRepositoryImpl
+import com.depromeet.linkzupzup.domains.UserUseCases
 import com.depromeet.linkzupzup.presenter.MainViewModel
 import com.depromeet.linkzupzup.presenter.model.*
 import com.depromeet.linkzupzup.ui.theme.*
@@ -50,9 +52,8 @@ class MainUI: BaseView<MainViewModel>() {
     override fun onCreateViewContent() {
         LinkZupZupTheme {
             Surface(color = Gray10) {
-                vm?.let{ viewModel -> UserUI(vm = viewModel)}
-
-                /*Column(modifier = Modifier.fillMaxWidth()) {
+                /*vm?.let{ viewModel -> UserUI(vm = viewModel) }
+                Column(modifier = Modifier.fillMaxWidth()) {
                     Button(onClick = {
                         vm?.getUserInfo()
                     }, modifier = Modifier.fillMaxWidth()) {
@@ -67,7 +68,7 @@ class MainUI: BaseView<MainViewModel>() {
                         // 링크 스크랩 리스트
                         addAll(MainContentData.mockMainContentList(5))
                     }
-                    MainBodyUI(contentDataList = mainContentList)
+                    vm?.let{ viewModel -> MainBodyUI(contentDataList = mainContentList, vm = viewModel) }
                 }
             }
         }
@@ -85,7 +86,20 @@ fun MainPreview() {
         // 스크랩 링크 리스트
         addAll(MainContentData.mockMainContentList(5))
     }
-    MainBodyUI(mainContentList)
+    MainBodyUI(mainContentList, MainViewModel(userUseCases = UserUseCases(UserRepositoryImpl())))
+}
+
+@ExperimentalMaterialApi
+@Preview
+@Composable
+fun BottomSheetPreview() {
+    val coroutineScope = rememberCoroutineScope()
+    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
+    )
+    BottomSheet(bottomSheetScaffoldState,coroutineScope,
+        MainViewModel(UserUseCases(UserRepositoryImpl()))
+    )
 }
 
 @Composable
@@ -118,7 +132,7 @@ fun NeedUserLoginUI() {
 /* MainUI */
 @ExperimentalMaterialApi
 @Composable
-fun MainBodyUI(contentDataList : ArrayList<MainContentData<*>>){
+fun MainBodyUI(contentDataList : ArrayList<MainContentData<*>>, vm : MainViewModel){
     // 로그인 성공
     val coroutineScope = rememberCoroutineScope()
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
@@ -129,7 +143,7 @@ fun MainBodyUI(contentDataList : ArrayList<MainContentData<*>>){
     BottomSheetScaffold(
         topBar = { MainAppBar() },
         scaffoldState = bottomSheetScaffoldState,
-        sheetContent = { BottomSheet(bottomSheetScaffoldState,coroutineScope) },   // sheetContent -  Column scope
+        sheetContent = { BottomSheet(bottomSheetScaffoldState,coroutineScope,vm) },   // sheetContent -  Column scope
         sheetShape = RoundedCornerShape(topStartPercent = 5,topEndPercent = 5),
         sheetPeekHeight = 0.dp,
         sheetBackgroundColor = Gray0t,
@@ -415,28 +429,27 @@ fun MainHashtagCard(tagName : String, backColor : Color, textColor : Color){
     }
 }
 
-
-
 /* BottomSheet */
 @ExperimentalMaterialApi
 @Composable
-fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineScope : CoroutineScope){
+fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineScope : CoroutineScope, vm : MainViewModel){
 
     // in Column Scope
     Column(modifier = Modifier
-            .fillMaxWidth()
-            .height(580.dp)
-            .padding(start = 23.dp, end = 23.dp, bottom= 23.dp)) {
+        .fillMaxWidth()
+        .height(580.dp)
+        .padding(start = 23.dp, end = 23.dp, bottom = 23.dp)) {
 
         // 닫기 버튼
         Row(horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .fillMaxWidth()) {
-
+                .fillMaxWidth()
+                .height(56.dp)) {
             BottomSheetCloseBtn(painterResource(id = R.drawable.ic_close)){
                 coroutineScope.launch {
-                    bottomSheetScaffoldState.bottomSheetState.collapse()
-                } }
+                    bottomSheetScaffoldState.bottomSheetState.collapse() }
+            }
         }
 
         Column(modifier = Modifier
@@ -451,13 +464,15 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
             BottomSheetLinkInput()
 
             /* 해시태그 선택 */
-            BottomSheetSelect()
+            BottomSheetSelect(vm)
 
             /* 커스텀 태그 입력 화면 */
             ButtomSheetInputTag()
         }
 
 
+        /* 클릭된 해시태그 보여주는 열 */
+        BottomSheetSelectedTagList(vm = vm)
 
         /* 하단 저장하기 버튼 */
         Button(shape = RoundedCornerShape(4.dp),
@@ -490,9 +505,8 @@ fun BottomSheetCloseBtn(painter: Painter, onClick: ()->Unit){
             .clickable(onClick = onClick)) {
 
         Row(verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .size(44.dp)) {
+            horizontalArrangement = Arrangement.End,
+            modifier = Modifier.size(44.dp)) {
 
             Image(
                 painter = painter,
@@ -512,7 +526,6 @@ fun BottomHeaderCard(padding: PaddingValues = PaddingValues(0.dp)){
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(96.dp)
                 .background(Color.Transparent)
                 .padding(padding)) {
 
@@ -564,22 +577,22 @@ fun BottomSheetLinkInput(){
 }
 
 @Composable
-fun BottomSheetSelect(){
+fun BottomSheetSelect(vm : MainViewModel){
 
     val inputTag = remember { mutableStateOf(TextFieldValue()) }
-    val tc1 : List<TagColor2> = listOf(
-        TagColor2("디자인",TagBgColor01, TagTextColor01),
-        TagColor2("포트폴리오",TagBgColor02, TagTextColor02),
-        TagColor2("UX",TagBgColor03, TagTextColor03),
-        TagColor2("UI",TagBgColor04, TagTextColor04),
-        TagColor2("마케팅",TagBgColor05, TagTextColor05),
-        TagColor2("인공지능",TagBgColor06, TagTextColor06))
-    val tc2 : List<TagColor2> = listOf(
-        TagColor2("프론트 개발",TagBgColor07, TagTextColor07),
-        TagColor2("그로스 해킹",TagBgColor03, TagTextColor03),
-        TagColor2("Android",TagBgColor01, TagTextColor01),
-        TagColor2("스타트업",TagBgColor02, TagTextColor02),
-        TagColor2("ios",TagBgColor04, TagTextColor04))
+    val tc1 : List<LinkHashData> = listOf(
+        LinkHashData(0,"디자인","",TagColor(TagBgColor01, TagTextColor01)),
+        LinkHashData(1,"포트폴리오","",TagColor(TagBgColor02, TagTextColor02)),
+        LinkHashData(2,"UX","",TagColor(TagBgColor03, TagTextColor03)),
+        LinkHashData(3,"UI","",TagColor(TagBgColor04, TagTextColor04)),
+        LinkHashData(4,"마케팅","",TagColor(TagBgColor05, TagTextColor05)),
+        LinkHashData(5,"인공지","",TagColor(TagBgColor06, TagTextColor06)))
+    val tc2 : List<LinkHashData> = listOf(
+        LinkHashData(6,"프론트 개발","",TagColor(TagBgColor07, TagTextColor07)),
+        LinkHashData(7,"그로스 해킹","",TagColor(TagBgColor03, TagTextColor03)),
+        LinkHashData(8,"Android","",TagColor(TagBgColor01, TagTextColor01)),
+        LinkHashData(9,"스타트업","",TagColor(TagBgColor02, TagTextColor02)),
+        LinkHashData(10,"ios","",TagColor(TagBgColor04, TagTextColor04)))
 
     Row(modifier = Modifier
         .fillMaxWidth()){
@@ -587,6 +600,7 @@ fun BottomSheetSelect(){
             modifier = Modifier.weight(1f),
             style = TextStyle(
                 fontSize = 14.sp,
+                color = Gray100t,
                 fontFamily = FontFamily(Font(
                     resId = R.font.spoqa_hansansneo_bold,
                     weight = FontWeight.W700))))
@@ -610,19 +624,17 @@ fun BottomSheetSelect(){
         }
     }
 
-    LazyRow(modifier = Modifier
-            .fillMaxWidth(),
+    LazyRow(modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(10.dp)){
-        items(tc1) { tag ->
-            BottomSheetHashtagCard(tagName = tag.tagName, backColor = tag.bgColor, textColor = tag.textColor)
+        itemsIndexed(tc1) { index, tag ->
+            BottomSheetHashtagCard(vm, tag)
         }
     }
 
-    LazyRow(modifier = Modifier
-            .fillMaxWidth(),
+    LazyRow(modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(10.dp)){
-        items(tc2) { tag ->
-            BottomSheetHashtagCard(tagName = tag.tagName, backColor = tag.bgColor, textColor = tag.textColor)
+        itemsIndexed(tc2) { index, tag ->
+            BottomSheetHashtagCard(vm, tag)
         }
     }
 }
@@ -646,12 +658,17 @@ fun ButtomSheetInputTag(){
 }
 
 @Composable
-fun BottomSheetHashtagCard(tagName : String, backColor : Color, textColor : Color, isSelected : Boolean = false){
+fun BottomSheetHashtagCard(vm : MainViewModel, tag: LinkHashData, isSelected : Boolean = false){
     val ctx = LocalContext.current
     Card(
-        modifier = Modifier.height(32.dp),
+        modifier = Modifier
+            .height(32.dp)
+            .clickable {
+                if (isSelected) vm.removeHashtag(tag)
+                else vm.addHashtag(tag)
+            },
         elevation = 0.dp,
-        backgroundColor = backColor){
+        backgroundColor = tag.tagColor.bgColor){
 
         Box(contentAlignment = Alignment.Center){
 
@@ -660,24 +677,43 @@ fun BottomSheetHashtagCard(tagName : String, backColor : Color, textColor : Colo
             verticalAlignment = Alignment.CenterVertically){
 
                 Text(
-                    text = "#$tagName",
+                    text = "#${tag.hashtagName}",
                     style = TextStyle(
                         fontSize = 12.sp,
-                        color = textColor,
+                        color = tag.tagColor.textColor,
                         fontFamily = FontFamily(Font(
                             resId = R.font.spoqa_hansansneo_regular,
                             weight = FontWeight.W300))))
-
-                // 선택된 해시태그는 닫기버튼 필요 -> 현재 클릭 영역이 너무 작음
                 if(isSelected){
                     Image(
                         painter = painterResource(id = R.drawable.ic_close),
                         contentDescription = null,
-                        modifier = Modifier.size(12.dp)
-                            .clickable(onClick = { Toast.makeText(ctx,"삭제버튼 클릭", Toast.LENGTH_SHORT).show()}))
+                        modifier = Modifier
+                            .size(12.dp)
+                            .clickable(onClick = {
+                                Toast
+                                    .makeText(ctx, "삭제버튼 클릭", Toast.LENGTH_SHORT)
+                                    .show()
+                            }))
                 }
             }
 
+        }
+    }
+}
+
+@Composable
+fun BottomSheetSelectedTagList(vm: MainViewModel){
+    var selectedTag: List<LinkHashData> = listOf()
+    vm.liveSelectedTagList.observe(vm.lifecycleOwner!!){tag ->
+        selectedTag = tag
+    }
+
+
+    LazyRow(modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)){
+        itemsIndexed(selectedTag){ index, tag->
+            BottomSheetHashtagCard(vm, tag, isSelected = true)
         }
     }
 }
