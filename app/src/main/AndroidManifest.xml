@@ -17,16 +17,19 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.LinkZupZup.NoActionBar">
+
+        </activity>
+
+        <activity android:name=".view.main.MainActivity" />
+        <activity android:name=".view.scrap.ScrapDetailActivity" />
+        <activity android:name=".view.mypage.MypageActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
 
-        <activity android:name=".view.main.MainActivity" />
-        <activity android:name=".view.scrap.ScrapDetailActivity" />
-        <activity android:name=".view.mypage.MypageActivity" />
+        </activity>
         <!--<activity android:name=".view.alarm.AlarmDetailActivity" />-->
 
         <receiver
