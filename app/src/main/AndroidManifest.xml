@@ -26,6 +26,7 @@
 
         <activity android:name=".view.main.MainActivity" />
         <activity android:name=".view.scrap.ScrapDetailActivity" />
+        <activity android:name=".view.mypage.MypageActivity" />
         <!--<activity android:name=".view.alarm.AlarmDetailActivity" />-->
 
         <receiver
