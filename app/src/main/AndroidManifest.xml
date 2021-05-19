@@ -30,6 +30,7 @@
             </intent-filter>
 
         </activity>
+        <activity android:name=".view.mydonut.MyDonutActivity" />
         <!--<activity android:name=".view.alarm.AlarmDetailActivity" />-->
 
         <receiver

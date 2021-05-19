@@ -1,5 +1,6 @@
 package com.depromeet.linkzupzup.view.mypage.ui
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,6 +30,7 @@ import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.presenter.MyPageViewModel
 import com.depromeet.linkzupzup.presenter.model.MyPageData
 import com.depromeet.linkzupzup.ui.theme.*
+import com.depromeet.linkzupzup.view.mydonut.MyDonutActivity
 import java.text.DecimalFormat
 
 class MyPageUI: BaseView<MyPageViewModel>() {
@@ -60,7 +62,7 @@ fun MyPageBodyUI(myPageContentList: ArrayList<MyPageData<*>>, viewModel: MyPageV
         backgroundColor = Color.Transparent,
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)) {
+            .padding(start = 16.dp,end = 16.dp, bottom = 16.dp)) {
         
         Column(
             modifier = Modifier
@@ -77,7 +79,8 @@ fun MyPageBodyUI(myPageContentList: ArrayList<MyPageData<*>>, viewModel: MyPageV
 @Composable
 fun MyPageTopBar(){
     val ctx = LocalContext.current
-    Row(modifier = Modifier
+    Row(verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
         .fillMaxWidth()
         .height(52.dp)){
 
@@ -113,6 +116,7 @@ fun BackButton(painter: Painter, onClick : () -> Unit){
 
 @Composable
 fun MyPageProfile(myPageContentList: ArrayList<MyPageData<*>>, userName : String){
+    val ctx = LocalContext.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -182,7 +186,7 @@ fun MyPageProfile(myPageContentList: ArrayList<MyPageData<*>>, userName : String
             .fillMaxWidth()
             .height(52.dp),
         onClick = {
-
+            ctx.startActivity(Intent(ctx,MyDonutActivity::class.java))
         }) {
 
         Text("내 도넛 히스토리",
