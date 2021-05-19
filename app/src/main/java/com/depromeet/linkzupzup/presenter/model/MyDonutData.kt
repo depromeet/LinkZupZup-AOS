@@ -9,13 +9,11 @@ class MyDonutData<T : Any> {
 
         /* 임시 */
         fun mockMyDonutContentList(cnt : Int): ArrayList<MyDonutData<DonutBadge>> {
-            var cnt2 = cnt
-            var idx = 0
-            if(cnt2 > 12) cnt2 = 12
-
             return arrayListOf<MyDonutData<DonutBadge>>().apply {
-                repeat(cnt2) {
-                    add(MyDonutData(HAVE_DONUT, mockBadgeData[idx++]))
+                repeat(cnt) {
+                    val badgeImgRes: Int = getRandomMockDonutImgRes()
+                    val donutBadge: DonutBadge = getMockBadgeData(badgeImgRes)
+                    add(MyDonutData(HAVE_DONUT, donutBadge))
                 }
             }
         }
