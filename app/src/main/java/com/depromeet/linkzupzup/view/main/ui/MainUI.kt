@@ -11,8 +11,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,15 +24,21 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -438,14 +448,14 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
     Column(modifier = Modifier
         .fillMaxWidth()
         .height(580.dp)
-        .padding(start = 23.dp, end = 23.dp, bottom = 23.dp)) {
+        .padding(bottom = 16.dp)) {
 
         // 닫기 버튼
         Row(horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
                 .height(56.dp)) {
+
             BottomSheetCloseBtn(painterResource(id = R.drawable.ic_close)){
                 coroutineScope.launch {
                     bottomSheetScaffoldState.bottomSheetState.collapse() }
@@ -454,32 +464,42 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
 
         Column(modifier = Modifier
             .fillMaxWidth()
-            .weight(1f),
-            verticalArrangement = Arrangement.spacedBy(10.dp)){
+            .weight(1f)
+            .padding(start = 23.dp, end = 23.dp)){
 
             /* title */
             BottomHeaderCard()
 
+            Spacer(Modifier.height(8.dp))
+
             /* Text field */
-            BottomSheetLinkInput()
+            // BottomSheetLinkInput()
+            CustomTextField(hintStr = "\uD83D\uDC49 링크주소를 여기에 붙여넣기 해주세요.",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp))
+
+            Spacer(Modifier.height(20.dp))
 
             /* 해시태그 선택 */
             BottomSheetSelect(vm)
+
+            Spacer(Modifier.height(24.dp))
 
             /* 커스텀 태그 입력 화면 */
             ButtomSheetInputTag()
         }
 
-
         /* 클릭된 해시태그 보여주는 열 */
-        BottomSheetSelectedTagList(vm = vm)
+        BottomSheetSelectedTagList(vm = vm, modifier = Modifier.fillMaxWidth()
+            .padding(horizontal = 24.dp))
 
         /* 하단 저장하기 버튼 */
         Button(shape = RoundedCornerShape(4.dp),
             colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Gray50t, contentColor = Gray70),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
+            modifier = Modifier.fillMaxWidth()
+                .height(52.dp)
+                .padding(start = 24.dp, end = 24.dp, bottom = 16.dp),
             onClick = { DLog.e("MainUI", "BottomSheet/click save link button") }) {
 
             Text("저장하기",
@@ -491,29 +511,22 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
                         resId = R.font.spoqa_hansansneo_bold,
                         weight = FontWeight.W700))))
         }
-
     }
 }
 
 @Composable
 fun BottomSheetCloseBtn(painter: Painter, onClick: ()->Unit){
-    Card(elevation = 0.dp,
-        shape = RoundedCornerShape(0),
-        backgroundColor = Color.Transparent,
-        modifier = Modifier
-            .wrapContentSize()
+    Row(verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start,
+        modifier = Modifier.width(68.dp)
+            .height(56.dp)
             .clickable(onClick = onClick)) {
 
-        Row(verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End,
-            modifier = Modifier.size(44.dp)) {
+        Spacer(Modifier.width(20.dp))
 
-            Image(
-                painter = painter,
-                contentDescription = null,
-                Modifier.size(24.dp)
-            )
-        }
+        Image(painter = painter,
+            contentDescription = null,
+            Modifier.size(24.dp))
     }
 }
 
@@ -579,6 +592,8 @@ fun BottomSheetLinkInput(){
 @Composable
 fun BottomSheetSelect(vm : MainViewModel){
 
+    val cnt = 0
+    val size = 3
     val inputTag = remember { mutableStateOf(TextFieldValue()) }
     val tc1 : List<LinkHashData> = listOf(
         LinkHashData(0,"디자인","",TagColor(TagBgColor01, TagTextColor01)),
@@ -594,8 +609,10 @@ fun BottomSheetSelect(vm : MainViewModel){
         LinkHashData(9,"스타트업","",TagColor(TagBgColor02, TagTextColor02)),
         LinkHashData(10,"ios","",TagColor(TagBgColor04, TagTextColor04)))
 
-    Row(modifier = Modifier
-        .fillMaxWidth()){
+    Row(verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+        .height(18.dp)){
+
         Text(text = "해시태그를 선택해주세요.",
             modifier = Modifier.weight(1f),
             style = TextStyle(
@@ -605,24 +622,16 @@ fun BottomSheetSelect(vm : MainViewModel){
                     resId = R.font.spoqa_hansansneo_bold,
                     weight = FontWeight.W700))))
 
-        Row(horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically){
-            Text(text = "0",
-                style = TextStyle(
-                    fontSize = 12.sp,
-                    color = Gray70,
-                    fontFamily = FontFamily(Font(
-                        resId = R.font.spoqa_hansansneo_regular,
-                        weight = FontWeight.W700))))
-            Text(text = "/3",
-                style = TextStyle(
-                    fontSize = 12.sp,
-                    color = Gray70,
-                    fontFamily = FontFamily(Font(
-                        resId = R.font.spoqa_hansansneo_regular,
-                        weight = FontWeight.W700))))
-        }
+        Text(text = "$cnt/$size",
+            style = TextStyle(
+                fontSize = 12.sp,
+                color = Gray70,
+                fontFamily = FontFamily(Font(
+                    resId = R.font.spoqa_hansansneo_regular,
+                    weight = FontWeight.W700))))
     }
+
+    Spacer(Modifier.height(12.dp))
 
     LazyRow(modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(10.dp)){
@@ -630,6 +639,8 @@ fun BottomSheetSelect(vm : MainViewModel){
             BottomSheetHashtagCard(vm, tag)
         }
     }
+
+    Spacer(Modifier.height(12.dp))
 
     LazyRow(modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(10.dp)){
@@ -703,17 +714,112 @@ fun BottomSheetHashtagCard(vm : MainViewModel, tag: LinkHashData, isSelected : B
 }
 
 @Composable
-fun BottomSheetSelectedTagList(vm: MainViewModel){
+fun BottomSheetSelectedTagList(vm: MainViewModel, modifier: Modifier = Modifier.fillMaxWidth()){
     var selectedTag: List<LinkHashData> = listOf()
     vm.liveSelectedTagList.observe(vm.lifecycleOwner!!){tag ->
         selectedTag = tag
     }
 
 
-    LazyRow(modifier = Modifier.fillMaxWidth(),
+    LazyRow(modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(10.dp)){
         itemsIndexed(selectedTag){ index, tag->
             BottomSheetHashtagCard(vm, tag, isSelected = true)
+        }
+    }
+}
+
+/**
+ * 향후 Master 브런치와 머지 이후 Custom UI는 공통으로 관리하도록 옮기겠습니다.
+ */
+@Composable
+fun CustomTextField(modifier: Modifier = Modifier
+    .fillMaxWidth()
+    .height(40.dp)
+    .heightIn(min = 20.dp, max = 100.dp),
+                    txt: String = "",
+                    hintStr: String = "",
+                    shape: Shape = RoundedCornerShape(4.dp),
+                    backgroundColor: Color = Color(0xFFF1F2F5),
+                    onValueChange: (String) -> Unit = {}) {
+
+    Card(modifier = modifier,
+        shape = shape,
+        backgroundColor = backgroundColor,
+        elevation = 0.dp) {
+
+        val text = rememberSaveable { mutableStateOf(txt) }
+        val textModifier: Modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 12.dp, end = 44.dp)
+
+        // clear or 입력후 엔터 입력 시, 키보드를 내리기 위해 사용
+        val focusManager = LocalFocusManager.current
+
+        Box(Modifier.fillMaxSize()) {
+
+            // hint text
+            if (text.value.isNullOrEmpty()) Text(text = hintStr,
+                style = TextStyle(
+                    fontSize = 12.sp,
+                    color = Color(0xFF878D91),
+                    lineHeight = 16.8.sp,
+                    fontFamily = FontFamily(
+                        Font(resId = R.font.spoqa_hansansneo_regular, weight = FontWeight.W500)
+                    )
+                ),
+                maxLines = 1,
+                modifier = textModifier.align(Alignment.Center))
+
+            // edit text
+            BasicTextField(
+                value = text.value,
+                onValueChange = {
+                    text.value = it
+                    onValueChange.invoke(it)
+                },
+                modifier = textModifier.align(Alignment.Center),
+                textStyle = TextStyle(
+                    fontSize = 12.sp,
+                    color = Color(0xFF292A2B),
+                    fontFamily = FontFamily(
+                        Font(
+                            resId = R.font.spoqa_hansansneo_regular,
+                            weight = FontWeight.W500)
+                    ),
+                    textDecoration = TextDecoration.None,
+                    shadow = Shadow(),
+                    lineHeight = 16.8.sp
+                ),
+                singleLine = true,
+                maxLines = 1,
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done, keyboardType = KeyboardType.Text)
+            )
+
+            // clear btn
+            if (text.value.isNotEmpty()) Row(Modifier.fillMaxSize()) {
+
+                Spacer(Modifier.weight(1f))
+
+                Column(verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .width(44.dp)
+                        .fillMaxHeight()
+                        .padding(start = 8.dp)
+                        .clickable {
+                            text.value = ""
+                            // 포커스 제거, 키보드 내리기!
+                            focusManager.clearFocus()
+                        }) {
+
+                    Image(painter = painterResource(id = R.drawable.ic_gray_close),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp))
+
+                }
+            }
+
         }
     }
 }
