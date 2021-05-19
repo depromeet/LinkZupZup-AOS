@@ -11,5 +11,7 @@ val viewModelModule = module {
     viewModel { MainViewModel(get()) }
     viewModel { ScrapDetailViewModel(get()) }
     viewModel { AlarmDetailViewModel(get()) }
+    viewModel { MyPageViewModel() }
+    viewModel { MyDonutViewModel() }
     viewModel { LinkHistoryDetailViewModel(get()) }
 }
