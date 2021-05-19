@@ -10,21 +10,31 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -452,6 +462,101 @@ fun CustomTextCheckBox(modifier: Modifier = Modifier.height(20.dp), enableImg: I
             Text(text = text,
                 style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = if (checked.value) enableColor else disableColor),
                 textAlign = TextAlign.Center)
+
+        }
+    }
+}
+
+/**
+ * 향후 Master 브런치와 머지 이후 Custom UI는 공통으로 관리하도록 옮기겠습니다.
+ */
+@Composable
+fun CustomTextField(modifier: Modifier = Modifier
+    .fillMaxWidth()
+    .height(40.dp)
+    .heightIn(min = 20.dp, max = 100.dp),
+                    txt: String = "",
+                    hintStr: String = "",
+                    shape: Shape = RoundedCornerShape(4.dp),
+                    backgroundColor: Color = Color(0xFFF1F2F5),
+                    onValueChange: (String) -> Unit = {}) {
+
+    Card(modifier = modifier,
+        shape = shape,
+        backgroundColor = backgroundColor,
+        elevation = 0.dp) {
+
+        val text = rememberSaveable { mutableStateOf(txt) }
+        val textModifier: Modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 12.dp, end = 44.dp)
+
+        // clear or 입력후 엔터 입력 시, 키보드를 내리기 위해 사용
+        val focusManager = LocalFocusManager.current
+
+        Box(Modifier.fillMaxSize()) {
+
+            // hint text
+            if (text.value.isNullOrEmpty()) Text(text = hintStr,
+                style = TextStyle(
+                    fontSize = 12.sp,
+                    color = Color(0xFF878D91),
+                    lineHeight = 16.8.sp,
+                    fontFamily = FontFamily(
+                        Font(resId = R.font.spoqa_hansansneo_regular, weight = FontWeight.W500)
+                    )
+                ),
+                maxLines = 1,
+                modifier = textModifier.align(Alignment.Center))
+
+            // edit text
+            BasicTextField(
+                value = text.value,
+                onValueChange = {
+                    text.value = it
+                    onValueChange.invoke(it)
+                },
+                modifier = textModifier.align(Alignment.Center),
+                textStyle = TextStyle(
+                    fontSize = 12.sp,
+                    color = Color(0xFF292A2B),
+                    fontFamily = FontFamily(
+                        Font(
+                            resId = R.font.spoqa_hansansneo_regular,
+                            weight = FontWeight.W500)
+                    ),
+                    textDecoration = TextDecoration.None,
+                    shadow = Shadow(),
+                    lineHeight = 16.8.sp
+                ),
+                singleLine = true,
+                maxLines = 1,
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done, keyboardType = KeyboardType.Text)
+            )
+
+            // clear btn
+            if (text.value.isNotEmpty()) Row(Modifier.fillMaxSize()) {
+
+                Spacer(Modifier.weight(1f))
+
+                Column(verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .width(44.dp)
+                        .fillMaxHeight()
+                        .padding(start = 8.dp)
+                        .clickable {
+                            text.value = ""
+                            // 포커스 제거, 키보드 내리기!
+                            focusManager.clearFocus()
+                        }) {
+
+                    Image(painter = painterResource(id = R.drawable.ic_gray_close),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp))
+
+                }
+            }
 
         }
     }
