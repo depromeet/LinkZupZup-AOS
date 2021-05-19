@@ -5,6 +5,9 @@ import android.view.View
 import androidx.annotation.DimenRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -12,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.component.SSLHelper
 import io.reactivex.Scheduler
@@ -68,6 +72,12 @@ fun <T> Single<T>.subSimple(onSuccess: Consumer<in T>?, baseView: BaseView<*>): 
 
 @Composable
 fun <T> T.mutableStateValue(): MutableState<T> = remember { mutableStateOf(this) }
+
+@Composable
+fun LazyItemScope.topSpacer(index: Int, size: Dp) = if (index == 0) Spacer(Modifier.height(size)) else null
+
+@Composable
+fun LazyItemScope.bottomSpacer(index: Int, items: List<*>, size: Dp) = if (index >= items.size - 1) Spacer(Modifier.height(size)) else null
 
 /**
  * 참고 : https://meetup.toast.com/posts/130
