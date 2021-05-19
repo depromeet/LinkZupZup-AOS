@@ -32,11 +32,8 @@ import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.presenter.MyPageViewModel
 import com.depromeet.linkzupzup.presenter.model.MyPageData
 import com.depromeet.linkzupzup.ui.theme.*
-import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.CustomSwitchCompat
-import com.depromeet.linkzupzup.view.custom.CustomToogle
 import com.depromeet.linkzupzup.view.mydonut.MyDonutActivity
-import java.text.DecimalFormat
 
 class MyPageUI: BaseView<MyPageViewModel>() {
     @Composable
@@ -44,6 +41,7 @@ class MyPageUI: BaseView<MyPageViewModel>() {
         LinkZupZupTheme {
             Surface(color = Gray10) {
                 Column(modifier = Modifier.fillMaxWidth()) {
+
                     val myPageContentList : ArrayList<MyPageData<*>> = arrayListOf<MyPageData<*>>().apply{
                         // 이번 달 내 포인트
                         add(MyPageData<Any>(MyPageData.THIS_WEEK_POINT,9999))
@@ -53,7 +51,8 @@ class MyPageUI: BaseView<MyPageViewModel>() {
                         add(MyPageData<Any>(MyPageData.THIS_WEEK_READ_COUNT,100))
                     }
 
-                    vm?.let { viewModel -> MyPageBodyUI(myPageContentList = myPageContentList, viewModel = viewModel) }
+                    MyPageBodyUI(myPageContentList = myPageContentList)
+
                 }
             }
         }
@@ -61,22 +60,39 @@ class MyPageUI: BaseView<MyPageViewModel>() {
 }
 
 @Composable
-fun MyPageBodyUI(myPageContentList: ArrayList<MyPageData<*>>, viewModel: MyPageViewModel){
-    Scaffold(
-        topBar = { MyPageTopBar() },
+fun MyPageBodyUI(myPageContentList: ArrayList<MyPageData<*>>){
+    Scaffold(topBar = { MyPageTopBar() },
         backgroundColor = Color.Transparent,
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
             .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
         
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Transparent)) {
+        Column(Modifier.fillMaxWidth()
+            .background(Color.Transparent)) {
 
+            // 상단 프로필
             MyPageProfile(myPageContentList = myPageContentList, userName = "김나경")
 
-            MyPageMenu()
+            Spacer(modifier = Modifier.height(30.dp))
+
+            // menu button list
+            LazyColumn(Modifier.fillMaxWidth()) {
+                items(MyPageData.MENU_DATA){ menu->
+                    MyPageMenuCard(menu.first, menu.second)
+                }
+            }
+
+            // logout button
+            Row(horizontalArrangement = Arrangement.End,
+                modifier = Modifier.fillMaxWidth()
+                    .padding(top = 18.dp)){
+
+                Text(text = "로그아웃",
+                    style = TextStyle(fontSize = 12.sp,
+                        lineHeight = 16.sp,
+                        color = Gray70,
+                        fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_regular,
+                            weight = FontWeight.W300))))
+            }
         }
     }
 }
@@ -85,8 +101,7 @@ fun MyPageBodyUI(myPageContentList: ArrayList<MyPageData<*>>, viewModel: MyPageV
 fun MyPageTopBar(){
     val ctx = LocalContext.current
     Row(verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
             .height(52.dp)){
 
         BackButton(painterResource(id = R.drawable.ic_detail_back)){
@@ -100,21 +115,18 @@ fun BackButton(painter: Painter, onClick : () -> Unit){
     Card(elevation = 0.dp,
         shape = RoundedCornerShape(0),
         backgroundColor = Color.Transparent,
-        modifier = Modifier
-            .fillMaxHeight()
+        modifier = Modifier.fillMaxHeight()
             .wrapContentWidth()
             .noRippleClickable(onClick = onClick)) {
 
         Row(verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start,
-            modifier = Modifier
-                .size(40.dp)) {
+            modifier = Modifier.size(40.dp)) {
 
-            Image(
-                painter = painter,
+            Image(painter = painter,
                 contentDescription = null,
-                Modifier.size(24.dp)
-            )
+                Modifier.size(24.dp))
+
         }
     }
 }
@@ -125,15 +137,13 @@ fun MyPageProfile(myPageContentList: ArrayList<MyPageData<*>>, userName : String
     val ctx = LocalContext.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
             .padding(vertical = 10.dp)){
 
         Image(
             painter = painterResource(id = R.drawable.ic_donut04),
             contentDescription = null,
-            modifier = Modifier
-                .size(64.dp, 48.dp)
+            modifier = Modifier.size(64.dp, 48.dp)
                 .padding(end = 10.dp))
 
         Text(
@@ -144,12 +154,10 @@ fun MyPageProfile(myPageContentList: ArrayList<MyPageData<*>>, userName : String
                 weight = FontWeight.W700))))
     }
 
-    Card(
-        elevation = 0.dp,
+    Card(elevation = 0.dp,
         backgroundColor = Gray0t,
         shape = RoundedCornerShape(10),
-        modifier = Modifier
-            .fillMaxWidth()){
+        modifier = Modifier.fillMaxWidth()){
 
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
@@ -189,9 +197,7 @@ fun MyPageProfile(myPageContentList: ArrayList<MyPageData<*>>, userName : String
     Button(shape = RoundedCornerShape(4.dp),
         elevation = ButtonDefaults.elevation(0.dp),
         colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Blue50, contentColor = Color.White),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(52.dp),
+        modifier = Modifier.fillMaxWidth().height(52.dp),
         onClick = {
             ctx.startActivity(Intent(ctx,MyDonutActivity::class.java))
         }) {
@@ -213,8 +219,7 @@ fun MyPageProfileCard(title: String, num : Int, unit : String){
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
             .padding(vertical = 16.dp)){
 
         Text(text = title,
@@ -235,35 +240,6 @@ fun MyPageProfileCard(title: String, num : Int, unit : String){
 
 }
 
-
-@Composable
-fun MyPageMenu(){
-    Spacer(modifier = Modifier.height(30.dp))
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()) {
-
-        items(MyPageData.MENU_DATA){ menu->
-            MyPageMenuCard(menu.first, menu.second)
-        }
-    }
-
-
-    Row(horizontalArrangement = Arrangement.End,
-        modifier = Modifier
-        .fillMaxWidth()
-        .padding(top = 18.dp)){
-        Text(
-            text = "로그아웃",
-            style = TextStyle(fontSize = 12.sp,
-                lineHeight = 16.sp,
-                color = Gray70,
-                fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_regular,
-                    weight = FontWeight.W300))))
-    }
-}
-
-
 @Composable
 fun MyPageMenuCard(menuName : String, menuType : Int){
     val ctx = LocalContext.current
@@ -278,9 +254,7 @@ fun MyPageMenuCard(menuName : String, menuType : Int){
                 .fillMaxWidth()
                 .height(56.dp)
                 .noRippleClickable {
-                    Toast
-                        .makeText(ctx, "페이지 이동", Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(ctx, "페이지 이동", Toast.LENGTH_SHORT).show()
                 }){
 
             Row(
@@ -289,8 +263,7 @@ fun MyPageMenuCard(menuName : String, menuType : Int){
                     .fillMaxWidth()
                     .padding(horizontal = 17.dp)){
 
-                Text(
-                    text = menuName,
+                Text(text = menuName,
                     modifier = Modifier.weight(1f),
                     style = TextStyle(fontSize = 12.sp,
                         lineHeight = 16.sp,
@@ -312,18 +285,15 @@ fun DetailBtn(painter: Painter){
     Card(elevation = 0.dp,
         shape = RoundedCornerShape(0),
         backgroundColor = Color.Transparent,
-        modifier = Modifier
-            .wrapContentSize()) {
+        modifier = Modifier.wrapContentSize()) {
 
         Row(verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.wrapContentSize()) {
 
-            Image(
-                painter = painter,
+            Image(painter = painter,
                 contentDescription = null,
-                Modifier.size(24.dp)
-            )
+                Modifier.size(24.dp))
         }
     }
 }
@@ -344,4 +314,19 @@ fun PreviewMenu(){
         MyPageMenuCard("다 읽은 링크", MyPageData.MENU_DETAIL)
     }
 
+}
+
+@Preview
+@Composable
+fun MyPageBodyPreview() {
+    val myPageContentList : ArrayList<MyPageData<*>> = arrayListOf<MyPageData<*>>().apply{
+        // 이번 달 내 포인트
+        add(MyPageData<Any>(MyPageData.THIS_WEEK_POINT,9999))
+        // 전체 읽은 수
+        add(MyPageData<Any>(MyPageData.TOTAL_READ_COUNT,9999))
+        // 이번 달 읽은 수
+        add(MyPageData<Any>(MyPageData.THIS_WEEK_READ_COUNT,100))
+    }
+
+    MyPageBodyUI(myPageContentList = myPageContentList)
 }
