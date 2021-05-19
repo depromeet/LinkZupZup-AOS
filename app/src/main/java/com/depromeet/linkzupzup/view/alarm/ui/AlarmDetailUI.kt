@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.extensions.mutableStateValue
+import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.extensions.timeBaseStr
 import com.depromeet.linkzupzup.extensions.timeStr
 import com.depromeet.linkzupzup.presenter.AlarmDetailViewModel
@@ -67,7 +68,7 @@ fun AlarmDetailAppBar(appBarColor: MutableState<Color> = remember { mutableState
         navigationIcon = {
             Card(elevation = 0.dp,
                 backgroundColor = Color(0xFFF8FAFB),
-                modifier = Modifier.clickable {
+                modifier = Modifier.noRippleClickable {
                     Toast.makeText(ctx, "뒤로가기", Toast.LENGTH_SHORT).show()
                 }) {
 
@@ -301,7 +302,7 @@ fun AlarmDetailBottomSheet(bottomSheetScaffoldState: BottomSheetScaffoldState, c
             Card(elevation = 0.dp,
                 modifier = Modifier.width(68.dp)
                     .height(56.dp)
-                    .clickable {
+                    .noRippleClickable {
                         coroutineScope.launch {
                             bottomSheetScaffoldState.bottomSheetState.collapse()
                         }

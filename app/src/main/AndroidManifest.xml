@@ -12,15 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LinkZupZup">
-        <activity
-            android:name=".view.alarm.AlarmDetailActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.LinkZupZup.NoActionBar">
-        </activity>
 
         <activity
-            android:name=".view.main.MainActivity"
+            android:name=".view.alarm.AlarmDetailActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,6 +22,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".view.main.MainActivity" />
 
         <activity android:name=".view.scrap.ScrapDetailActivity" />
         <!--<activity android:name=".view.alarm.AlarmDetailActivity" />-->
