@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
+import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.presenter.MyPageViewModel
 import com.depromeet.linkzupzup.presenter.model.MyPageData
 import com.depromeet.linkzupzup.ui.theme.*
@@ -96,8 +97,9 @@ fun BackButton(painter: Painter, onClick : () -> Unit){
         shape = RoundedCornerShape(0),
         backgroundColor = Color.Transparent,
         modifier = Modifier
-            .wrapContentSize()
-            .clickable(onClick = onClick)) {
+            .fillMaxHeight()
+            .wrapContentWidth()
+            .noRippleClickable(onClick = onClick)) {
 
         Row(verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start,
