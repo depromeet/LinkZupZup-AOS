@@ -15,6 +15,10 @@
         <entry key="../../../../../layout/compose-model-1621058930598.xml" value="0.375" />
         <entry key="../../../../../layout/compose-model-1621252691029.xml" value="0.3388888888888889" />
         <entry key="../../../../../layout/compose-model-1621253070920.xml" value="0.33796296296296297" />
+        <entry key="../../../../../layout/compose-model-1621406260708.xml" value="0.335" />
+        <entry key="../../../../../layout/compose-model-1621410831855.xml" value="1.0" />
+        <entry key="../../../../../layout/compose-model-1621411103627.xml" value="0.5" />
+        <entry key="../../../../../layout/compose-model-1621411240122.xml" value="0.45" />
         <entry key="../../../../layout/compose-model-1619012044353.xml" value="0.1" />
         <entry key="../../../../layout/compose-model-1619012897588.xml" value="0.5194444444444445" />
         <entry key="../../../../layout/compose-model-1619242634699.xml" value="0.2212962962962963" />
@@ -31,7 +35,6 @@
         <entry key="..\:/Users/Jackson/AndroidStudioProjects/LinkZupZup/app/src/main/res/drawable/bg_default_switch_track_normal.xml" value="0.30185185185185187" />
         <entry key="..\:/Users/Jackson/AndroidStudioProjects/LinkZupZup/app/src/main/res/drawable/switch_track_selector.xml" value="0.30185185185185187" />
         <entry key="..\:/Users/Jackson/AndroidStudioProjects/LinkZupZup/app/src/main/res/layout/switch_compat.xml" value="0.22" />
-        <entry key="..\:/Users/soundgram/Documents/GitHub/LinkZupZup-AOS/app/src/main/res/drawable/ic_back.xml" value="0.36102564102564105" />
         <entry key="app/src/main/res/drawable/ic_alram.xml" value="0.3472222222222222" />
         <entry key="app/src/main/res/drawable/ic_black_alarm.xml" value="0.28888888888888886" />
         <entry key="app/src/main/res/drawable/ic_black_close.xml" value="0.29814814814814816" />
