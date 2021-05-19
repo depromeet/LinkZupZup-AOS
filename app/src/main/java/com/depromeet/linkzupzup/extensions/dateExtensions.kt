@@ -1,6 +1,8 @@
 package com.depromeet.linkzupzup.extensions
 
 import com.depromeet.linkzupzup.utils.DateUtil
+import java.lang.String.format
+import java.text.DecimalFormat
 import java.util.*
 
 /**
@@ -24,3 +26,7 @@ fun String.minute(): Int
 // 숫자의 자릿수를 digitFormat에 맞춰 문자열로 반환
 fun Int.digitFormat(digitFormat: String = "%02d"): String
     = String.format(digitFormat, this)
+
+// 숫자의 1000단위 마다 반점을 넣은 문자열로 반환
+fun Int.digitFormat1000(digitFormat: DecimalFormat = DecimalFormat("#,###,###")): String
+    = digitFormat.format(this)

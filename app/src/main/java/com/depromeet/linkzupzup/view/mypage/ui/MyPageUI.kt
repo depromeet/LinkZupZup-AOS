@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
+import com.depromeet.linkzupzup.extensions.digitFormat1000
 import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.presenter.MyPageViewModel
 import com.depromeet.linkzupzup.presenter.model.MyPageData
@@ -203,8 +204,7 @@ fun MyPageProfile(myPageContentList: ArrayList<MyPageData<*>>, userName : String
 
 @Composable
 fun MyPageProfileCard(title: String, num : Int, unit : String){
-    val decimalFormat = DecimalFormat("#,###,###")
-    val decNum = decimalFormat.format(num)
+    val decNum = num.digitFormat1000()
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

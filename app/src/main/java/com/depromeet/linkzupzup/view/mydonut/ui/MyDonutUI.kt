@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -25,8 +26,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
+import com.depromeet.linkzupzup.extensions.digitFormat1000
 import com.depromeet.linkzupzup.presenter.MyDonutViewModel
+import com.depromeet.linkzupzup.presenter.model.DonutBadge
+import com.depromeet.linkzupzup.presenter.model.MyDonutData
 import com.depromeet.linkzupzup.ui.theme.*
+import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.mypage.ui.BackButton
 
 class MyDonutUI : BaseView<MyDonutViewModel>() {
@@ -35,7 +40,14 @@ class MyDonutUI : BaseView<MyDonutViewModel>() {
     override fun onCreateViewContent() {
         LinkZupZupTheme {
             Surface(color = Color.White) {
-                MyDonutBodyUI()
+                val myDonutList : ArrayList<MyDonutData<*>> = arrayListOf<MyDonutData<*>>().apply{
+                    // 데이터가 없는 경우
+                    //add(MyDonutData<Any>(MyDonutData.NO_DONUT))
+
+                    // 데이터가 있는 경우
+                    addAll(MyDonutData.mockMyDonutContentList(12))
+                }
+                MyDonutBodyUI(myDonutList)
             }
         }
     }
@@ -43,9 +55,8 @@ class MyDonutUI : BaseView<MyDonutViewModel>() {
 }
 
 @ExperimentalFoundationApi
-@Preview
 @Composable
-fun MyDonutBodyUI(){
+fun MyDonutBodyUI(myDonutList: ArrayList<MyDonutData<*>>){
     Scaffold(
         topBar = { MyDonutTopBar() },
         backgroundColor = Color.Transparent,
@@ -59,8 +70,7 @@ fun MyDonutBodyUI(){
                 .background(Color.Transparent)) {
 
             Information()
-            DonutBadgeGridList()
-            //NoDonut()
+            DonutBadgeGridList(myDonutList)
 
         }
     }
@@ -179,34 +189,51 @@ fun NoDonut(){
     }
 }
 
-@Preview
+
 @ExperimentalFoundationApi
 @Composable
-fun DonutBadgeGridList(){
-    val badges = (0..13).toList()
+fun DonutBadgeGridList(myDonutList: ArrayList<MyDonutData<*>>){
+    var cellFixed = MyDonutData.HAVE_DONUT
+    if(myDonutList.size==1 && myDonutList[0].type==MyDonutData.NO_DONUT)
+        cellFixed = MyDonutData.NO_DONUT
 
     LazyVerticalGrid(
-        cells = GridCells.Fixed(3),
+        cells = GridCells.Fixed(cellFixed),
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 10.dp)) {
-        items(badges){
+        items(myDonutList){ badge->
+            when(badge.type){
+                // 도넛이 없을 경우
+                MyDonutData.NO_DONUT ->
+                    NoDonut()
+                // 도넛이 있을 경우
+                MyDonutData.HAVE_DONUT ->
+                    (badge.data as? DonutBadge)?.let{ badgeData ->
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .padding(6.dp)){
 
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .wrapContentSize()
-                    .padding(6.dp)){
-                DonutBadgeCard()
+                            DonutBadgeCard(painterResource(id = badgeData.badgeResource),badgeData.point, badgeData.date)
+
+                        }
+
+                    }
+
+                else -> DLog.e("TEST","empty")
             }
         }
     }
 }
 
-@Preview
+
 @Composable
-fun DonutBadgeCard(){
+fun DonutBadgeCard(painter : Painter, point : Int, date : String){
+
+    val pointStr = point.digitFormat1000()+"p"
 
     Card(shape = RoundedCornerShape(0.dp),
         elevation = 0.dp,
@@ -224,12 +251,12 @@ fun DonutBadgeCard(){
                 .padding(20.dp)){
 
                 Image(
-                    painter = painterResource(id = R.drawable.ic_donut04),
+                    painter = painter,
                     contentDescription = null)
             }
 
             Text(
-                text = "5,235p",
+                text = pointStr,
                 modifier = Modifier.fillMaxWidth(),
                 style = TextStyle(fontSize = 12.sp,
                     lineHeight = 16.sp,
@@ -243,7 +270,7 @@ fun DonutBadgeCard(){
                 .fillMaxWidth()
                 .padding(bottom = 8.dp)){
                 Text(
-                    text = "2021년 4월",
+                    text = date,
                     modifier = Modifier.fillMaxWidth(),
                     style = TextStyle(fontSize = 12.sp,
                         lineHeight = 16.sp,
