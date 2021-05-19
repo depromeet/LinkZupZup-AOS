@@ -4,7 +4,6 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -269,7 +268,7 @@ fun MyPageMenuCard(menuName : String, menuType : Int){
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
-            .clickable {
+            .noRippleClickable {
                 Toast.makeText(ctx,"페이지 이동",Toast.LENGTH_SHORT).show() }){
 
         Row(
