@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.depromeet.linkzupzup.R
@@ -31,6 +32,9 @@ import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.presenter.MyPageViewModel
 import com.depromeet.linkzupzup.presenter.model.MyPageData
 import com.depromeet.linkzupzup.ui.theme.*
+import com.depromeet.linkzupzup.utils.DLog
+import com.depromeet.linkzupzup.view.custom.CustomSwitchCompat
+import com.depromeet.linkzupzup.view.custom.CustomToogle
 import com.depromeet.linkzupzup.view.mydonut.MyDonutActivity
 import java.text.DecimalFormat
 
@@ -63,7 +67,7 @@ fun MyPageBodyUI(myPageContentList: ArrayList<MyPageData<*>>, viewModel: MyPageV
         backgroundColor = Color.Transparent,
         modifier = Modifier
             .fillMaxSize()
-            .padding(start = 16.dp,end = 16.dp, bottom = 16.dp)) {
+            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
         
         Column(
             modifier = Modifier
@@ -82,8 +86,8 @@ fun MyPageTopBar(){
     val ctx = LocalContext.current
     Row(verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-        .fillMaxWidth()
-        .height(52.dp)){
+            .fillMaxWidth()
+            .height(52.dp)){
 
         BackButton(painterResource(id = R.drawable.ic_detail_back)){
             Toast.makeText(ctx,"뒤로가기",Toast.LENGTH_SHORT).show()
@@ -183,6 +187,7 @@ fun MyPageProfile(myPageContentList: ArrayList<MyPageData<*>>, userName : String
     Spacer(modifier = Modifier.height(8.dp))
 
     Button(shape = RoundedCornerShape(4.dp),
+        elevation = ButtonDefaults.elevation(0.dp),
         colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Blue50, contentColor = Color.White),
         modifier = Modifier
             .fillMaxWidth()
@@ -233,11 +238,10 @@ fun MyPageProfileCard(title: String, num : Int, unit : String){
 
 @Composable
 fun MyPageMenu(){
-    
-    LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp),
+    Spacer(modifier = Modifier.height(30.dp))
+    LazyColumn(
         modifier = Modifier
-        .fillMaxWidth()
-        .padding(top = 40.dp)) {
+            .fillMaxWidth()) {
 
         items(MyPageData.MENU_DATA){ menu->
             MyPageMenuCard(menu.first, menu.second)
@@ -245,8 +249,10 @@ fun MyPageMenu(){
     }
 
 
-    Row(modifier = Modifier.fillMaxWidth().padding(top = 28.dp),
-    horizontalArrangement = Arrangement.End){
+    Row(horizontalArrangement = Arrangement.End,
+        modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 18.dp)){
         Text(
             text = "로그아웃",
             style = TextStyle(fontSize = 12.sp,
@@ -261,37 +267,43 @@ fun MyPageMenu(){
 @Composable
 fun MyPageMenuCard(menuName : String, menuType : Int){
     val ctx = LocalContext.current
-    Card(
-        elevation = 0.dp,
-        backgroundColor = Gray0t,
-        shape = RoundedCornerShape(10),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .noRippleClickable {
-                Toast.makeText(ctx,"페이지 이동",Toast.LENGTH_SHORT).show() }){
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+    // elevation 으로 인한 그림자도 보이게 하고, 카드끼리 10dp 간격 생성.
+    Row(modifier = Modifier.padding(5.dp)){
+        Card(
+            elevation = 2.dp,
+            backgroundColor = Gray0t,
+            shape = RoundedCornerShape(10),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 17.dp)){
+                .height(56.dp)
+                .noRippleClickable {
+                    Toast
+                        .makeText(ctx, "페이지 이동", Toast.LENGTH_SHORT)
+                        .show()
+                }){
 
-            Text(
-                text = menuName,
-                modifier = Modifier.weight(1f),
-                style = TextStyle(fontSize = 12.sp,
-                    lineHeight = 16.sp,
-                    fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_regular,
-                        weight = FontWeight.W300))))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 17.dp)){
 
-            when(menuType){
-                MyPageData.MENU_DETAIL ->
-                    DetailBtn(painter = painterResource(id = R.drawable.ic_next))
-                MyPageData.MENU_TOGGLE -> ToggleBtn()
+                Text(
+                    text = menuName,
+                    modifier = Modifier.weight(1f),
+                    style = TextStyle(fontSize = 12.sp,
+                        lineHeight = 16.sp,
+                        fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_regular,
+                            weight = FontWeight.W300))))
+
+                when(menuType){
+                    MyPageData.MENU_DETAIL -> DetailBtn(painter = painterResource(id = R.drawable.ic_next))
+                    MyPageData.MENU_TOGGLE -> ToggleBtn()
+                }
             }
-        }
 
+        }
     }
 }
 
@@ -316,8 +328,20 @@ fun DetailBtn(painter: Painter){
     }
 }
 
+@Preview
 @Composable
-fun ToggleBtn(){
-
+fun ToggleBtn() {
+    CustomSwitchCompat(instanceCallback = { it.isChecked = true })
 }
 
+@Preview
+@Composable
+fun PreviewMenu(){
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .background(Color.White)
+        .padding(20.dp)){
+        MyPageMenuCard("다 읽은 링크", MyPageData.MENU_DETAIL)
+    }
+
+}
