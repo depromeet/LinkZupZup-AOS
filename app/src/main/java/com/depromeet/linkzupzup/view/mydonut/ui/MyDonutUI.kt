@@ -36,7 +36,6 @@ import com.depromeet.linkzupzup.presenter.model.DonutBadge
 import com.depromeet.linkzupzup.presenter.model.MyDonutData
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.DLog
-import com.depromeet.linkzupzup.view.mypage.ui.BackButton
 
 class MyDonutUI : BaseView<MyDonutViewModel>() {
 
