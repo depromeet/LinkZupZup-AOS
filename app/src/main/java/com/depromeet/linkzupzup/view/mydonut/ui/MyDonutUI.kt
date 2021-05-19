@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.extensions.digitFormat1000
+import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.presenter.MyDonutViewModel
 import com.depromeet.linkzupzup.presenter.model.DonutBadge
 import com.depromeet.linkzupzup.presenter.model.MyDonutData
@@ -46,7 +47,7 @@ class MyDonutUI : BaseView<MyDonutViewModel>() {
             Surface(color = Color.White) {
                 val myDonutList : ArrayList<MyDonutData<*>> = arrayListOf<MyDonutData<*>>().apply{
                     // 데이터가 없는 경우
-                    //add(MyDonutData<Any>(MyDonutData.NO_DONUT))
+                    // add(MyDonutData<Any>(MyDonutData.NO_DONUT))
 
                     // 데이터가 있는 경우
                     addAll(MyDonutData.mockMyDonutContentList(24))
@@ -64,8 +65,7 @@ fun MyDonutBodyUI(myDonutList: ArrayList<MyDonutData<*>>){
     Scaffold(
         topBar = { MyDonutTopBar() },
         backgroundColor = Color.Transparent,
-        modifier = Modifier.fillMaxSize()
-            .padding(horizontal = 16.dp)) {
+        modifier = Modifier.fillMaxSize()) {
 
         Column(modifier = Modifier.fillMaxWidth()
             .background(Color.Transparent)) {
@@ -88,15 +88,13 @@ fun MyDonutTopBar(){
             modifier = Modifier.align(Alignment.CenterStart)
                 .fillMaxHeight()){
 
-            BackButton(painterResource(id = R.drawable.ic_detail_back)){
+            MyDonutBackButton(painterResource(id = R.drawable.ic_detail_back)){
                 // finish activity
             }
         }
 
-        Box(modifier = Modifier
-            .align(Alignment.Center)){
-            Text(
-                text = "내 도넛 히스토리",
+        Box(modifier = Modifier.align(Alignment.Center)){
+            Text(text = "내 도넛 히스토리",
                 style = TextStyle(fontSize = 14.sp,
                     lineHeight = 16.sp,
                     color = Gray100t,
@@ -110,14 +108,38 @@ fun MyDonutTopBar(){
 
 }
 
+
+
+@Composable
+fun MyDonutBackButton(painter: Painter, onClick : () -> Unit){
+    Card(elevation = 0.dp,
+        shape = RoundedCornerShape(0),
+        backgroundColor = Color.Transparent,
+        modifier = Modifier.fillMaxHeight()
+            .wrapContentWidth()
+            .noRippleClickable(onClick = onClick)) {
+
+        Row(verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier.size(56.dp)
+                .padding(start = 16.dp)) {
+
+            Image(painter = painter,
+                contentDescription = null,
+                Modifier.size(24.dp))
+
+        }
+    }
+}
+
 @Composable
 fun Information(){
     Row(modifier = Modifier.fillMaxWidth()
-        .padding(top = 12.dp)){
+        .padding(start = 16.dp, top = 12.dp)){
 
         Card(elevation = 0.dp,
             backgroundColor = Blue50Op8,
-            shape = RoundedCornerShape(20),
+            shape = RoundedCornerShape(8.dp),
             modifier = Modifier.fillMaxWidth()
                 .height(32.dp)){
 
@@ -148,13 +170,14 @@ fun Information(){
 @Composable
 fun NoDonut(){
     Row(modifier = Modifier.fillMaxWidth()
-        .padding(vertical = 8.dp)){
+        .padding(top = 4.dp)){
 
         Card(elevation = 0.dp,
             backgroundColor = Blue50Op8,
-            shape = RoundedCornerShape(20),
+            shape = RoundedCornerShape(8.dp),
             modifier = Modifier.fillMaxWidth()
-                .height(64.dp)){
+                .height(64.dp)
+                .padding(horizontal = 6.dp)){
 
             Row(verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
@@ -184,8 +207,8 @@ fun DonutBadgeGridList(myDonutList: ArrayList<MyDonutData<*>>){
 
     LazyVerticalGrid(
         cells = GridCells.Fixed(cellFixed),
-        modifier = Modifier.fillMaxWidth()
-            .padding(top = 10.dp)) {
+        contentPadding = PaddingValues(10.dp),
+        modifier = Modifier.fillMaxWidth()) {
 
         items(myDonutList){ badge->
             when(badge.type){
@@ -195,7 +218,10 @@ fun DonutBadgeGridList(myDonutList: ArrayList<MyDonutData<*>>){
 
                 // 도넛이 있을 경우
                 MyDonutData.HAVE_DONUT -> (badge.data as? DonutBadge)?.let{ badgeData ->
-                    DonutBadgeCard(painterResource(id = badgeData.badgeResource),badgeData.point, badgeData.date)
+                    Box(Modifier.fillMaxSize()
+                        .padding(6.dp)) {
+                        DonutBadgeCard(painterResource(id = badgeData.badgeResource),badgeData.point, badgeData.date)
+                    }
                 }
 
                 else -> DLog.e("TEST","empty")
@@ -213,7 +239,7 @@ fun DonutBadgeCard(painter : Painter, point : Int, date : String){
     Card(shape = RoundedCornerShape(0.dp),
         elevation = 0.dp,
         modifier = Modifier.fillMaxWidth()
-            .height(130.dp)){
+            .height(130.dp)) {
 
         Column(Modifier.fillMaxSize()
             .padding(top = 20.dp, bottom = 8.dp)) {
