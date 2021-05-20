@@ -21,17 +21,20 @@
 
         </activity>
 
-        <activity android:name=".view.main.MainActivity" />
+        <activity android:name=".view.main.MainActivity">
+
+        </activity>
         <activity android:name=".view.scrap.ScrapDetailActivity" />
         <activity android:name=".view.mypage.MyPageActivity">
+        </activity>
+        <activity android:name=".view.mydonut.MyDonutActivity" />
+        <activity android:name=".view.webView.WebViewActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
-        <activity android:name=".view.mydonut.MyDonutActivity" />
         <!--<activity android:name=".view.alarm.AlarmDetailActivity" />-->
 
         <receiver
