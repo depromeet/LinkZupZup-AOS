@@ -1,19 +1,19 @@
 package com.depromeet.linkzupzup.view.custom
 
+import android.util.Size
 import android.widget.CompoundButton
-import android.widget.NumberPicker
-import android.widget.TimePicker
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.SwitchCompat
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Divider
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,9 +35,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.component.SliderAdapter
+import com.depromeet.linkzupzup.extensions.getDay
+import com.depromeet.linkzupzup.extensions.isToday
 import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.utils.CommonUtil
 import com.depromeet.linkzupzup.utils.DLog
+import com.depromeet.linkzupzup.utils.DateUtil
 import com.depromeet.linkzupzup.utils.DeviceUtils
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.VerticalPager
@@ -46,6 +49,8 @@ import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.absoluteValue
 
 /**
@@ -162,6 +167,10 @@ fun CustomPreView() {
                     DLog.e("TEST", if (it) "공휴일 알람 비활성" else "공휴일 알람 활성")
                 })
 
+            val datePickerItems = DateUtil.getDateList()
+            CustomDatePicker(items = datePickerItems)
+
+
         }
 
     }
@@ -203,8 +212,7 @@ fun CustomViewPicker(datas: ArrayList<String>,
 
 @ExperimentalPagerApi
 @Composable
-fun CustomTimePicker(modifier: Modifier = Modifier
-    .fillMaxWidth()
+fun CustomTimePicker(modifier: Modifier = Modifier.fillMaxWidth()
     .padding(horizontal = 24.dp),
     onChangeListener: (Int, Int, Int) -> Unit = { amPm, hour, minute -> }) {
     Box(modifier = modifier.height(170.dp), contentAlignment = Alignment.Center) {
@@ -406,12 +414,14 @@ fun CustomToogle(modifier: Modifier, spaceSize: Dp = 6.dp, datas: ArrayList<Stri
             val textColor = if (selectedState.value == index) Color(0xFFFFFFFF) else Color(0xFF878D91)
 
             Card(shape = RoundedCornerShape(4.dp), elevation = 0.dp, backgroundColor = backgroundColor, border = border,
-                modifier = Modifier.fillMaxHeight().clickable {
-                    if (selectedState.value != index) {
-                        selectedState.value = if (selectedState.value == 0) 1 else 0
-                        onChangeListener.invoke(index)
-                    }
-                }) {
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .clickable {
+                        if (selectedState.value != index) {
+                            selectedState.value = if (selectedState.value == 0) 1 else 0
+                            onChangeListener.invoke(index)
+                        }
+                    }) {
                 Column(verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
@@ -434,7 +444,8 @@ fun CustomToogle(modifier: Modifier, spaceSize: Dp = 6.dp, datas: ArrayList<Stri
 @Composable
 fun CustomTextCheckBox(modifier: Modifier = Modifier.height(20.dp), enableImg: Int, disableImg: Int, text: String, enableColor: Color = Color(0xFF4076F6), disableColor: Color = Color(0xFF878D91), onChangeListener: (Boolean) -> Unit = {}) {
     val checked = remember { mutableStateOf(false) }
-    Card(elevation = 0.dp, backgroundColor = Color.Transparent, modifier = Modifier.wrapContentSize()
+    Card(elevation = 0.dp, backgroundColor = Color.Transparent, modifier = Modifier
+        .wrapContentSize()
         .clickable {
             checked.value = !checked.value
             onChangeListener.invoke(!checked.value)
@@ -454,5 +465,73 @@ fun CustomTextCheckBox(modifier: Modifier = Modifier.height(20.dp), enableImg: I
                 textAlign = TextAlign.Center)
 
         }
+    }
+}
+
+@Composable
+fun CustomDatePicker(modifier: Modifier = Modifier.fillMaxWidth().background(Color(0xFFF8FAFB)),
+                     items: ArrayList<Pair<String, Calendar>>,
+                     onClickListener: (Int, Pair<String, Calendar>)->Unit = { i, d -> }) {
+    Row(modifier) {
+        LazyRow(Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(0.dp)) {
+            itemsIndexed(items) { index, date ->
+                CustomDatePickerItemView(index = index, data = date, onClickListener = onClickListener)
+            }
+        }
+    }
+}
+
+@Composable
+fun CustomDatePickerItemView(dpSize: Size = Size(46,44), index: Int, data: Pair<String, Calendar>, onClickListener: (Int, Pair<String, Calendar>)->Unit = { i, d -> }) {
+    Card(shape = MaterialTheme.shapes.large,
+        backgroundColor = Color.Transparent,
+        elevation = 0.dp,
+        modifier = Modifier.size(dpSize.width.dp, dpSize.height.dp)
+            .noRippleClickable { onClickListener.invoke(index, data) }) {
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()
+                .background(Color.Transparent)) {
+
+            // week
+            Text(text = data.first,
+                style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_regular, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = Color(0xFF292A2B)),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.wrapContentWidth()
+                    .height(16.dp))
+
+            Spacer(Modifier.weight(1f))
+
+            Box(Modifier.size(24.dp)) {
+
+                val isNow = data.second.isToday()
+                val txtColor = if (isNow) Color.White else Color(0xFF292A2B)
+
+                // circle background
+                if (isNow) Surface(shape = CircleShape,
+                    modifier = Modifier.size(24.dp)) {
+                    Column(verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxSize()
+                            .background(Color(0xFF4076F6))) {}
+                }
+
+                // date
+                Column(verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxSize()) {
+
+                    Text(text = "${data.second.getDay()}",
+                        style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700)), fontSize = 12.sp, lineHeight = 16.8.sp, color = txtColor),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.wrapContentWidth().absolutePadding())
+
+                }
+            }
+
+        }
+
     }
 }
