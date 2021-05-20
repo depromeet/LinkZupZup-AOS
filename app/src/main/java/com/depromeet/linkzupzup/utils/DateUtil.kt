@@ -23,4 +23,22 @@ object DateUtil {
     fun dateStrToCalendar(dateStr: String): Calendar
             = dateToCalendar(dateStrToDate(dateStr))
 
+    val weeklyStrArr = arrayListOf("일", "월", "화", "수", "목", "금", "토")
+
+    fun getDateList(untilNum: Int = 37): ArrayList<Pair<String, Calendar>>
+        = arrayListOf<Pair<String, Calendar>>().apply {
+            (0..untilNum).forEach { inc ->
+                Calendar.getInstance().let { cal ->
+                    // increase
+                    cal.add(Calendar.DATE, inc)
+
+                    // day of week
+                    val weekNum = cal.get(Calendar.DAY_OF_WEEK)
+                    val weekStr = weeklyStrArr[weekNum - 1]
+
+                    add(Pair(weekStr, cal.clone() as Calendar))
+                }
+            }
+        }
+
 }
