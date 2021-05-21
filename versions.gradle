@@ -87,7 +87,8 @@ tedPermission.runtime = "gun0912.ted:tedpermission:$tedPermissionVersion"
 lib.tedPermission = tedPermission
 
 def multidex = [:]
-multidex.runtime = "androidx.multidex:multidex:$multidexVersion"
+// multidex.runtime = "androidx.multidex:multidex:$multidexVersion"
+multidex.runtime = "com.android.support:multidex:$multidexVersion"
 lib.multidex = multidex
 
 ext.lib = lib

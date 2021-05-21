@@ -12,7 +12,7 @@ import com.depromeet.linkzupzup.utils.DLog
 class SliderAdapter(callback: (View)->Unit): RecyclerView.Adapter<SliderItemViewHolder>() {
 
     private val data: ArrayList<String> = ArrayList();
-    private val clickListener = View.OnClickListener { v -> v?.let { callback.invoke(it) } }
+    private val clickListener = View.OnClickListener { v -> v?.let { callback(it) } }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SliderItemViewHolder {
         val itemView: View = LayoutInflater.from(parent.context).inflate(R.layout.slider_holder_layout, parent, false)

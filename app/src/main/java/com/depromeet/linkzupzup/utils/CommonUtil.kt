@@ -21,7 +21,7 @@ object CommonUtil {
     }
     fun getRandomeTagColor(bound: Int = 7, colors: ArrayList<TagColor> = TagColors): TagColor {
         Random().nextInt(bound).let { randomNum ->
-            return colors[randomNum].also { DLog.e("COLOR", "textColor: ${it.textColor}, bgColor: ${it.bgColor}") }
+            return colors[randomNum]
         }
     }
 
