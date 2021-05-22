@@ -40,3 +40,48 @@ fun Calendar.compareDate(calendar: Calendar): Boolean {
 }
 
 fun Calendar.isToday(): Boolean = compareDate(Calendar.getInstance())
+
+
+
+
+/**
+ * Long Time Value -> Calendar
+ */
+fun timeToCalendar(timeValue: Long): Calendar
+        = Calendar.getInstance().apply { time = Date(timeValue) }
+/**
+ * Calendar -> AM or PM
+ */
+fun Calendar.isAmPm(): Boolean = get(Calendar.AM_PM) == Calendar.AM
+
+/**
+ * Calendar -> hour
+ */
+fun Calendar.getHourValue(): Int = get(Calendar.HOUR)
+
+/**
+ * Calendar -> minute
+ */
+fun Calendar.getMinuteValue(): Int = get(Calendar.MINUTE)
+
+/**
+ * Day -> Calendar ( 반영 )
+ */
+fun Calendar.setDay(day: Int): Calendar = apply { set(Calendar.DAY_OF_WEEK, day) }
+
+/**
+ * AM or PM -> Calendar ( 반영 )
+ * amOrPm -> 0 : AM (= Calendar.AM )
+ *           1 : PM (= Calendar.PM )
+ */
+fun Calendar.setAMorPM(amOrPm: Int): Calendar = apply { set(Calendar.AM_PM, amOrPm) }
+
+/**
+ * Hour -> Calendar ( 반영 )
+ */
+fun Calendar.setHour(hour: Int): Calendar = apply { set(Calendar.HOUR, hour) }
+
+/**
+ * Minute -> Calendar ( 반영 )
+ */
+fun Calendar.setMinute(minute: Int): Calendar = apply { set(Calendar.MINUTE, minute) }
