@@ -2,6 +2,7 @@ package com.depromeet.linkzupzup.extensions
 
 import android.content.Context
 import android.view.View
+import android.widget.Toast
 import androidx.annotation.DimenRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -78,6 +79,8 @@ fun LazyItemScope.topSpacer(index: Int, size: Dp) = if (index == 0) Spacer(Modif
 
 @Composable
 fun LazyItemScope.bottomSpacer(index: Int, items: List<*>, size: Dp) = if (index >= items.size - 1) Spacer(Modifier.height(size)) else null
+
+fun toast(ctx: Context, msg: String, duration: Int = Toast.LENGTH_SHORT) = Toast.makeText(ctx, msg, duration).show()
 
 /**
  * 참고 : https://meetup.toast.com/posts/130

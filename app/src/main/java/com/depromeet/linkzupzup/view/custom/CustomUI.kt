@@ -35,6 +35,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.component.SliderAdapter
+import com.depromeet.linkzupzup.extensions.compareDate
 import com.depromeet.linkzupzup.extensions.getDay
 import com.depromeet.linkzupzup.extensions.isToday
 import com.depromeet.linkzupzup.extensions.noRippleClickable
@@ -77,11 +78,11 @@ fun CustomSwitchCompat(modifier: Modifier = Modifier.height(24.dp),
                 thumbDrawable = ContextCompat.getDrawable(context, thumbDrawableRes)
                 trackDrawable = ContextCompat.getDrawable(context, trackDrawableRes)
                 checkedOnChangeListener?.let { listener -> setOnCheckedChangeListener(listener) }
-                instanceCallback.invoke(this)
+                instanceCallback(this)
             }
         },
         update = { view ->
-            updateCallback.invoke(view)
+            updateCallback(view)
         }
     )
 
@@ -99,11 +100,11 @@ fun CustomSwitchCompat(modifier: Modifier = Modifier.height(24.dp),
 //        modifier = modifier,
 //        factory = { ctx ->
 //            NumberPicker(ctx).apply {
-//                instanceCallback.invoke(this)
+//                instanceCallback(this)
 //            }
 //        },
 //        update = { view ->
-//            updateCallback.invoke(view)
+//            updateCallback(view)
 //        }
 //    )
 //}
@@ -127,14 +128,14 @@ fun CustomSwitchCompat(modifier: Modifier = Modifier.height(24.dp),
 //                wrapSelectorWheel = enableWrapSelectorWheel
 //                displayedValues = datas
 //                onValueChangeListener?.let { listenr -> setOnValueChangedListener(listenr) }
-//                instanceCallback.invoke(this)
+//                instanceCallback(this)
 //                setOnScrollListener { numberPicker, i ->
 //                    DLog.e("TEST", "scroll: $i")
 //                }
 //            }
 //        },
 //        update = { view ->
-//            updateCallback.invoke(view)
+//            updateCallback(view)
 //        }
 //    )
 //}
@@ -201,11 +202,11 @@ fun CustomViewPicker(datas: ArrayList<String>,
                     val childPosition = getChildLayoutPosition(view)
                     smoothScrollToPosition(childPosition)
                 }.apply { setData(datas) }
-                instanceCallback.invoke(this)
+                instanceCallback(this)
             }
         },
         update = { view ->
-            updateCallback.invoke(view)
+            updateCallback(view)
         }
     )
 }
@@ -234,13 +235,18 @@ fun CustomTimePicker(modifier: Modifier = Modifier.fillMaxWidth()
         Row {
 
             // 오전, 오후
-            arrayListOf("오후", "오전").let { amPms ->
-                CustomImgTextPicker(imgs = arrayListOf(R.drawable.ic_sun_img, R.drawable.ic_sun_img),
-                    txts = amPms,
-                    spaceSize = 4.dp,
-                    modifier = Modifier.fillMaxHeight()) { str, idx ->
+            arrayListOf("\uD83C\uDF19 오후", "\u2600\uFE0F 오전").let { amPms ->
+//                CustomImgTextPicker(imgs = arrayListOf(R.drawable.ic_sun_img, R.drawable.ic_sun_img),
+//                    txts = amPms,
+//                    spaceSize = 4.dp,
+//                    modifier = Modifier.fillMaxHeight()) { str, idx ->
+//                    amPmVal.value = idx
+//                    onChangeListener(amPmVal.value, hourVal.value, minuteVal.value)
+//                }
+
+                CustomTextPicker(datas = amPms, modifier = Modifier.fillMaxHeight()) { str, idx ->
                     amPmVal.value = idx
-                    onChangeListener.invoke(amPmVal.value, hourVal.value, minuteVal.value)
+                    onChangeListener(amPmVal.value, hourVal.value, minuteVal.value)
                 }
             }
 
@@ -252,7 +258,7 @@ fun CustomTimePicker(modifier: Modifier = Modifier.fillMaxWidth()
             }.let { hours ->
                 CustomTextPicker(datas = hours) { str, idx ->
                     hourVal.value = idx
-                    onChangeListener.invoke(amPmVal.value, hourVal.value, minuteVal.value)
+                    onChangeListener(amPmVal.value, hourVal.value, minuteVal.value)
                 }
             }
 
@@ -262,7 +268,7 @@ fun CustomTimePicker(modifier: Modifier = Modifier.fillMaxWidth()
             }.let { minutes ->
                 CustomTextPicker(datas = minutes) { str, idx ->
                     minuteVal.value = idx
-                    onChangeListener.invoke(amPmVal.value, hourVal.value, minuteVal.value)
+                    onChangeListener(amPmVal.value, hourVal.value, minuteVal.value)
                 }
             }
 
@@ -288,7 +294,7 @@ fun CustomImgTextPicker(modifier: Modifier = Modifier.height(170.dp),
         // https://google.github.io/accompanist/pager/#reacting-to-page-changes
         LaunchedEffect(txtsState) {
             snapshotFlow { txtsState.currentPage }.collect {
-                onChangeListener.invoke(txts[it], it)
+                onChangeListener(txts[it], it)
             }
         }
 
@@ -361,7 +367,7 @@ fun CustomTextPicker(modifier: Modifier = Modifier.height(170.dp),
 
         LaunchedEffect(datasState) {
             snapshotFlow { datasState.currentPage }.collect {
-                onChangeListener.invoke(datas[it], it)
+                onChangeListener(datas[it], it)
             }
         }
 
@@ -419,7 +425,7 @@ fun CustomToogle(modifier: Modifier, spaceSize: Dp = 6.dp, datas: ArrayList<Stri
                     .clickable {
                         if (selectedState.value != index) {
                             selectedState.value = if (selectedState.value == 0) 1 else 0
-                            onChangeListener.invoke(index)
+                            onChangeListener(index)
                         }
                     }) {
                 Column(verticalArrangement = Arrangement.Center,
@@ -448,7 +454,7 @@ fun CustomTextCheckBox(modifier: Modifier = Modifier.height(20.dp), enableImg: I
         .wrapContentSize()
         .clickable {
             checked.value = !checked.value
-            onChangeListener.invoke(!checked.value)
+            onChangeListener(!checked.value)
         }) {
         Row(modifier = modifier,
             verticalAlignment = Alignment.CenterVertically,
@@ -469,27 +475,30 @@ fun CustomTextCheckBox(modifier: Modifier = Modifier.height(20.dp), enableImg: I
 }
 
 @Composable
-fun CustomDatePicker(modifier: Modifier = Modifier.fillMaxWidth().background(Color(0xFFF8FAFB)),
+fun CustomDatePicker(pickDate: Calendar = Calendar.getInstance(),
                      items: ArrayList<Pair<String, Calendar>>,
+                     modifier: Modifier = Modifier.fillMaxWidth().background(Color(0xFFF8FAFB)),
                      onClickListener: (Int, Pair<String, Calendar>)->Unit = { i, d -> }) {
     Row(modifier) {
         LazyRow(Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(horizontal = 24.dp, vertical = 20.dp),
             horizontalArrangement = Arrangement.spacedBy(0.dp)) {
             itemsIndexed(items) { index, date ->
-                CustomDatePickerItemView(index = index, data = date, onClickListener = onClickListener)
+                CustomDatePickerItemView(pickDate = pickDate, index = index, data = date, onClickListener = onClickListener)
             }
         }
     }
 }
 
 @Composable
-fun CustomDatePickerItemView(dpSize: Size = Size(46,44), index: Int, data: Pair<String, Calendar>, onClickListener: (Int, Pair<String, Calendar>)->Unit = { i, d -> }) {
+fun CustomDatePickerItemView(pickDate: Calendar = Calendar.getInstance(), dpSize: Size = Size(46,44), index: Int, data: Pair<String, Calendar>, onClickListener: (Int, Pair<String, Calendar>)->Unit = { i, d -> }) {
     Card(shape = MaterialTheme.shapes.large,
         backgroundColor = Color.Transparent,
         elevation = 0.dp,
         modifier = Modifier.size(dpSize.width.dp, dpSize.height.dp)
-            .noRippleClickable { onClickListener.invoke(index, data) }) {
+            .noRippleClickable {
+                onClickListener(index, data)
+            }) {
 
         Column(horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
@@ -506,11 +515,12 @@ fun CustomDatePickerItemView(dpSize: Size = Size(46,44), index: Int, data: Pair<
 
             Box(Modifier.size(24.dp)) {
 
-                val isNow = data.second.isToday()
-                val txtColor = if (isNow) Color.White else Color(0xFF292A2B)
+                // val isNow = data.second.isToday()
+                val isPickDate = data.second.compareDate(pickDate)
+                val txtColor = if (isPickDate) Color.White else Color(0xFF292A2B)
 
                 // circle background
-                if (isNow) Surface(shape = CircleShape,
+                if (isPickDate) Surface(shape = CircleShape,
                     modifier = Modifier.size(24.dp)) {
                     Column(verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -526,7 +536,7 @@ fun CustomDatePickerItemView(dpSize: Size = Size(46,44), index: Int, data: Pair<
                     Text(text = "${data.second.getDay()}",
                         style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700)), fontSize = 12.sp, lineHeight = 16.8.sp, color = txtColor),
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.wrapContentWidth().absolutePadding())
+                        modifier = Modifier.wrapContentWidth())
 
                 }
             }

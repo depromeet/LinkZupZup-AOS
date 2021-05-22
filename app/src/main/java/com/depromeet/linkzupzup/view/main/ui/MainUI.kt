@@ -48,10 +48,12 @@ import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.dataSources.repositories.UserRepositoryImpl
 import com.depromeet.linkzupzup.domains.UserUseCases
+import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.presenter.MainViewModel
 import com.depromeet.linkzupzup.presenter.model.*
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.DLog
+import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -515,22 +517,6 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
 }
 
 @Composable
-fun BottomSheetCloseBtn(painter: Painter, onClick: ()->Unit){
-    Row(verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start,
-        modifier = Modifier.width(68.dp)
-            .height(56.dp)
-            .clickable(onClick = onClick)) {
-
-        Spacer(Modifier.width(20.dp))
-
-        Image(painter = painter,
-            contentDescription = null,
-            Modifier.size(24.dp))
-    }
-}
-
-@Composable
 fun BottomHeaderCard(padding: PaddingValues = PaddingValues(0.dp)){
     // in ColumnScope
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -776,7 +762,7 @@ fun CustomTextField(modifier: Modifier = Modifier
                 value = text.value,
                 onValueChange = {
                     text.value = it
-                    onValueChange.invoke(it)
+                    onValueChange(it)
                 },
                 modifier = textModifier.align(Alignment.Center),
                 textStyle = TextStyle(

@@ -32,10 +32,11 @@ fun Int.digitFormat1000(digitFormat: DecimalFormat = DecimalFormat("#,###,###"))
 
 fun Calendar.getDay(): Int = get(Calendar.DATE)
 
-fun Calendar.isToday(): Boolean {
-    Calendar.getInstance().let { now ->
-        return get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
-               get(Calendar.MONTH) == now.get(Calendar.MONTH) &&
-               get(Calendar.DATE) == now.get(Calendar.DATE)
-    }
+fun Calendar.compareDate(calendar: Calendar): Boolean {
+    return get(Calendar.YEAR) == calendar.get(Calendar.YEAR) &&
+           get(Calendar.MONTH) == calendar.get(Calendar.MONTH) &&
+           get(Calendar.DATE) == calendar.get(Calendar.DATE)
+
 }
+
+fun Calendar.isToday(): Boolean = compareDate(Calendar.getInstance())
