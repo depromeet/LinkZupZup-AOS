@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -32,6 +33,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.SecureFlagPolicy
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.extensions.noRippleClickable
@@ -159,85 +163,95 @@ fun WebViewBackButton(painter: Painter, onClick : () -> Unit){
 
 @Composable
 fun WebViewCustomDialog(openDialog : MutableState<Boolean>){
+    if(openDialog.value)
+        WebViewCustomDialog(onDismissRequest = { openDialog.value = false })
+}
 
-    if(openDialog.value){
-        AlertDialog(
-            modifier = Modifier
-                .height(293.dp)
-                .width(263.dp),
-            shape = RoundedCornerShape(8.dp),
-            backgroundColor = Color.White,
-            onDismissRequest = { openDialog.value = false },
-            title = { DialogBody(234) },
-            confirmButton = {
-
-                Button(shape = RoundedCornerShape(4.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Blue50, contentColor = Color.White),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp),
-                    onClick = { openDialog.value = false }) {
-
-                    Text("확인",
-                        textAlign = TextAlign.Center,
-                        style = TextStyle(
-                            fontSize = 14.sp,
-                            lineHeight = 17.5.sp,
-                            fontFamily = FontFamily(Font(
-                                resId = R.font.spoqa_hansansneo_bold,
-                                weight = FontWeight.W700))))
-                }
-            }
-        )
+@Composable
+fun WebViewCustomDialog(onDismissRequest: () -> Unit){
+    Dialog(onDismissRequest = onDismissRequest) {
+        DialogBody(234, onDismissRequest)
     }
-
 }
 
 
 @Composable
-fun DialogBody(readCount : Int){
+fun DialogBody(readCount : Int, onClick: () -> Unit){
 
     val thisWeekCount : String = "이번 달 읽은 링크 ${readCount}개"
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth()) {
+    Card(shape = Shapes.small,
+        modifier = Modifier
+            .height(293.dp)
+            .width(263.dp)
+            .background(Color.Transparent)) {
 
-        Image(painter = painterResource(id = R.drawable.ic_donut05),
-            contentDescription = null,
+        Column(horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
             modifier = Modifier
-                .size(124.dp, 92.dp)
-                .padding(bottom = 20.dp))
+                .fillMaxSize()
+                .padding(16.dp)){
 
-        Text(text ="\uD83D\uDD25 읽기 완료!",
-            modifier = Modifier.padding(bottom=8.dp),
-            style = TextStyle(
-                fontSize = 18.sp,
-                lineHeight = 22.5.sp,
-                fontFamily = FontFamily(Font(
-                    resId = R.font.spoqa_hansansneo_bold,
-                    weight = FontWeight.W700))))
+            Spacer(modifier = Modifier.height(24.dp))
 
-        val thisWeekCountStr = AnnotatedString(
-            text = thisWeekCount,
-            spanStyles = listOf(
-                AnnotatedString.Range(
-                    start = 11,
-                    end = thisWeekCount.length,
-                    item = SpanStyle(color = Gray70,
-                        fontSize = 12.sp,
+            Image(painter = painterResource(id = R.drawable.ic_donut05),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(124.dp, 92.dp))
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(text ="\uD83D\uDD25 읽기 완료!",
+                style = TextStyle(
+                    fontSize = 18.sp,
+                    lineHeight = 22.5.sp,
+                    fontFamily = FontFamily(Font(
+                        resId = R.font.spoqa_hansansneo_bold,
+                        weight = FontWeight.W700))))
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            val thisWeekCountStr = AnnotatedString(
+                text = thisWeekCount,
+                spanStyles = listOf(
+                    AnnotatedString.Range(
+                        start = 11,
+                        end = thisWeekCount.length,
+                        item = SpanStyle(color = Gray70,
+                            fontSize = 12.sp,
+                            fontFamily = FontFamily(Font(
+                                resId = R.font.spoqa_hansansneo_bold,
+                                weight = FontWeight.W700))))
+                )
+            )
+            Text(thisWeekCountStr,
+                style = TextStyle(
+                    fontSize = 12.sp,
+                    lineHeight = 16.8.sp,
+                    color= Gray70,
+                    fontFamily = FontFamily(Font(
+                        resId = R.font.spoqa_hansansneo_regular,
+                        weight = FontWeight.W700))))
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(shape = RoundedCornerShape(4.dp),
+                colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Blue50, contentColor = Color.White),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                onClick = onClick) {
+
+                Text("확인",
+                    textAlign = TextAlign.Center,
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        lineHeight = 17.5.sp,
                         fontFamily = FontFamily(Font(
                             resId = R.font.spoqa_hansansneo_bold,
                             weight = FontWeight.W700))))
-            )
-        )
-        Text(thisWeekCountStr,
-            style = TextStyle(
-                fontSize = 12.sp,
-                lineHeight = 16.8.sp,
-                color= Gray70,
-                fontFamily = FontFamily(Font(
-                    resId = R.font.spoqa_hansansneo_regular,
-                    weight = FontWeight.W700))))
+            }
+        }
     }
 
 }
@@ -246,6 +260,6 @@ fun DialogBody(readCount : Int){
 @Composable
 fun PreviewDialogBody(){
     Surface(Modifier.background(Color.White)) {
-        DialogBody(readCount = 234)
+        DialogBody(readCount = 234, onClick = { })
     }
 }
