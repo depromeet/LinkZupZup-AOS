@@ -29,6 +29,7 @@
         <activity android:name=".view.mypage.MyPageActivity" />
         <activity android:name=".view.mydonut.MyDonutActivity" />
         <activity android:name=".view.alarm.AlarmDetailActivity" />
+        <activity android:name=".view.webView.WebViewActivity"/>
 
         <receiver
             android:name=".component.AlarmReceiver"
