@@ -11,4 +11,5 @@ val viewModelModule = module {
     viewModel { MyPageViewModel() }
     viewModel { MyDonutViewModel() }
     viewModel { LinkHistoryDetailViewModel(get()) }
+    viewModel { WebViewViewModel() }
 }
