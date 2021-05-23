@@ -41,7 +41,13 @@ fun Calendar.compareDate(calendar: Calendar): Boolean {
 
 fun Calendar.isToday(): Boolean = compareDate(Calendar.getInstance())
 
-
+fun Calendar.getAlarmDateStr(): String {
+    val hour = getDay()
+    val dateStr = "4월 10일 오전 12:50분"
+    val dateLastStr = "에 알림이 울려요!"
+    val alarmDateStr = "${dateStr}${dateLastStr}"
+    return ""
+}
 
 
 /**
@@ -49,39 +55,50 @@ fun Calendar.isToday(): Boolean = compareDate(Calendar.getInstance())
  */
 fun timeToCalendar(timeValue: Long): Calendar
         = Calendar.getInstance().apply { time = Date(timeValue) }
+// fun calendarToTIme()
+
 /**
  * Calendar -> AM or PM
+ * 0: AM (= Calendar.AM )
+ * 1: PM (= Calendar.PM )
  */
-fun Calendar.isAmPm(): Boolean = get(Calendar.AM_PM) == Calendar.AM
+fun Calendar.isAmPm(): Boolean = getAMPM() == Calendar.AM
+/**
+ * 0: AM (= Calendar.AM )
+ * 1: PM (= Calendar.PM )
+ */
+fun Calendar.getAMPM(): Int = get(Calendar.AM_PM)
+fun Calendar.setAMorPM(amOrPm: Int): Calendar = apply { set(Calendar.AM_PM, amOrPm) }
+
+/**
+ * Calendar -> Month
+ */
+fun Calendar.getMonth(): Int = get(Calendar.MONTH)
+fun Calendar.setMonth(month: Int): Calendar = apply { set(Calendar.MONTH, month) }
+
+/**
+ * Calendar -> Date
+ */
+fun Calendar.getDate(): Int = get(Calendar.DATE)
+fun Calendar.setDate(year: Int, month: Int, day: Int): Calendar = apply {
+    set(Calendar.YEAR, year)
+    set(Calendar.MONTH, month)
+    set(Calendar.DATE, day)
+}
+fun Calendar.setDate(date: Calendar): Calendar = apply {
+    set(Calendar.YEAR, date.get(Calendar.YEAR))
+    set(Calendar.MONTH, date.get(Calendar.MONTH))
+    set(Calendar.DATE, date.get(Calendar.DATE))
+}
 
 /**
  * Calendar -> hour
  */
 fun Calendar.getHourValue(): Int = get(Calendar.HOUR)
-
-/**
- * Calendar -> minute
- */
-fun Calendar.getMinuteValue(): Int = get(Calendar.MINUTE)
-
-/**
- * Day -> Calendar ( 반영 )
- */
-fun Calendar.setDay(day: Int): Calendar = apply { set(Calendar.DAY_OF_WEEK, day) }
-
-/**
- * AM or PM -> Calendar ( 반영 )
- * amOrPm -> 0 : AM (= Calendar.AM )
- *           1 : PM (= Calendar.PM )
- */
-fun Calendar.setAMorPM(amOrPm: Int): Calendar = apply { set(Calendar.AM_PM, amOrPm) }
-
-/**
- * Hour -> Calendar ( 반영 )
- */
 fun Calendar.setHour(hour: Int): Calendar = apply { set(Calendar.HOUR, hour) }
 
 /**
- * Minute -> Calendar ( 반영 )
+ * Minute
  */
+fun Calendar.getMinuteValue(): Int = get(Calendar.MINUTE)
 fun Calendar.setMinute(minute: Int): Calendar = apply { set(Calendar.MINUTE, minute) }
