@@ -446,8 +446,9 @@ fun MainHashtagCard(tagName : String, backColor : Color, textColor : Color){
 @Composable
 fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineScope : CoroutineScope, vm : MainViewModel){
 
-    var saveBtnColor = remember { mutableStateOf(Gray50t) }
-    var saveTxtColor = remember { mutableStateOf(Gray70) }
+    val saveBtnColor = remember { mutableStateOf(Gray50t) }
+    val saveTxtColor = remember { mutableStateOf(Gray70) }
+
     // in Column Scope
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -511,7 +512,10 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
             modifier = Modifier.fillMaxWidth()
                 .height(52.dp)
                 .padding(start = 24.dp, end = 24.dp),
-            onClick = { DLog.e("MainUI", "BottomSheet/click save link button") }) {
+            onClick = {
+                // Room Link table 저장
+
+            }) {
 
             Text("저장하기",
                 textAlign = TextAlign.Center,
