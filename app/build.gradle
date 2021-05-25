@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-android-extensions'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -37,6 +38,12 @@ android {
     }
     buildFeatures {
         compose true
+    }
+    kapt {
+        generateStubs = true
+    }
+    dataBinding {
+        enabled = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion composeVersion
@@ -79,6 +86,11 @@ dependencies {
     implementation lib.insets.runtime
     implementation lib.pager.runtime
     implementation lib.multidex.runtime
+    implementation lib.room.runtime
+    implementation lib.room.legacy
+    implementation lib.room.lifecycle
+    implementation lib.room.viewmodel
+    kapt lib.room.compiler
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
