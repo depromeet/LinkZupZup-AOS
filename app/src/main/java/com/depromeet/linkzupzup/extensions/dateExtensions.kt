@@ -49,6 +49,10 @@ fun Calendar.getAlarmDateStr(): String {
     return ""
 }
 
+fun Calendar.clearMillis(): Calendar = apply {
+    set(Calendar.SECOND, 0)
+    set(Calendar.MILLISECOND, 0)
+}
 
 /**
  * Long Time Value -> Calendar
@@ -102,3 +106,15 @@ fun Calendar.setHour(hour: Int): Calendar = apply { set(Calendar.HOUR, hour) }
  */
 fun Calendar.getMinuteValue(): Int = get(Calendar.MINUTE)
 fun Calendar.setMinute(minute: Int): Calendar = apply { set(Calendar.MINUTE, minute) }
+
+/**
+ * AlarmMananger에 알람을 등록할 시, 사용될 requestCode를 아래와 같이
+ * "년월일시분초"를 모두 더한 합으로 사용할 예정입니다.
+ */
+fun Calendar.getTotalTimeSum(): Int
+    = get(Calendar.YEAR) +
+      get(Calendar.MONTH) +
+      get(Calendar.DATE) +
+      get(Calendar.HOUR) +
+      get(Calendar.MINUTE) +
+      get(Calendar.SECOND)

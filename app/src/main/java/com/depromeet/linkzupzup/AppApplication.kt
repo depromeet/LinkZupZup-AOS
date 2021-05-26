@@ -2,6 +2,7 @@ package com.depromeet.linkzupzup
 
 import androidx.multidex.MultiDexApplication
 import com.depromeet.linkzupzup.di.*
+import com.depromeet.linkzupzup.receiver.NotificationSetting
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -11,6 +12,9 @@ class AppApplication: MultiDexApplication() {
 
     override fun onCreate() {
         super.onCreate()
+
+        // Notification ChannelID 생성
+        NotificationSetting.initChannelId(this)
 
         startKoin {
             androidLogger()
