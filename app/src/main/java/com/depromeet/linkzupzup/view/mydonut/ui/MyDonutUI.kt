@@ -547,8 +547,8 @@ fun AdditionalPointInfo(){
                 item = SpanStyle(color = Color(0xff1f1f1f),
                     fontSize = 12.sp,
                     fontFamily = FontFamily(Font(
-                        resId = R.font.spoqa_hansansneo_bold,
-                        weight = FontWeight.W700)))
+                        resId = R.font.spoqa_hansansneo_regular,
+                        weight = FontWeight.W500)))
             ),
             AnnotatedString.Range(
                 start = 24,
@@ -556,8 +556,8 @@ fun AdditionalPointInfo(){
                 item = SpanStyle(color = Color(0xff1f1f1f),
                     fontSize = 12.sp,
                     fontFamily = FontFamily(Font(
-                        resId = R.font.spoqa_hansansneo_bold,
-                        weight = FontWeight.W700)))
+                        resId = R.font.spoqa_hansansneo_regular,
+                        weight = FontWeight.W500)))
             )
         )
     )
