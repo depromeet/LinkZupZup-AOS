@@ -455,7 +455,8 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
         // 닫기 버튼
         Row(horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .height(56.dp)) {
 
             BottomSheetCloseBtn(painterResource(id = R.drawable.ic_close)){
@@ -493,15 +494,18 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
         }
 
         /* 클릭된 해시태그 보여주는 열 */
-        BottomSheetSelectedTagList(vm = vm, modifier = Modifier.fillMaxWidth()
+        BottomSheetSelectedTagList(vm = vm, modifier = Modifier
+            .fillMaxWidth()
             .padding(horizontal = 24.dp))
 
         /* 하단 저장하기 버튼 */
         Button(shape = RoundedCornerShape(4.dp),
+
             colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Gray50t, contentColor = Gray70),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .height(52.dp)
-                .padding(start = 24.dp, end = 24.dp, bottom = 16.dp),
+                .padding(start = 24.dp, end = 24.dp),
             onClick = { DLog.e("MainUI", "BottomSheet/click save link button") }) {
 
             Text("저장하기",
@@ -596,8 +600,9 @@ fun BottomSheetSelect(vm : MainViewModel){
         LinkHashData(10,"ios","",TagColor(TagBgColor04, TagTextColor04)))
 
     Row(verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
-        .height(18.dp)){
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(18.dp)){
 
         Text(text = "해시태그를 선택해주세요.",
             modifier = Modifier.weight(1f),
@@ -640,27 +645,71 @@ fun BottomSheetSelect(vm : MainViewModel){
 fun ButtomSheetInputTag(){
     val beforeClickStr : String = "원하시는 해시태그가 없으신가요?"
     val afterClickStr : String = "원하는 해시태그가 없다면 적어주세요!"
+
+    val isVisible = remember { mutableStateOf(false) }
+    val clickStr = remember { mutableStateOf(beforeClickStr) }
+    val strColor = remember { mutableStateOf(Gray70)}
+
     Column(modifier = Modifier.fillMaxWidth()){
         Text(
-            text = beforeClickStr,
+            text = clickStr.value,
             modifier = Modifier
-                .clickable(onClick = { }),
+                .noRippleClickable {
+                    isVisible.value = !isVisible.value
+                    if(isVisible.value) {
+                        clickStr.value = afterClickStr
+                        strColor.value = Gray100t
+                    }
+                    else {
+                        clickStr.value = beforeClickStr
+                        strColor.value = Gray70
+                    } },
             style = TextStyle(
                 fontSize = 12.sp,
-                color = Gray70,
+                color = strColor.value,
                 fontFamily = FontFamily(Font(
                     resId = R.font.spoqa_hansansneo_regular,
                     weight = FontWeight.W700))))
+
+        if(isVisible.value){
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp)){
+
+                CustomTextField(modifier = Modifier
+                    .height(40.dp)
+                    .weight(1f),
+                    useClearBtn = false,
+                    hintStr = "#")
+
+                Card(modifier = Modifier
+                    .width(40.dp)
+                    .height(40.dp)
+                    .align(Alignment.CenterVertically),
+                    shape = RoundedCornerShape(4.dp),
+                    backgroundColor = Gray70,
+                    elevation = 0.dp){
+                    Row(horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(8.dp)){
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_white_plus),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp))
+                    }
+                }
+                
+            }
+        }
     }
 }
 
 @Composable
 fun BottomSheetHashtagCard(vm : MainViewModel, tag: LinkHashData, isSelected : Boolean = false){
-    val ctx = LocalContext.current
     Card(
         modifier = Modifier
             .height(32.dp)
-            .clickable {
+            .noRippleClickable {
                 if (isSelected) vm.removeHashtag(tag)
                 else vm.addHashtag(tag)
             },
@@ -685,13 +734,7 @@ fun BottomSheetHashtagCard(vm : MainViewModel, tag: LinkHashData, isSelected : B
                     Image(
                         painter = painterResource(id = R.drawable.ic_close),
                         contentDescription = null,
-                        modifier = Modifier
-                            .size(12.dp)
-                            .clickable(onClick = {
-                                Toast
-                                    .makeText(ctx, "삭제버튼 클릭", Toast.LENGTH_SHORT)
-                                    .show()
-                            }))
+                        modifier = Modifier.size(12.dp))
                 }
             }
 
@@ -713,6 +756,8 @@ fun BottomSheetSelectedTagList(vm: MainViewModel, modifier: Modifier = Modifier.
             BottomSheetHashtagCard(vm, tag, isSelected = true)
         }
     }
+    
+    Spacer(modifier = Modifier.height(20.dp))
 }
 
 /**
@@ -727,6 +772,7 @@ fun CustomTextField(modifier: Modifier = Modifier
                     hintStr: String = "",
                     shape: Shape = RoundedCornerShape(4.dp),
                     backgroundColor: Color = Color(0xFFF1F2F5),
+                    useClearBtn : Boolean = true,
                     onValueChange: (String) -> Unit = {}) {
 
     Card(modifier = modifier,
@@ -783,26 +829,29 @@ fun CustomTextField(modifier: Modifier = Modifier
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done, keyboardType = KeyboardType.Text)
             )
 
-            // clear btn
-            if (text.value.isNotEmpty()) Row(Modifier.fillMaxSize()) {
+            if(useClearBtn){
+                // clear btn
+                if (text.value.isNotEmpty()) Row(Modifier.fillMaxSize()) {
 
-                Spacer(Modifier.weight(1f))
+                    Spacer(Modifier.weight(1f))
 
-                Column(verticalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .width(44.dp)
-                        .fillMaxHeight()
-                        .padding(start = 8.dp)
-                        .clickable {
-                            text.value = ""
-                            // 포커스 제거, 키보드 내리기!
-                            focusManager.clearFocus()
-                        }) {
+                    Column(verticalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .width(44.dp)
+                            .fillMaxHeight()
+                            .padding(start = 8.dp)
+                            .clickable {
+                                text.value = ""
+                                onValueChange(text.value)
+                                // 포커스 제거, 키보드 내리기!
+                                focusManager.clearFocus()
+                            }) {
 
-                    Image(painter = painterResource(id = R.drawable.ic_gray_close),
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp))
+                        Image(painter = painterResource(id = R.drawable.ic_gray_close),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp))
 
+                    }
                 }
             }
 
