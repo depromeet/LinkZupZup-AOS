@@ -1,4 +1,4 @@
-package com.depromeet.linkzupzup.roomdb
+package com.depromeet.linkzupzup.dataSources.roomdb
 
 import androidx.room.*
 import com.depromeet.linkzupzup.domains.entities.LinkEntity

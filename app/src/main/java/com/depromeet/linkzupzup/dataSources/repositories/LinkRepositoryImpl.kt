@@ -2,7 +2,7 @@ package com.depromeet.linkzupzup.dataSources.repositories
 
 import android.content.Context
 import com.depromeet.linkzupzup.domains.entities.LinkEntity
-import com.depromeet.linkzupzup.roomdb.RoomDB
+import com.depromeet.linkzupzup.dataSources.roomdb.RoomDB
 import kotlinx.coroutines.runBlocking
 
 class LinkRepositoryImpl(context : Context) : LinkRepository {
