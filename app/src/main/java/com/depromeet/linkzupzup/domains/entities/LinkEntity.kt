@@ -11,11 +11,22 @@ class LinkEntity (
 
     @SerializedName("url")
     @PrimaryKey
-    @ColumnInfo(name="url")
+    @ColumnInfo(name="link_url")
     var url : String = "",
 
     @SerializedName("title")
-    @ColumnInfo(name="title")
-    var title : String = ""
+    @ColumnInfo(name="link_title")
+    var title : String = "",
+
+
+    @SerializedName("description")
+    @ColumnInfo(name="link_description")
+    var description : String = "",
+
+    @SerializedName("imgUrl")
+    @ColumnInfo(name="link_imgurl")
+    var imgUrl : String = ""
+
+
 )
 

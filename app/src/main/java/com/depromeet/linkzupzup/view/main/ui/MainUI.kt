@@ -43,14 +43,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.MutableLiveData
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
-import com.depromeet.linkzupzup.dataSources.repositories.LinkRepositoryImpl
-import com.depromeet.linkzupzup.dataSources.repositories.UserRepositoryImpl
-import com.depromeet.linkzupzup.domains.LinkUseCases
-import com.depromeet.linkzupzup.domains.UserUseCases
-import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.presenter.MainViewModel
 import com.depromeet.linkzupzup.presenter.model.*
 import com.depromeet.linkzupzup.ui.theme.*
@@ -519,7 +513,8 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
                 .padding(start = 24.dp, end = 24.dp),
             onClick = {
                 // Room Link table 저장
-                vm.insertLink(LinkData(linkURL = linkUrl.value))
+                // vm.insertLink(LinkData(linkURL = linkUrl.value))
+                vm.getMetadata(linkUrl.value)
             }) {
 
             Text("저장하기",

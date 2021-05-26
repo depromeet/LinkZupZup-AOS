@@ -13,6 +13,7 @@ ext {
     multidexVersion = "2.0.1"
     roomVersion = '2.4.0-alpha02'
     roomDebugVersion = '1.0.6'
+    jsoupVersion = '1.13.1'
 }
 ext.lib = [:]
 
@@ -103,5 +104,10 @@ room.livedata = "androidx.lifecycle:lifecycle-livedata-ktx:2.3.1"
 room.compiler = "androidx.room:room-compiler:$roomVersion"
 // room.debug = "com.amitshekhar.android:debug-db:$roomDebugVersion"    // Logcat 에서 D/DebugDB 검색한 결과링크에서 DB 시각화해 볼 수 있음
 lib.room = room
+
+/* JSoup */
+def jsoup = [:]
+jsoup.runtime = "org.jsoup:jsoup:$jsoupVersion"
+lib.jsoup = jsoup
 
 ext.lib = lib

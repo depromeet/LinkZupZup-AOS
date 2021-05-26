@@ -10,4 +10,4 @@ fun UserEntity.mapToPresenter() = User(name, age)
 fun User.mapToDataLayer() = UserEntity(name= name, age= age)
 
 fun LinkEntity.mapToPresenter() = LinkData(linkURL = url)
-fun LinkData.mapToDataLayer() = LinkEntity(url = linkURL)
+fun LinkData.mapToDataLayer() = LinkEntity(url = linkURL, title = linkTitle, imgUrl = imgURL, description = description)

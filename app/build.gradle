@@ -94,6 +94,7 @@ dependencies {
     implementation lib.room.lifecycle
     implementation lib.room.viewmodel
     implementation lib.room.livedata
+    implementation lib.jsoup.runtime
     kapt lib.room.compiler
 
     testImplementation 'junit:junit:4.+'

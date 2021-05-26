@@ -9,7 +9,7 @@ interface LinkDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertLink(link: LinkEntity): Long
 
-    @Query("SELECT * FROM Link WHERE url =:url")
+    @Query("SELECT * FROM Link WHERE link_url =:url")
     suspend fun getLink(url: String) : LinkEntity?
 
     @Query("SELECT * FROM Link")
