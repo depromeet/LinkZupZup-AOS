@@ -10,5 +10,5 @@ val useCaseModule = module {
     factory { UserUseCases(get()) }
     factory { ScrapUseCases(get()) }
     factory { AlarmUseCases(get()) }
-    factory { LinkUseCases() }
+    factory { LinkUseCases(get()) }
 }

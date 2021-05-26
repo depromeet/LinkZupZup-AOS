@@ -46,11 +46,14 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.MutableLiveData
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
+import com.depromeet.linkzupzup.dataSources.repositories.LinkRepositoryImpl
 import com.depromeet.linkzupzup.dataSources.repositories.UserRepositoryImpl
+import com.depromeet.linkzupzup.domains.LinkUseCases
 import com.depromeet.linkzupzup.domains.UserUseCases
 import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.presenter.MainViewModel
 import com.depromeet.linkzupzup.presenter.model.*
+import com.depromeet.linkzupzup.roomdb.LinkVO
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
@@ -98,7 +101,7 @@ fun MainPreview() {
         // 스크랩 링크 리스트
         addAll(MainContentData.mockMainContentList(5))
     }
-    MainBodyUI(mainContentList, MainViewModel(userUseCases = UserUseCases(UserRepositoryImpl())))
+    // MainBodyUI(mainContentList, MainViewModel(userUseCases = UserUseCases(UserRepositoryImpl()),LinkUseCases(LinkRepositoryImpl())))
 }
 
 @ExperimentalMaterialApi
@@ -109,9 +112,9 @@ fun BottomSheetPreview() {
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
     )
-    BottomSheet(bottomSheetScaffoldState,coroutineScope,
-        MainViewModel(UserUseCases(UserRepositoryImpl()))
-    )
+//    BottomSheet(bottomSheetScaffoldState,coroutineScope,
+//        MainViewModel(UserUseCases(UserRepositoryImpl()), LinkUseCases(LinkRepositoryImpl()))
+//    )
 }
 
 @Composable
@@ -448,6 +451,7 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
 
     val saveBtnColor = remember { mutableStateOf(Gray50t) }
     val saveTxtColor = remember { mutableStateOf(Gray70) }
+    val linkUrl = remember { mutableStateOf("") }
 
     // in Column Scope
     Column(modifier = Modifier
@@ -482,6 +486,8 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp)){
+                linkUrl.value = it
+
                 if(it.isNullOrEmpty()){
                     saveBtnColor.value = Gray50t
                     saveTxtColor.value = Gray70
@@ -514,7 +520,7 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
                 .padding(start = 24.dp, end = 24.dp),
             onClick = {
                 // Room Link table 저장
-
+                vm.insertLink(LinkVO(linkUrl.value,""))
             }) {
 
             Text("저장하기",

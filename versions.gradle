@@ -95,11 +95,13 @@ lib.multidex = multidex
 
 def room = [:]
 room.runtime = "androidx.room:room-runtime:$roomVersion"
+room.ktx = "androidx.room:room-ktx:$roomVersion"
 room.legacy = "androidx.legacy:legacy-support-v4:1.0.0"
 room.lifecycle = "androidx.lifecycle:lifecycle-extensions:2.2.0"
 room.viewmodel = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1"
+room.livedata = "androidx.lifecycle:lifecycle-livedata-ktx:2.3.1"
 room.compiler = "androidx.room:room-compiler:$roomVersion"
-room.debug = "com.amitshekhar.android:debug-db:$roomDebugVersion"
+// room.debug = "com.amitshekhar.android:debug-db:$roomDebugVersion"    // Logcat 에서 D/DebugDB 검색한 결과링크에서 DB 시각화해 볼 수 있음
 lib.room = room
 
 ext.lib = lib

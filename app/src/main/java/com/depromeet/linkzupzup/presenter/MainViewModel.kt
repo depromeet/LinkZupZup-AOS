@@ -2,17 +2,22 @@ package com.depromeet.linkzupzup.presenter
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.depromeet.linkzupzup.base.BaseViewModel
+import com.depromeet.linkzupzup.dataSources.repositories.LinkRepositoryImpl
+import com.depromeet.linkzupzup.domains.LinkUseCases
 import com.depromeet.linkzupzup.domains.UserUseCases
 import com.depromeet.linkzupzup.extensions.schedulers
 import com.depromeet.linkzupzup.presenter.model.LinkHashData
 import com.depromeet.linkzupzup.presenter.model.TagColor
 import com.depromeet.linkzupzup.presenter.model.User
+import com.depromeet.linkzupzup.roomdb.LinkVO
 import com.depromeet.linkzupzup.ui.theme.TagBgColor01
 import com.depromeet.linkzupzup.ui.theme.TagTextColor01
 import com.depromeet.linkzupzup.utils.DLog
+import kotlinx.coroutines.launch
 
-class MainViewModel(private val userUseCases: UserUseCases): BaseViewModel() {
+class MainViewModel(private val userUseCases: UserUseCases, private val linkUseCases: LinkUseCases): BaseViewModel() {
 
     companion object {
         val TAG = MainViewModel::class.java.simpleName
@@ -51,5 +56,14 @@ class MainViewModel(private val userUseCases: UserUseCases): BaseViewModel() {
                 DLog.e("getUserInfo", it.message ?: "")
                 progressStatus(false)
             })
+    }
+
+
+    fun insertLink(linkVO : LinkVO){
+
+        // viewModel 에서 제공하는 coroutine scope
+        viewModelScope.launch {
+            linkUseCases.insertLinkInfo(linkVO = linkVO)
+        }
     }
 }

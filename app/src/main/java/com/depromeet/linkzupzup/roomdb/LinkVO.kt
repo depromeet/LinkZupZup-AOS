@@ -25,7 +25,7 @@ interface LinkDAO {
      fun insertLink(linkVO: LinkVO): Long
 
     @Query("SELECT * FROM Link WHERE url =:url")
-    suspend fun getLink(url: String) : LinkVO
+    suspend fun getLink(url: String) : LinkVO?
 
     @Query("SELECT * FROM Link")
     suspend fun getLinkList() : List<LinkVO>

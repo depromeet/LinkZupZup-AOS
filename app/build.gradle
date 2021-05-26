@@ -49,6 +49,10 @@ android {
         kotlinCompilerExtensionVersion composeVersion
         kotlinCompilerVersion kotlinVersion
     }
+    packagingOptions {
+        exclude 'META-INF/LGPL2.1'
+        exclude 'META-INF/AL2.0'
+    }
 }
 
 dependencies {
@@ -87,9 +91,11 @@ dependencies {
     implementation lib.pager.runtime
     implementation lib.multidex.runtime
     implementation lib.room.runtime
+    implementation lib.room.ktx
     implementation lib.room.legacy
     implementation lib.room.lifecycle
     implementation lib.room.viewmodel
+    implementation lib.room.livedata
     kapt lib.room.compiler
 
     testImplementation 'junit:junit:4.+'
