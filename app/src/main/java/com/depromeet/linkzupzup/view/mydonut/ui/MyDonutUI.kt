@@ -4,13 +4,11 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
@@ -40,10 +38,13 @@ import com.depromeet.linkzupzup.presenter.model.MyDonutData
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
+import com.depromeet.linkzupzup.view.main.ui.BottomSheet
+import com.depromeet.linkzupzup.view.main.ui.MainAppBar
 import kotlinx.coroutines.launch
 
 class MyDonutUI : BaseView<MyDonutViewModel>() {
 
+    @ExperimentalMaterialApi
     @ExperimentalFoundationApi
     @Composable
     override fun onCreateViewContent() {
@@ -63,10 +64,43 @@ class MyDonutUI : BaseView<MyDonutViewModel>() {
 
 }
 
+@ExperimentalMaterialApi
 @ExperimentalFoundationApi
 @Composable
 fun MyDonutBodyUI(myDonutList: ArrayList<MyDonutData<*>>){
-    Scaffold(
+    val coroutineScope = rememberCoroutineScope()
+    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
+    )
+    BottomSheetScaffold(
+        topBar = { MyDonutTopBar() },
+        scaffoldState = bottomSheetScaffoldState,
+        sheetShape = RoundedCornerShape(topStartPercent = 5,topEndPercent = 5),
+        sheetPeekHeight = 0.dp,
+        sheetBackgroundColor = Gray0t,
+        sheetGesturesEnabled = false,
+        backgroundColor = Color.Transparent,
+        modifier = Modifier.fillMaxSize(),
+        sheetContent = { InfoBottomSheet(){
+            coroutineScope.launch {
+                bottomSheetScaffoldState.bottomSheetState.collapse()
+            } }
+        }){
+
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.Transparent)) {
+
+            Information(){
+                coroutineScope.launch {
+                    bottomSheetScaffoldState.bottomSheetState.expand()
+                }
+            }
+            DonutBadgeGridList(myDonutList)
+        }
+    }
+
+    /* Scaffold(
         topBar = { MyDonutTopBar() },
         backgroundColor = Color.Transparent,
         modifier = Modifier.fillMaxSize()) {
@@ -80,7 +114,7 @@ fun MyDonutBodyUI(myDonutList: ArrayList<MyDonutData<*>>){
             DonutBadgeGridList(myDonutList)
 
         }
-    }
+    } */
 }
 
 @Composable
@@ -142,10 +176,11 @@ fun MyDonutBackButton(painter: Painter, onClick : () -> Unit){
 }
 
 @Composable
-fun Information(){
+fun Information(onClick: () -> Unit){
     Row(modifier = Modifier
         .fillMaxWidth()
-        .padding(start = 16.dp, top = 12.dp)){
+        .padding(start = 16.dp, top = 12.dp, end = 16.dp)
+        .noRippleClickable { onClick() }){
 
         Card(elevation = 0.dp,
             backgroundColor = Blue50Op8,
@@ -304,6 +339,7 @@ fun DonutBadgeCard(painter : Painter, point : Int, date : String){
 }
 
 
+@ExperimentalMaterialApi
 @ExperimentalFoundationApi
 @Preview
 @Composable
@@ -322,9 +358,9 @@ fun DonutPreview() {
     }
 }
 
-@Preview
+
 @Composable
-fun InfoBottomSheet(){
+fun InfoBottomSheet(onClick: () -> Unit){
 
     Surface(modifier = Modifier.background(Color.White)) {
 
@@ -334,7 +370,6 @@ fun InfoBottomSheet(){
             modifier = Modifier
                 .fillMaxWidth()
                 .height(580.dp)
-                .padding(bottom = 16.dp)
                 .background(Color.Transparent)) {
 
             // 닫기 버튼
@@ -345,7 +380,7 @@ fun InfoBottomSheet(){
                     .height(56.dp)) {
 
                 BottomSheetCloseBtn(painterResource(id = R.drawable.ic_close)){
-
+                    onClick()
                 }
             }
 
@@ -366,9 +401,15 @@ fun InfoBottomSheet(){
                             drawRect(gradient)
                         }
                     }){
-                items(MyDonutData.donutInfo){ info->
+                itemsIndexed(MyDonutData.donutInfo){ index,info->
                     info?.let{
                         InfoDonutCard(painter = painterResource(info.badgeResource), info = info.getInfoStr())
+                        if(index != MyDonutData.donutInfo.size-2){
+                            Divider(color = Gray20,
+                                thickness = 1.dp,
+                                modifier = Modifier
+                                    .padding(horizontal = 20.dp))
+                        }
                     } ?: run{
                         AdditionalPointInfo()
                     }
@@ -421,7 +462,6 @@ fun InfoSheetHeader(){
                 style = TextStyle(
                     fontSize = 12.sp,
                     lineHeight = 16.8.sp,
-                    color= Gray70,
                     fontFamily = FontFamily(Font(
                         resId = R.font.spoqa_hansansneo_regular,
                         weight = FontWeight.W500))))
@@ -431,10 +471,11 @@ fun InfoSheetHeader(){
 
 @Composable
 fun InfoDonutCard(painter : Painter = painterResource(id = R.drawable.ic_donut01), info : String){
-    Card(modifier = Modifier
-        .fillMaxWidth()
-        .height(85.dp)
-        .background(Color.Transparent)){
+    Card(elevation = 0.dp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(85.dp)
+            .background(Color.Transparent)){
 
         Row(horizontalArrangement = Arrangement.spacedBy(25.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -477,8 +518,8 @@ fun AdditionalPointInfo(){
         text = "5번째, 10번째, 15번째 등 읽은 아티클 수가 5의 배수에 해당되는 경우 20 point가 추가로 적립되며 읽은 아티클의 수는 하루마다 갱신됩니다.",
         spanStyles = listOf(
             AnnotatedString.Range(
-                start = 29,
-                end = 34,
+                start = 28,
+                end = 33,
                 item = SpanStyle(color = Color(0xff1f1f1f),
                     fontSize = 12.sp,
                     fontFamily = FontFamily(Font(
@@ -486,8 +527,8 @@ fun AdditionalPointInfo(){
                         weight = FontWeight.W500)))
             ),
             AnnotatedString.Range(
-                start = 44,
-                end = 52,
+                start = 43,
+                end = 51,
                 item = SpanStyle(color = Color(0xff1f1f1f),
                     fontSize = 12.sp,
                     fontFamily = FontFamily(Font(
@@ -522,10 +563,11 @@ fun AdditionalPointInfo(){
     )
 
 
-
+    Spacer(modifier = Modifier.height(27.dp))
     Column(horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
+            .height(172.dp)
             .background(Color(0xfff5f5f5))) {
 
         Spacer(modifier = Modifier.height(12.dp))
