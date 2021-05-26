@@ -1,18 +1,18 @@
 package com.depromeet.linkzupzup.dataSources.repositories
 
 import android.content.Context
-import com.depromeet.linkzupzup.roomdb.LinkVO
+import com.depromeet.linkzupzup.domains.entities.LinkEntity
 import com.depromeet.linkzupzup.roomdb.RoomDB
 import kotlinx.coroutines.runBlocking
 
 class LinkRepositoryImpl(context : Context) : LinkRepository {
 
     private val roomDB = RoomDB.getInstance(context)
-    private val linkDAO = roomDB.linkDAO()
+    private val linkDAO = roomDB.linkDao()
 
-    override fun insertLink(linkVO: LinkVO) {
+    override fun insertLink(linkEntity: LinkEntity) {
         runBlocking {
-            linkDAO.insertLink(linkVO = linkVO)
+            linkDAO.insertLink(link = linkEntity)
         }
     }
 

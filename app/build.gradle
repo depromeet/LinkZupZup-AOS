@@ -37,13 +37,11 @@ android {
         useIR = true
     }
     buildFeatures {
-        compose true
+        compose = true
+        dataBinding = true
     }
     kapt {
         generateStubs = true
-    }
-    dataBinding {
-        enabled = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion composeVersion

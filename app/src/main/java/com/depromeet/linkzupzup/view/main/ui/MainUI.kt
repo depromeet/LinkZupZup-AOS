@@ -53,7 +53,6 @@ import com.depromeet.linkzupzup.domains.UserUseCases
 import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.presenter.MainViewModel
 import com.depromeet.linkzupzup.presenter.model.*
-import com.depromeet.linkzupzup.roomdb.LinkVO
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
@@ -520,7 +519,7 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
                 .padding(start = 24.dp, end = 24.dp),
             onClick = {
                 // Room Link table 저장
-                vm.insertLink(LinkVO(linkUrl.value,""))
+                vm.insertLink(LinkData(linkURL = linkUrl.value))
             }) {
 
             Text("저장하기",

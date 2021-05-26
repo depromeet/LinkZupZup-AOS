@@ -1,9 +1,9 @@
 package com.depromeet.linkzupzup.dataSources.repositories
 
-import com.depromeet.linkzupzup.roomdb.LinkVO
+import com.depromeet.linkzupzup.domains.entities.LinkEntity
 
 interface LinkRepository {
 
-    fun insertLink(linkVO: LinkVO)
+    fun insertLink(linkEntity: LinkEntity)
 
 }

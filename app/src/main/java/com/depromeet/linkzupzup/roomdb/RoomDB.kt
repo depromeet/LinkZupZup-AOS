@@ -4,11 +4,13 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.depromeet.linkzupzup.domains.entities.LinkEntity
+import com.depromeet.linkzupzup.presenter.model.LinkData
 
-@Database(version = 1, entities = [LinkVO::class], exportSchema = false)
+@Database(version = 1, entities = [LinkEntity::class], exportSchema = false)
 abstract class RoomDB : RoomDatabase(){
 
-    abstract fun linkDAO() : LinkDAO
+    abstract fun linkDao() : LinkDao
 
     companion object{
         private var instance : RoomDB ? = null
