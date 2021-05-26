@@ -458,14 +458,39 @@ fun InfoSheetHeader(){
                 )
             )
 
-            Text(guideStr,
-                style = TextStyle(
-                    fontSize = 12.sp,
-                    lineHeight = 16.8.sp,
-                    fontFamily = FontFamily(Font(
-                        resId = R.font.spoqa_hansansneo_regular,
-                        weight = FontWeight.W500))))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.wrapContentWidth()) {
+
+                Text(text = "\uD83C\uDF89",
+                    style = TextStyle(fontSize = 18.sp,
+                        lineHeight = 22.5.sp,
+                        fontFamily = FontFamily(
+                            Font(resId = R.font.spoqa_hansansneo_bold,
+                                weight = FontWeight.W500))))
+                Text(
+                    guideStr,
+                    style = TextStyle(
+                        fontSize = 12.sp,
+                        lineHeight = 16.8.sp,
+                        fontFamily = FontFamily(
+                            Font(
+                                resId = R.font.spoqa_hansansneo_regular,
+                                weight = FontWeight.W500
+                            )
+                        )
+                    )
+                )
+
+                Text(text = "\uD83C\uDF89",
+                    style = TextStyle(fontSize = 18.sp,
+                        lineHeight = 22.5.sp,
+                        fontFamily = FontFamily(
+                            Font(resId = R.font.spoqa_hansansneo_bold,
+                                weight = FontWeight.W500))))
             }
+        }
+
     }
 }
 
