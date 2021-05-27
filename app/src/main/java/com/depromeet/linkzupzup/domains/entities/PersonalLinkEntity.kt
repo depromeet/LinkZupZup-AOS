@@ -3,6 +3,7 @@ package com.depromeet.linkzupzup.domains.entities
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
+import java.sql.Date
 
 @Entity(
     tableName = "PersonalLink",
@@ -23,10 +24,10 @@ class PersonalLinkEntity (
     var alarmEnable : Boolean = false,
 
     @ColumnInfo(name="link_alarm_dt")
-    var alarmDt : Long = 0,
+    var alarmDt : Date,
 
     @ColumnInfo(name="link_created_dt")
-    var createdDt : Long = 0
+    var createdDt : Date
 )
 
 
