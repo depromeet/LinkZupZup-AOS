@@ -15,7 +15,7 @@
         android:theme="@style/Theme.LinkZupZup">
 
         <activity
-            android:name=".view.main.MainActivity"
+            android:name=".view.alarm.AlarmDetailActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.LinkZupZup.NoActionBar">
@@ -29,7 +29,7 @@
         <activity android:name=".view.scrap.ScrapDetailActivity" />
         <activity android:name=".view.mypage.MyPageActivity" />
         <activity android:name=".view.mydonut.MyDonutActivity" />
-        <activity android:name=".view.alarm.AlarmDetailActivity" />
+        <activity android:name=".view.main.MainActivity" />
         <activity android:name=".view.webView.WebViewActivity"/>
 
         <receiver android:name=".receiver.AlarmReceiver">
