@@ -22,7 +22,8 @@ class AppApplication: MultiDexApplication() {
                 apiModule,
                 viewModelModule,
                 useCaseModule,
-                repositoryModule))
+                repositoryModule,
+                roomModule))
         }
     }
 

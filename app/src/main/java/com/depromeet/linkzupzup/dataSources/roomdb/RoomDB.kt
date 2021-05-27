@@ -13,11 +13,12 @@ abstract class RoomDB : RoomDatabase(){
 
     companion object{
         private var instance : RoomDB ? = null
+        private const val DB_NAME = "linkzupzup_roomdb"
 
         @Synchronized
         fun getInstance(context: Context) : RoomDB{
             if(instance==null){
-                instance = Room.databaseBuilder(context.applicationContext, RoomDB::class.java,"linkzupzup_roomdb")
+                instance = Room.databaseBuilder(context.applicationContext, RoomDB::class.java, DB_NAME)
                     .fallbackToDestructiveMigration()
                     .allowMainThreadQueries()
                     .build()
