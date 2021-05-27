@@ -32,8 +32,12 @@
         <activity android:name=".view.alarm.AlarmDetailActivity" />
         <activity android:name=".view.webView.WebViewActivity"/>
 
-        <receiver android:name=".receiver.AlarmReceiver"
-            android:exported="false" />
+        <receiver android:name=".receiver.AlarmReceiver">
+            <intent-filter>
+                <action android:name="com.depromeet.linkzupzup.PERSONAL_ALARM_START" />
+                <action android:name="com.depromeet.linkzupzup.STATISTICS_ALARM_START" />
+            </intent-filter>
+        </receiver>
 
         <receiver android:name=".receiver.AlarmSettingBootReceiver">
             <intent-filter>

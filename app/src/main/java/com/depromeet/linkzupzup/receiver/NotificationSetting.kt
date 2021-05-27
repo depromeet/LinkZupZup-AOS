@@ -32,6 +32,9 @@ enum class NotifiChannel(val channelId: String, val channelName: String, val des
 
 object NotificationSetting {
 
+    const val PERSONAL_ALROM_START = "com.depromeet.linkzupzup.PERSONAL_ALARM_START"
+    const val STATISTICS_ALROM_START = "com.depromeet.linkzupzup.STATISTICS_ALARM_START"
+
     var notificationManager: NotificationManager? = null
 
     fun initChannelId(ctx: Context, managerblock: NotificationManager.()->Unit = {}) {
