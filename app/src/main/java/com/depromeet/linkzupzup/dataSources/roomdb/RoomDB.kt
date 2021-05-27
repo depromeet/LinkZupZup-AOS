@@ -1,12 +1,11 @@
 package com.depromeet.linkzupzup.dataSources.roomdb
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import androidx.room.*
 import com.depromeet.linkzupzup.domains.entities.LinkEntity
 
 @Database(version = 1, entities = [LinkEntity::class], exportSchema = false)
+@TypeConverters(RoomConverter::class)
 abstract class RoomDB : RoomDatabase(){
 
     abstract fun linkDao() : LinkDao
