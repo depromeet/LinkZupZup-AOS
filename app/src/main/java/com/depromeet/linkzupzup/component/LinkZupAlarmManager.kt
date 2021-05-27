@@ -6,24 +6,26 @@ import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
 import androidx.activity.ComponentActivity
+import com.depromeet.linkzupzup.receiver.AlarmReceiver
 import java.util.*
 
 /**
- * DI ( Koin ) 을 사용할 예정
+ *
+ * 참고로만 사용하고 향후 제거할 예정
+ *
  * 참고 : https://codechacha.com/ko/android-alarmmanager/
  */
-class LinkZupAlarmManager {
+class LinkZupAlarmManager(ctx: Context, requestChannelId: Int = AlarmReceiver.NOTIFICATION_ID) {
 
-    lateinit var alarmManager: AlarmManager
-    lateinit var alarmIntent: Intent
-    lateinit var pendingIntent: PendingIntent
+    private var alarmManager: AlarmManager
+    private var alarmIntent: Intent
+    private var pendingIntent: PendingIntent
 
-    fun getInstance(ctx: Context): LinkZupAlarmManager {
+    init {
         alarmManager = ctx.getSystemService(ComponentActivity.ALARM_SERVICE) as AlarmManager
         alarmIntent = Intent(ctx, AlarmReceiver::class.java)
-        pendingIntent = createAlarmPendingIntent(ctx, AlarmReceiver.NOTIFICATION_ID,
+        pendingIntent = createAlarmPendingIntent(ctx, requestChannelId,
             alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-        return this
     }
 
     fun createAlarmPendingIntent(ctx: Context,
@@ -106,7 +108,7 @@ class LinkZupAlarmManager {
      */
     fun setExactAndAllowWhileIdle(triggerTime: Long = 60 * 1000,
                                   operation: PendingIntent = pendingIntent,
-                                  type: Int = AlarmManager.ELAPSED_REALTIME_WAKEUP) {
+                                  type: Int = AlarmManager.RTC_WAKEUP) {
         alarmManager.setExactAndAllowWhileIdle(
             type,
             (SystemClock.elapsedRealtime() + triggerTime),

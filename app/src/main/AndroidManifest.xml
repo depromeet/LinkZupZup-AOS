@@ -3,6 +3,7 @@
     package="com.depromeet.linkzupzup">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:name=".AppApplication"
@@ -14,30 +15,35 @@
         android:theme="@style/Theme.LinkZupZup">
 
         <activity
-            android:name=".view.main.MainActivity"
+            android:name=".view.scrap.ScrapDetailActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.LinkZupZup.NoActionBar">
-
-        </activity>
-
-        <activity android:name=".view.scrap.ScrapDetailActivity" />
-        <activity android:name=".view.mypage.MyPageActivity">
-        </activity>
-        <activity android:name=".view.mydonut.MyDonutActivity" />
-        <activity android:name=".view.webView.WebViewActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!--<activity android:name=".view.alarm.AlarmDetailActivity" />-->
-        <activity android:name=".view.alarm.AlarmDetailActivity" />
 
-        <receiver
-            android:name=".component.AlarmReceiver"
-            android:exported="false" />
+        <activity android:name=".view.main.MainActivity" />
+        <activity android:name=".view.mypage.MyPageActivity" />
+        <activity android:name=".view.mydonut.MyDonutActivity" />
+        <activity android:name=".view.alarm.AlarmDetailActivity" />
+        <activity android:name=".view.webView.WebViewActivity"/>
+
+        <receiver android:name=".receiver.AlarmReceiver">
+            <intent-filter>
+                <action android:name="com.depromeet.linkzupzup.PERSONAL_ALARM_START" />
+                <action android:name="com.depromeet.linkzupzup.STATISTICS_ALARM_START" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".receiver.AlarmSettingBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+            </intent-filter>
+        </receiver>
 
     </application>
 
