@@ -3,8 +3,11 @@ package com.depromeet.linkzupzup.view.main
 import android.os.Bundle
 import com.depromeet.linkzupzup.base.BaseActivity
 import com.depromeet.linkzupzup.presenter.MainViewModel
+import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.main.ui.MainUI
-import com.depromeet.linkzupzup.view.main.ui.MainUI2
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 
 class MainActivity : BaseActivity<MainUI, MainViewModel>() {
@@ -14,6 +17,27 @@ class MainActivity : BaseActivity<MainUI, MainViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        with(viewModel) {
+
+            getLinkList()
+
+            linkAlarmResponse.observe(this@MainActivity) {
+                val status = Integer.parseInt(it.status)
+                if (status in 200..299) {
+                    DLog.e("TEST", "status: $status")
+
+                    it.data?.let { data ->
+                        DLog.e("TEST", "content size: ${data.content.size}")
+                    }
+
+                } else {
+                    DLog.e("TEST", it.comment)
+                }
+            }
+
+        }
+
     }
 
 }

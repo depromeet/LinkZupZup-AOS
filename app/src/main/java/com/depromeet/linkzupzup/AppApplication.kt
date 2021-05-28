@@ -24,9 +24,10 @@ class AppApplication: MultiDexApplication() {
                 commonModule,
                 networkModule,
                 apiModule,
-                viewModelModule,
+                dataSourceModule,
+                repositoryModule,
                 useCaseModule,
-                repositoryModule))
+                viewModelModule))
         }
     }
 

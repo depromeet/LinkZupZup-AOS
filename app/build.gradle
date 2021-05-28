@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-    id 'kotlin-android-extensions'
+    id 'kotlin-parcelize'
 }
 
 android {
@@ -41,6 +41,10 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion composeVersion
         kotlinCompilerVersion kotlinVersion
+    }
+    packagingOptions {
+        exclude 'META-INF/AL2.0'
+        exclude 'META-INF/LGPL2.1'
     }
 }
 
