@@ -100,7 +100,8 @@ fun MainPreview() {
         // 스크랩 링크 리스트
         addAll(MainContentData.mockMainContentList(5))
     }
-    MainBodyUI(mainContentList, vm = MainViewModel(linkUseCases = LinkUseCases(LinkRepositoryImpl(LinkDataSource(object: LinkAPIService {
+    val ctx = LocalContext.current
+    MainBodyUI(mainContentList, vm = MainViewModel(linkUseCases = LinkUseCases(LinkRepositoryImpl(ctx, LinkDataSource(object: LinkAPIService {
         override fun getLinkList(query: HashMap<String, Any>): Observable<LinkAlarmResponseEntity> {
             TODO("Not yet implemented")
         }
@@ -115,8 +116,9 @@ fun BottomSheetPreview() {
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
     )
+    val ctx = LocalContext.current
     BottomSheet(bottomSheetScaffoldState,coroutineScope,
-        MainViewModel(linkUseCases = LinkUseCases(LinkRepositoryImpl(LinkDataSource(object: LinkAPIService {
+        MainViewModel(linkUseCases = LinkUseCases(LinkRepositoryImpl(ctx, LinkDataSource(object: LinkAPIService {
             override fun getLinkList(query: HashMap<String, Any>): Observable<LinkAlarmResponseEntity> {
                 TODO("Not yet implemented")
             }
