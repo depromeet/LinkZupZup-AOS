@@ -429,6 +429,10 @@ fun MainHashtagCard(tagName : String, backColor : Color, textColor : Color){
 @Composable
 fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineScope : CoroutineScope, vm : MainViewModel? = null){
 
+    val saveBtnColor = remember { mutableStateOf(Gray50t) }
+    val saveTxtColor = remember { mutableStateOf(Gray70) }
+    val linkUrl = remember { mutableStateOf("") }
+
     // in Column Scope
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -458,11 +462,20 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
             Spacer(Modifier.height(8.dp))
 
             /* Text field */
-            // BottomSheetLinkInput()
             CustomTextField(hintStr = "\uD83D\uDC49 링크주소를 여기에 붙여넣기 해주세요.",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp))
+                    .height(40.dp)){
+                linkUrl.value = it
+
+                if(it.isNullOrEmpty()){
+                    saveBtnColor.value = Gray50t
+                    saveTxtColor.value = Gray70
+                }else if(it.isNotEmpty()){
+                    saveBtnColor.value = Blue50
+                    saveTxtColor.value = Color.White
+                }
+            }
 
             Spacer(Modifier.height(20.dp))
 
@@ -481,11 +494,15 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
 
         /* 하단 저장하기 버튼 */
         Button(shape = RoundedCornerShape(4.dp),
-            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Gray50t, contentColor = Gray70),
+            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = saveBtnColor.value, contentColor = saveTxtColor.value),
             modifier = Modifier.fillMaxWidth()
                 .height(52.dp)
-                .padding(start = 24.dp, end = 24.dp, bottom = 16.dp),
-            onClick = { DLog.e("MainUI", "BottomSheet/click save link button") }) {
+                .padding(start = 24.dp, end = 24.dp),
+            onClick = {
+                // Room Link table 저장
+                // vm.insertLink(LinkData(linkURL = linkUrl.value))
+                vm.getMetadata(linkUrl.value)
+            }) {
 
             Text("저장하기",
                 textAlign = TextAlign.Center,
@@ -570,7 +587,7 @@ fun BottomSheetSelect(vm: MainViewModel? = null){
         LinkHashData(2,"UX","",TagColor(TagBgColor03, TagTextColor03)),
         LinkHashData(3,"UI","",TagColor(TagBgColor04, TagTextColor04)),
         LinkHashData(4,"마케팅","",TagColor(TagBgColor05, TagTextColor05)),
-        LinkHashData(5,"인공지","",TagColor(TagBgColor06, TagTextColor06)))
+        LinkHashData(5,"인공지능","",TagColor(TagBgColor06, TagTextColor06)))
     val tc2 : List<LinkHashData> = listOf(
         LinkHashData(6,"프론트 개발","",TagColor(TagBgColor07, TagTextColor07)),
         LinkHashData(7,"그로스 해킹","",TagColor(TagBgColor03, TagTextColor03)),
@@ -783,6 +800,7 @@ fun CustomTextField(modifier: Modifier = Modifier
                         .padding(start = 8.dp)
                         .clickable {
                             text.value = ""
+                            onValueChange(text.value)
                             // 포커스 제거, 키보드 내리기!
                             focusManager.clearFocus()
                         }) {

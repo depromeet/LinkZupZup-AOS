@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'kotlin-kapt'
     id 'kotlin-parcelize'
 }
 
@@ -36,15 +37,19 @@ android {
         useIR = true
     }
     buildFeatures {
-        compose true
+        compose = true
+        dataBinding = true
+    }
+    kapt {
+        generateStubs = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion composeVersion
         kotlinCompilerVersion kotlinVersion
     }
     packagingOptions {
-        exclude 'META-INF/AL2.0'
         exclude 'META-INF/LGPL2.1'
+        exclude 'META-INF/AL2.0'
     }
 }
 
@@ -83,6 +88,14 @@ dependencies {
     implementation lib.insets.runtime
     implementation lib.pager.runtime
     implementation lib.multidex.runtime
+    implementation lib.room.runtime
+    implementation lib.room.ktx
+    implementation lib.room.legacy
+    implementation lib.room.lifecycle
+    implementation lib.room.viewmodel
+    implementation lib.room.livedata
+    implementation lib.jsoup.runtime
+    kapt lib.room.compiler
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

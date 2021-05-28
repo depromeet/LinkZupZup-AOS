@@ -13,7 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:networkSecurityConfig="@xml/network_security_config"
-        android:theme="@style/Theme.LinkZupZup">
+        android:theme="@style/Theme.LinkZupZup"
+        android:usesCleartextTraffic="true">
 
         <activity
             android:name=".view.main.MainActivity"

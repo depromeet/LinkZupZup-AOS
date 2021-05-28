@@ -14,6 +14,11 @@ import io.reactivex.schedulers.Schedulers
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlinx.coroutines.*
+import kotlin.coroutines.coroutineContext
+import androidx.lifecycle.viewModelScope
+import com.depromeet.linkzupzup.utils.MetaDataUtil.extractUrlFormText
+import com.depromeet.linkzupzup.utils.MetaDataUtil.getMetaDataFromUrl
 
 class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
 
@@ -71,4 +76,19 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
         }
     }
 
+
+    fun getMetadata(url : String){
+        CoroutineScope(Dispatchers.IO).launch {
+            extractUrlFormText(url)?.let{
+                insertLink(getMetaDataFromUrl(it))  // jSoup
+            }
+        }
+    }
+
+    private fun insertLink(link : LinkData){
+        // viewModel 에서 제공하는 coroutine scope
+        viewModelScope.launch {
+            linkUseCases.insertLinkInfo(link = link)
+        }
+    }
 }
