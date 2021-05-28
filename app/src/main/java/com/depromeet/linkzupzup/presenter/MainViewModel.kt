@@ -3,19 +3,20 @@ package com.depromeet.linkzupzup.presenter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.depromeet.linkzupzup.ParamsInfo
 import com.depromeet.linkzupzup.base.BaseViewModel
 import com.depromeet.linkzupzup.component.MetaDataManager.extractUrlFormText
 import com.depromeet.linkzupzup.component.MetaDataManager.getMetaDataFromUrl
 import com.depromeet.linkzupzup.domains.LinkUseCases
-import com.depromeet.linkzupzup.domains.UserUseCases
-import com.depromeet.linkzupzup.extensions.schedulers
+import com.depromeet.linkzupzup.domains.entities.LinkAlarmResponseEntity
 import com.depromeet.linkzupzup.presenter.model.LinkData
 import com.depromeet.linkzupzup.presenter.model.LinkHashData
 import com.depromeet.linkzupzup.presenter.model.User
-import com.depromeet.linkzupzup.utils.DLog
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
 
-class MainViewModel(private val userUseCases: UserUseCases, private val linkUseCases: LinkUseCases): BaseViewModel() {
+class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
 
     companion object {
         val TAG = MainViewModel::class.java.simpleName
@@ -35,26 +36,42 @@ class MainViewModel(private val userUseCases: UserUseCases, private val linkUseC
         list.add(item)
         selectedTagList.value = list
     }
-
     fun removeHashtag(item: LinkHashData) {
         list.remove(item)
         selectedTagList.value = list
     }
 
-    fun getUserInfo() {
-        addDisposable(userUseCases.getUserInfo()
-            .schedulers()
-            .doOnSubscribe {
-                progressStatus(true)
-            }.doOnSuccess {
-                progressStatus(false)
-            }.subscribe({
-                userInfo.value = it
-            }) {
-                DLog.e("getUserInfo", it.message ?: "")
-                progressStatus(false)
-            })
+
+
+
+
+
+    val linkAlarmResponse: MutableLiveData<LinkAlarmResponseEntity> = MutableLiveData()
+
+    /**
+     * 사용자가 저장한 링크 리스트 조회
+     * completed=F
+     * pageNumber=0
+     * pageSize=1
+     */
+    fun getLinkList(pageNumber: Int = 0, pageSize: Int = 10, completed: String = "") {
+        defaultParams().apply {
+            put(ParamsInfo.PAGE_NUMBER, pageNumber)
+            put(ParamsInfo.PAGE_SIZE, pageSize)
+            put(ParamsInfo.COMPLETED, completed)
+        }.let { params ->
+            progressStatus(true)
+            addDisposable(linkUseCases.getLinkList(params)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    linkAlarmResponse.value = it
+
+                    progressStatus(false)
+                }, this@MainViewModel::defaultThrowable))
+        }
     }
+
 
     fun getMetadata(url : String){
         CoroutineScope(Dispatchers.IO).launch {

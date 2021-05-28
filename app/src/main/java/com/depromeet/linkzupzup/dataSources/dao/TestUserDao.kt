@@ -7,7 +7,6 @@ import retrofit2.http.POST
 
 interface TestUserDao {
 
-    @POST(ApiUrl.SEARCH_REPOSITORIES)
     fun getVersionInfo(): Observable<VersionResponse>
 
 }

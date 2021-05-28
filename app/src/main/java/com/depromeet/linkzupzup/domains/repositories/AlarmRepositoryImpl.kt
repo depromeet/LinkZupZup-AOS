@@ -1,4 +1,4 @@
-package com.depromeet.linkzupzup.dataSources.repositories
+package com.depromeet.linkzupzup.domains.repositories
 
 import com.depromeet.linkzupzup.presenter.model.WeeklyAlarm
 

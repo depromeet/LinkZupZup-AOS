@@ -1,5 +1,7 @@
 package com.depromeet.linkzupzup.di
 
+import android.app.AlarmManager
+import androidx.activity.ComponentActivity
 import com.depromeet.linkzupzup.component.LinkZupAlarmManager
 import com.depromeet.linkzupzup.component.PreferencesManager
 import org.koin.android.ext.koin.androidApplication
@@ -9,6 +11,8 @@ val commonModule = module {
 
     single { PreferencesManager(androidApplication()) }
 
-    single { LinkZupAlarmManager().getInstance(androidApplication()) }
+    single { LinkZupAlarmManager(androidApplication()) }
+
+    single { androidApplication().getSystemService(ComponentActivity.ALARM_SERVICE) as AlarmManager }
 
 }

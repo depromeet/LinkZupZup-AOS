@@ -10,7 +10,7 @@ ext {
     accompanistVersion = '0.9.1'
     glideVersion = '4.12.0'
     tedPermissionVersion = '2.2.3'
-    multidexVersion = "2.0.1"
+    multidexVersion = "2.1.0"
     roomVersion = '2.4.0-alpha02'
     roomDebugVersion = '1.0.6'
     jsoupVersion = '1.13.1'

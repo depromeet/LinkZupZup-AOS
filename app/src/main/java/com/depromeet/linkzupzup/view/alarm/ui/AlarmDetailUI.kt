@@ -330,10 +330,17 @@ fun AlarmDetailBottomSheet(bottomSheetScaffoldState: BottomSheetScaffoldState, c
         }
 
         // timepicker
+        val timeDate = remember { mutableStateOf(Calendar.getInstance()) }
         CustomTimePicker(modifier = Modifier.fillMaxWidth()
             .height(210.dp)
-            .padding(horizontal = 24.dp, vertical = 20.dp)) { amPm, hour, minute ->
-            DLog.e("TEST", "amPm: $amPm, hour: $hour, minute: $minute")
+            .padding(horizontal = 24.dp, vertical = 20.dp)) { type, timeVal ->
+
+            when (type) {
+                Calendar.AM_PM -> timeDate.value.apply { set(Calendar.AM_PM, timeVal) }
+                Calendar.HOUR -> timeDate.value.apply { set(Calendar.HOUR, timeVal) }
+                Calendar.MINUTE -> timeDate.value.apply { set(Calendar.MINUTE, timeVal) }
+                else -> timeDate.value
+            }
         }
 
         Column(Modifier.fillMaxWidth()

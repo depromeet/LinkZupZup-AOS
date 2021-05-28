@@ -1,9 +1,6 @@
 package com.depromeet.linkzupzup.di
 
 import com.depromeet.linkzupzup.AppConst.CONNECTION_TIMEOUT
-import com.depromeet.linkzupzup.AppConst.DEVICE_TOKEN_KEY
-import com.depromeet.linkzupzup.AppConst.DEVICE_TYPE
-import com.depromeet.linkzupzup.AppConst.DEVICE_TYPE_KEY
 import com.depromeet.linkzupzup.AppConst.READ_TIMEOUT
 import com.depromeet.linkzupzup.AppConst.WRITE_TIMEOUT
 import com.depromeet.linkzupzup.BuildConfig
@@ -12,6 +9,8 @@ import com.depromeet.linkzupzup.component.PreferencesManager
 import com.depromeet.linkzupzup.extensions.applySSL
 import com.google.gson.GsonBuilder
 import com.depromeet.linkzupzup.ApiUrl
+import com.depromeet.linkzupzup.AppConst.AUTHHORIZATION_KEY
+import com.depromeet.linkzupzup.AppConst.USER_ID_KEY
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import okhttp3.Cache
 import okhttp3.Interceptor
@@ -27,7 +26,7 @@ val networkModule = module {
 
     single { Cache(androidApplication().cacheDir, 10L * 1024 * 1024) }
 
-    single { GsonBuilder().create() }
+    // single { GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create() }
 
     single {
         OkHttpClient().newBuilder()
@@ -57,8 +56,9 @@ val networkModule = module {
         Interceptor { chain ->
             val pref: PreferencesManager = get()
             chain.proceed(chain.request().newBuilder().apply {
-                header(DEVICE_TYPE_KEY, DEVICE_TYPE)
-                header(DEVICE_TOKEN_KEY, pref.getDeviceToken())
+                header(AUTHHORIZATION_KEY, pref.getAuthorization())
+                // header(USER_ID_KEY, pref.getUserId())
+                header(USER_ID_KEY, "2131")
             }.build())
         }
     }
