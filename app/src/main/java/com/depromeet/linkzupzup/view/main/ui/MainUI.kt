@@ -43,17 +43,19 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.MutableLiveData
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
-import com.depromeet.linkzupzup.dataSources.repositories.UserRepositoryImpl
-import com.depromeet.linkzupzup.domains.UserUseCases
-import com.depromeet.linkzupzup.extensions.noRippleClickable
+import com.depromeet.linkzupzup.dataSources.LinkDataSource
+import com.depromeet.linkzupzup.dataSources.api.LinkAPIService
+import com.depromeet.linkzupzup.domains.LinkUseCases
+import com.depromeet.linkzupzup.domains.entities.LinkAlarmResponseEntity
+import com.depromeet.linkzupzup.domains.repositories.LinkRepositoryImpl
 import com.depromeet.linkzupzup.presenter.MainViewModel
 import com.depromeet.linkzupzup.presenter.model.*
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
+import io.reactivex.Observable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -98,7 +100,11 @@ fun MainPreview() {
         // 스크랩 링크 리스트
         addAll(MainContentData.mockMainContentList(5))
     }
-    MainBodyUI(mainContentList, MainViewModel(userUseCases = UserUseCases(UserRepositoryImpl())))
+    MainBodyUI(mainContentList, vm = MainViewModel(linkUseCases = LinkUseCases(LinkRepositoryImpl(LinkDataSource(object: LinkAPIService {
+        override fun getLinkList(query: HashMap<String, Any>): Observable<LinkAlarmResponseEntity> {
+            TODO("Not yet implemented")
+        }
+    })))))
 }
 
 @ExperimentalMaterialApi
@@ -110,35 +116,12 @@ fun BottomSheetPreview() {
         bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
     )
     BottomSheet(bottomSheetScaffoldState,coroutineScope,
-        MainViewModel(UserUseCases(UserRepositoryImpl()))
+        MainViewModel(linkUseCases = LinkUseCases(LinkRepositoryImpl(LinkDataSource(object: LinkAPIService {
+            override fun getLinkList(query: HashMap<String, Any>): Observable<LinkAlarmResponseEntity> {
+                TODO("Not yet implemented")
+            }
+        }))))
     )
-}
-
-@Composable
-fun UserUI(vm: MainViewModel) {
-    val userInfo: MutableState<User?> = remember { mutableStateOf(null)}
-    vm.userInfo.observe(vm.lifecycleOwner!!) { user ->
-        userInfo.value = user
-    }
-
-    userInfo.value?.let { user ->
-        UserLoginStateUI(user)
-    } ?: NeedUserLoginUI()
-}
-
-@Composable
-fun UserLoginStateUI(user: User) {
-    val str = "name: ${user.name}, age: ${user.age}"
-    Text(str, textAlign = TextAlign.Center, modifier = Modifier
-        .fillMaxWidth()
-        .height(60.dp))
-}
-
-@Composable
-fun NeedUserLoginUI() {
-    Text("로그인이 필요합니다.", textAlign = TextAlign.Center, modifier = Modifier
-        .fillMaxWidth()
-        .height(60.dp))
 }
 
 /* MainUI */
@@ -444,7 +427,7 @@ fun MainHashtagCard(tagName : String, backColor : Color, textColor : Color){
 /* BottomSheet */
 @ExperimentalMaterialApi
 @Composable
-fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineScope : CoroutineScope, vm : MainViewModel){
+fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineScope : CoroutineScope, vm : MainViewModel? = null){
 
     // in Column Scope
     Column(modifier = Modifier
@@ -576,7 +559,7 @@ fun BottomSheetLinkInput(){
 }
 
 @Composable
-fun BottomSheetSelect(vm : MainViewModel){
+fun BottomSheetSelect(vm: MainViewModel? = null){
 
     val cnt = 0
     val size = 3
@@ -655,14 +638,16 @@ fun ButtomSheetInputTag(){
 }
 
 @Composable
-fun BottomSheetHashtagCard(vm : MainViewModel, tag: LinkHashData, isSelected : Boolean = false){
+fun BottomSheetHashtagCard(vm: MainViewModel? = null, tag: LinkHashData, isSelected : Boolean = false){
     val ctx = LocalContext.current
     Card(
         modifier = Modifier
             .height(32.dp)
             .clickable {
-                if (isSelected) vm.removeHashtag(tag)
-                else vm.addHashtag(tag)
+                vm?.run {
+                    if (isSelected) removeHashtag(tag)
+                    else addHashtag(tag)
+                }
             },
         elevation = 0.dp,
         backgroundColor = tag.tagColor.bgColor){
@@ -700,11 +685,14 @@ fun BottomSheetHashtagCard(vm : MainViewModel, tag: LinkHashData, isSelected : B
 }
 
 @Composable
-fun BottomSheetSelectedTagList(vm: MainViewModel, modifier: Modifier = Modifier.fillMaxWidth()){
+fun BottomSheetSelectedTagList(vm: MainViewModel? = null, modifier: Modifier = Modifier.fillMaxWidth()){
     var selectedTag: List<LinkHashData> = listOf()
-    vm.liveSelectedTagList.observe(vm.lifecycleOwner!!){tag ->
-        selectedTag = tag
+    vm?.run {
+        liveSelectedTagList.observe(lifecycleOwner!!){tag ->
+            selectedTag = tag
+        }
     }
+
 
 
     LazyRow(modifier = modifier,

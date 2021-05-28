@@ -1,6 +1,6 @@
 package com.depromeet.linkzupzup.domains
 
-import com.depromeet.linkzupzup.dataSources.repositories.TagRepositoryImpl
+import com.depromeet.linkzupzup.domains.repositories.TagRepositoryImpl
 
 class ScrapUseCases(private val tagRepositoryImpl: TagRepositoryImpl) {
 

@@ -1,6 +1,6 @@
 package com.depromeet.linkzupzup.domains
 
-import com.depromeet.linkzupzup.dataSources.repositories.AlarmRepositoryImpl
+import com.depromeet.linkzupzup.domains.repositories.AlarmRepositoryImpl
 import com.depromeet.linkzupzup.presenter.model.WeeklyAlarm
 
 class AlarmUseCases(private val alarmRepositoryImpl: AlarmRepositoryImpl) {

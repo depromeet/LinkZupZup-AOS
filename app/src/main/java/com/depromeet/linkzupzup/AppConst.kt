@@ -2,8 +2,9 @@ package com.depromeet.linkzupzup
 
 object AppConst {
 
-    const val DEVICE_TYPE_KEY: String = "devicetype"
-    const val DEVICE_TOKEN_KEY: String = "devicetoken"
+    const val AUTHHORIZATION_KEY: String = "Authorization"
+    const val USER_ID_KEY: String = "userId"
+    const val DEVICE_TYPE_KEY: String = "device_type"
     const val DEVICE_TYPE: String = "AOS"
 
 
