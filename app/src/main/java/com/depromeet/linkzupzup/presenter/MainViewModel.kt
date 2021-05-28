@@ -2,23 +2,19 @@ package com.depromeet.linkzupzup.presenter
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.depromeet.linkzupzup.ParamsInfo
 import com.depromeet.linkzupzup.base.BaseViewModel
 import com.depromeet.linkzupzup.domains.LinkUseCases
 import com.depromeet.linkzupzup.domains.entities.LinkAlarmResponseEntity
+import com.depromeet.linkzupzup.presenter.model.LinkData
 import com.depromeet.linkzupzup.presenter.model.LinkHashData
 import com.depromeet.linkzupzup.presenter.model.User
-import com.depromeet.linkzupzup.utils.DLog
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import kotlinx.coroutines.*
-import kotlin.coroutines.coroutineContext
-import androidx.lifecycle.viewModelScope
 import com.depromeet.linkzupzup.utils.MetaDataUtil.extractUrlFormText
 import com.depromeet.linkzupzup.utils.MetaDataUtil.getMetaDataFromUrl
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.*
 
 class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
 

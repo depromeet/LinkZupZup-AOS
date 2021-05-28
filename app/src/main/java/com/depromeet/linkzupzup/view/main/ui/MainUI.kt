@@ -501,7 +501,7 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
             onClick = {
                 // Room Link table 저장
                 // vm.insertLink(LinkData(linkURL = linkUrl.value))
-                vm.getMetadata(linkUrl.value)
+                vm?.getMetadata(linkUrl.value)
             }) {
 
             Text("저장하기",
