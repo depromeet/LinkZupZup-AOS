@@ -1,10 +1,7 @@
-package com.depromeet.linkzupzup.utils
+package com.depromeet.linkzupzup.component
 
 import com.depromeet.linkzupzup.presenter.model.LinkData
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import com.depromeet.linkzupzup.utils.DLog
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.net.MalformedURLException
@@ -13,7 +10,7 @@ import java.net.URL
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-object MetaDataUtil {
+object MetaDataManager {
 
     private fun isUrl(url : String) :Boolean{
 
@@ -67,7 +64,10 @@ object MetaDataUtil {
             linkData.description = doc.select("meta[property=og:description]")[0].attr("content")
             linkData.imgURL = doc.select("meta[property=og:image]")[0].attr("content")
 
-            DLog.d("LinkMetaData","${linkData.linkTitle} ${linkData.description} ${linkData.imgURL}")
+            DLog.d(
+                "LinkMetaData",
+                "${linkData.linkTitle} ${linkData.description} ${linkData.imgURL}"
+            )
         }catch (e : Exception){
             e.printStackTrace()
         }

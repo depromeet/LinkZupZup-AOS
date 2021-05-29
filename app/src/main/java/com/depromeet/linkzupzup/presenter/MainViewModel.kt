@@ -5,13 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.depromeet.linkzupzup.ParamsInfo
 import com.depromeet.linkzupzup.base.BaseViewModel
+import com.depromeet.linkzupzup.component.MetaDataManager.extractUrlFormText
+import com.depromeet.linkzupzup.component.MetaDataManager.getMetaDataFromUrl
 import com.depromeet.linkzupzup.domains.LinkUseCases
 import com.depromeet.linkzupzup.domains.entities.LinkAlarmResponseEntity
 import com.depromeet.linkzupzup.presenter.model.LinkData
 import com.depromeet.linkzupzup.presenter.model.LinkHashData
 import com.depromeet.linkzupzup.presenter.model.User
-import com.depromeet.linkzupzup.utils.MetaDataUtil.extractUrlFormText
-import com.depromeet.linkzupzup.utils.MetaDataUtil.getMetaDataFromUrl
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
