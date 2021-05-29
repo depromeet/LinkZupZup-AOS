@@ -1,8 +1,9 @@
-package com.depromeet.linkzupzup.dataSources.roomdb
+package com.depromeet.linkzupzup.component
 
 import android.content.Context
 import androidx.room.*
-import com.depromeet.linkzupzup.domains.entities.LinkMetaInfoEntity
+import com.depromeet.linkzupzup.architecture.dataLayer.dao.LinkMetaInfoDao
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
 
 @Database(version = 1, entities = [LinkMetaInfoEntity::class], exportSchema = false)
 @TypeConverters(RoomConverter::class)
