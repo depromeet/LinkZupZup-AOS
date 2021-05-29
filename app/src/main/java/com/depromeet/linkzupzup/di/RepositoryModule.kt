@@ -1,10 +1,9 @@
 package com.depromeet.linkzupzup.di
 
-import com.depromeet.linkzupzup.domains.repositories.AlarmRepositoryImpl
-import com.depromeet.linkzupzup.domains.repositories.LinkRepositoryImpl
-import com.depromeet.linkzupzup.domains.repositories.TagRepositoryImpl
-import com.depromeet.linkzupzup.domains.repositories.UserRepositoryImpl
-import org.koin.android.ext.koin.androidApplication
+import com.depromeet.linkzupzup.architecture.dataLayer.repositories.AlarmRepositoryImpl
+import com.depromeet.linkzupzup.architecture.dataLayer.repositories.LinkRepositoryImpl
+import com.depromeet.linkzupzup.architecture.dataLayer.repositories.TagRepositoryImpl
+import com.depromeet.linkzupzup.architecture.dataLayer.repositories.UserRepositoryImpl
 import org.koin.dsl.module
 
 val repositoryModule = module {

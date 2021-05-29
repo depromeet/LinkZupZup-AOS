@@ -31,8 +31,8 @@ import com.depromeet.linkzupzup.extensions.mutableStateValue
 import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.extensions.timeBaseStr
 import com.depromeet.linkzupzup.extensions.timeStr
-import com.depromeet.linkzupzup.presenter.AlarmDetailViewModel
-import com.depromeet.linkzupzup.presenter.model.WeeklyAlarm
+import com.depromeet.linkzupzup.architecture.presenterLayer.AlarmDetailViewModel
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.WeeklyAlarm
 import com.depromeet.linkzupzup.ui.theme.LinkZupZupTheme
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.CustomSwitchCompat

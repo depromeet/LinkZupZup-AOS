@@ -1,7 +1,7 @@
 package com.depromeet.linkzupzup.utils
 
 import androidx.compose.ui.graphics.Color
-import com.depromeet.linkzupzup.presenter.model.TagColor
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.TagColor
 import com.depromeet.linkzupzup.ui.theme.*
 import java.util.*
 import kotlin.collections.ArrayList

@@ -2,9 +2,9 @@ package com.depromeet.linkzupzup
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.depromeet.linkzupzup.dataSources.roomdb.LinkDAO
-import com.depromeet.linkzupzup.dataSources.roomdb.LinkVO
-import com.depromeet.linkzupzup.dataSources.roomdb.RoomDB
+import com.depromeet.linkzupzup.architecture.dataLayer.roomdb.LinkDAO
+import com.depromeet.linkzupzup.architecture.dataLayer.roomdb.LinkVO
+import com.depromeet.linkzupzup.component.RoomDB
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 

@@ -29,8 +29,8 @@ import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.extensions.clearMillis
 import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.extensions.toast
-import com.depromeet.linkzupzup.presenter.ScrapDetailViewModel
-import com.depromeet.linkzupzup.presenter.model.TagColor
+import com.depromeet.linkzupzup.architecture.presenterLayer.ScrapDetailViewModel
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.TagColor
 import com.depromeet.linkzupzup.ui.theme.BottomSheetShape
 import com.depromeet.linkzupzup.ui.theme.LinkZupZupTheme
 import com.depromeet.linkzupzup.utils.CommonUtil

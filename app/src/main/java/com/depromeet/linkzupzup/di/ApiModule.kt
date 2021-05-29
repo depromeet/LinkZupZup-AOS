@@ -1,6 +1,6 @@
 package com.depromeet.linkzupzup.di
 
-import com.depromeet.linkzupzup.dataSources.api.LinkAPIService
+import com.depromeet.linkzupzup.architecture.dataLayer.api.LinkAPIService
 import org.koin.dsl.module
 import retrofit2.Retrofit
 

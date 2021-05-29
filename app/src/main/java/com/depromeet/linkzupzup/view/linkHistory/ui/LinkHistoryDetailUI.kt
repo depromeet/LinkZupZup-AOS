@@ -32,9 +32,9 @@ import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.extensions.bottomSpacer
 import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.extensions.topSpacer
-import com.depromeet.linkzupzup.presenter.LinkHistoryDetailViewModel
-import com.depromeet.linkzupzup.presenter.model.LinkData
-import com.depromeet.linkzupzup.presenter.model.MainContentData
+import com.depromeet.linkzupzup.architecture.presenterLayer.LinkHistoryDetailViewModel
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.MainContentData
 import com.depromeet.linkzupzup.ui.theme.LinkZupZupTheme
 import com.depromeet.linkzupzup.view.main.ui.MainLinkCard
 

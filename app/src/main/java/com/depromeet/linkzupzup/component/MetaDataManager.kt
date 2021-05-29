@@ -1,6 +1,6 @@
 package com.depromeet.linkzupzup.component
 
-import com.depromeet.linkzupzup.presenter.model.LinkData
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
 import com.depromeet.linkzupzup.utils.DLog
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document

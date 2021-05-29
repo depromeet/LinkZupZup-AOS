@@ -2,12 +2,9 @@ package com.depromeet.linkzupzup.view.main
 
 import android.os.Bundle
 import com.depromeet.linkzupzup.base.BaseActivity
-import com.depromeet.linkzupzup.presenter.MainViewModel
+import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.main.ui.MainUI
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 
 class MainActivity : BaseActivity<MainUI, MainViewModel>() {

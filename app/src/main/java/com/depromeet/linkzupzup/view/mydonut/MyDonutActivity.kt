@@ -2,7 +2,7 @@ package com.depromeet.linkzupzup.view.mydonut
 
 import android.os.Bundle
 import com.depromeet.linkzupzup.base.BaseActivity
-import com.depromeet.linkzupzup.presenter.MyDonutViewModel
+import com.depromeet.linkzupzup.architecture.presenterLayer.MyDonutViewModel
 import com.depromeet.linkzupzup.view.mydonut.ui.MyDonutUI
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 
