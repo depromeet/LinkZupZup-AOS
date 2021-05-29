@@ -73,18 +73,18 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
     }
 
 
-    fun getMetadata(url : String){
+    private fun getMetadata(url : String){
         CoroutineScope(Dispatchers.IO).launch {
             extractUrlFormText(url)?.let{
-                insertLink(getMetaDataFromUrl(it))  // jSoup
+                // insertLink(getMetaDataFromUrl(it))  // jSoup
             }
         }
     }
 
-    private fun insertLink(link : LinkData){
+    fun insertLink(link : LinkData){
         // viewModel 에서 제공하는 coroutine scope
-        viewModelScope.launch {
-            linkUseCases.insertLinkInfo(link = link)
-        }
+        // viewModelScope.launch {
+        //     linkUseCases.insertLinkInfo(link = link)
+        // }
     }
 }

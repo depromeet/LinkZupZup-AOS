@@ -2,13 +2,13 @@ package com.depromeet.linkzupzup.dataSources.roomdb
 
 import android.content.Context
 import androidx.room.*
-import com.depromeet.linkzupzup.domains.entities.LinkEntity
+import com.depromeet.linkzupzup.domains.entities.LinkMetaInfoEntity
 
-@Database(version = 1, entities = [LinkEntity::class], exportSchema = false)
+@Database(version = 1, entities = [LinkMetaInfoEntity::class], exportSchema = false)
 @TypeConverters(RoomConverter::class)
 abstract class RoomDB : RoomDatabase(){
 
-    abstract fun linkDao() : LinkDao
+    abstract fun metaDao() : LinkMetaInfoDao
 
     companion object{
         private var instance : RoomDB ? = null

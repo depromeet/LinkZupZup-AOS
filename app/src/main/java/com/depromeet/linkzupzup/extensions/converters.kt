@@ -1,6 +1,6 @@
 package com.depromeet.linkzupzup.extensions
 
-import com.depromeet.linkzupzup.domains.entities.LinkEntity
+import com.depromeet.linkzupzup.domains.entities.LinkMetaInfoEntity
 import com.depromeet.linkzupzup.domains.entities.UserEntity
 import com.depromeet.linkzupzup.presenter.model.LinkData
 import com.depromeet.linkzupzup.presenter.model.User
@@ -9,5 +9,5 @@ import com.depromeet.linkzupzup.presenter.model.User
 fun UserEntity.mapToPresenter() = User(name, age)
 fun User.mapToDataLayer() = UserEntity(name= name, age= age)
 
-fun LinkEntity.mapToPresenter() = LinkData(linkURL = url)
-fun LinkData.mapToDataLayer() = LinkEntity(url = linkURL, title = linkTitle, imgUrl = imgURL, description = description)
+fun LinkMetaInfoEntity.mapToPresenter() = LinkData(linkURL = url, linkTitle = title, imgURL = imgUrl, description = content, createdAt = createdDt)
+fun LinkData.mapToDataLayer() = LinkMetaInfoEntity(url = linkURL, title = linkTitle, imgUrl = imgURL, content = description, createdDt = createdAt)

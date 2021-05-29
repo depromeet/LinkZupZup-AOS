@@ -1,6 +1,7 @@
 package com.depromeet.linkzupzup.presenter.model
 
 import androidx.compose.ui.graphics.Color
+import java.sql.Date
 
 data class LinkData(
     var linkId: Int = 0,
@@ -11,7 +12,7 @@ data class LinkData(
     var description : String = "",
     var hasReminder: Boolean = false,
     var hashtags: ArrayList<LinkHashData> = arrayListOf(),
-    var createdAt: String = "",
+    var createdAt: Date = Date(0),
     var completedAt: String = "",
     var completed: Boolean = false) {
 

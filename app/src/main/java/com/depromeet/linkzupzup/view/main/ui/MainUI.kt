@@ -47,6 +47,7 @@ import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.dataSources.LinkDataSource
 import com.depromeet.linkzupzup.dataSources.api.LinkAPIService
+import com.depromeet.linkzupzup.dataSources.roomdb.RoomDB
 import com.depromeet.linkzupzup.domains.LinkUseCases
 import com.depromeet.linkzupzup.domains.entities.LinkAlarmResponseEntity
 import com.depromeet.linkzupzup.domains.repositories.LinkRepositoryImpl
@@ -101,7 +102,8 @@ fun MainPreview() {
         addAll(MainContentData.mockMainContentList(5))
     }
     val ctx = LocalContext.current
-    MainBodyUI(mainContentList, vm = MainViewModel(linkUseCases = LinkUseCases(LinkRepositoryImpl(ctx, LinkDataSource(object: LinkAPIService {
+    MainBodyUI(mainContentList, vm = MainViewModel(linkUseCases = LinkUseCases(LinkRepositoryImpl(
+        RoomDB.getInstance(ctx), LinkDataSource(object: LinkAPIService {
         override fun getLinkList(query: HashMap<String, Any>): Observable<LinkAlarmResponseEntity> {
             TODO("Not yet implemented")
         }
@@ -118,7 +120,7 @@ fun BottomSheetPreview() {
     )
     val ctx = LocalContext.current
     BottomSheet(bottomSheetScaffoldState,coroutineScope,
-        MainViewModel(linkUseCases = LinkUseCases(LinkRepositoryImpl(ctx, LinkDataSource(object: LinkAPIService {
+        MainViewModel(linkUseCases = LinkUseCases(LinkRepositoryImpl(RoomDB.getInstance(ctx), LinkDataSource(object: LinkAPIService {
             override fun getLinkList(query: HashMap<String, Any>): Observable<LinkAlarmResponseEntity> {
                 TODO("Not yet implemented")
             }
@@ -502,8 +504,8 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
                 .padding(start = 24.dp, end = 24.dp),
             onClick = {
                 // Room Link table 저장
-                // vm.insertLink(LinkData(linkURL = linkUrl.value))
-                vm?.getMetadata(linkUrl.value)
+                vm?.insertLink(LinkData(linkURL = linkUrl.value))
+                // vm?.getMetadata(linkUrl.value)
             }) {
 
             Text("저장하기",

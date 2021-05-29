@@ -11,5 +11,5 @@ val repositoryModule = module {
     factory { UserRepositoryImpl() }
     factory { TagRepositoryImpl() }
     factory { AlarmRepositoryImpl() }
-    factory { LinkRepositoryImpl(androidApplication(), get()) }
+    factory { LinkRepositoryImpl(get(), get()) }
 }

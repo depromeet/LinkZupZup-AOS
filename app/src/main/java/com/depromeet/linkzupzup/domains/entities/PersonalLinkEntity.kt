@@ -8,7 +8,7 @@ import java.sql.Date
 @Entity(
     tableName = "PersonalLink",
     primaryKeys = ["link_id"],
-    indices = [Index(value = ["link_url","link_completed"],unique = true)])
+    indices = [Index(value = ["link_id","link_url","link_completed"],unique = true)])
 class PersonalLinkEntity (
 
     @ColumnInfo(name="link_id")
