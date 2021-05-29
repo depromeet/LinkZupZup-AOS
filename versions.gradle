@@ -18,7 +18,7 @@ ext {
     firebaseBom = '28.0.1'
     firebaseMessaging = '22.0.0'
     kakaoVersion = '2.5.1'
-
+    gsonVersion = '2.8.7'
 }
 ext.lib = [:]
 
@@ -129,5 +129,8 @@ def kakao = [:]
 kakao.runtime = "com.kakao.sdk:v2-user:$kakaoVersion"
 lib.kakao = kakao
 
+def gson = [:]
+gson.runtime = "com.google.code.gson:gson:$gsonVersion"
+lib.gson = gson
 
 ext.lib = lib

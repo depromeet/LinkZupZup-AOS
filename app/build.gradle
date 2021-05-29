@@ -95,6 +95,7 @@ dependencies {
     implementation lib.jsoup.runtime
     kapt lib.room.compiler
     implementation lib.kakao.runtime
+    implementation lib.gson.runtime
 
     // firebase
     implementation platform(lib.firebase.bom)
