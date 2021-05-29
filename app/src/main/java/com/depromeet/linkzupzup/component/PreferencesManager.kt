@@ -28,6 +28,7 @@ class PreferencesManager(ctx: Context, name: String = "pref") {
     fun getFCMToken(): String = pref.getString(USER_FCM_TOKEN,"") ?: ""
     fun setFCMToken(token : String){
         saver.putString(USER_FCM_TOKEN,token)
+        saver.commit()
     }
 
 

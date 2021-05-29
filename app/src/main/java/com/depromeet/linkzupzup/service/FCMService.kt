@@ -11,12 +11,16 @@ class FCMService : FirebaseMessagingService() {
 
     override fun onMessageReceived(p0: RemoteMessage) {
         super.onMessageReceived(p0)
-
+        setNotification()
     }
 
-    override fun onNewToken(p0: String) {
-        super.onNewToken(p0)
-        preference.setFCMToken(p0)
+    override fun onNewToken(token: String) {
+        super.onNewToken(token)
+        preference.setFCMToken(token)
+    }
+
+    private fun setNotification(){
+
     }
 
 

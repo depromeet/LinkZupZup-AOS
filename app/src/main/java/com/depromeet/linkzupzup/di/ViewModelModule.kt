@@ -13,4 +13,5 @@ val viewModelModule = module {
     viewModel { LinkHistoryDetailViewModel(get()) }
     viewModel { WebViewViewModel() }
     viewModel { IntroViewModel() }
+    viewModel { OnBoardingViewModel() }
 }
