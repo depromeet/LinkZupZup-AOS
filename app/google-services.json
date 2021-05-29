@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "465298268774",
+    "project_id": "linkzupzup",
+    "storage_bucket": "linkzupzup.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:465298268774:android:6516367ff73fc6038f83a7",
+        "android_client_info": {
+          "package_name": "com.depromeet.linkzupzup"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "465298268774-v29ou5icqa80usf9t6bdlt73tikd1f3g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtzNsap2BoYqY5KIR5T_t53Q7pkEuPn50"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "465298268774-v29ou5icqa80usf9t6bdlt73tikd1f3g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

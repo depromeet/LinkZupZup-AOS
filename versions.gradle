@@ -14,7 +14,11 @@ ext {
     roomVersion = '2.4.0-alpha02'
     roomDebugVersion = '1.0.6'
     jsoupVersion = '1.13.1'
+    googleServiceVersion = '4.3.8'
+    firebaseBom = '28.0.1'
+    firebaseMessaging = '22.0.0'
     kakaoVersion = '2.5.1'
+
 }
 ext.lib = [:]
 
@@ -95,6 +99,7 @@ def multidex = [:]
 multidex.runtime = "com.android.support:multidex:$multidexVersion"
 lib.multidex = multidex
 
+/* room */
 def room = [:]
 room.runtime = "androidx.room:room-runtime:$roomVersion"
 room.ktx = "androidx.room:room-ktx:$roomVersion"
@@ -111,8 +116,18 @@ def jsoup = [:]
 jsoup.runtime = "org.jsoup:jsoup:$jsoupVersion"
 lib.jsoup = jsoup
 
+
+/* Firebase FCM */
+def firebase = [:]
+firebase.googleService = "com.google.gms:google-services:$googleServiceVersion"
+firebase.bom = "com.google.firebase:firebase-bom:$firebaseBom"
+firebase.analytics = "com.google.firebase:firebase-analytics-ktx"
+firebase.messaging = "com.google.firebase:firebase-messaging-ktx:$firebaseMessaging"
+lib.firebase = firebase
+
 def kakao = [:]
 kakao.runtime = "com.kakao.sdk:v2-user:$kakaoVersion"
 lib.kakao = kakao
+
 
 ext.lib = lib

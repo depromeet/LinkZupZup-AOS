@@ -12,5 +12,8 @@ val viewModelModule = module {
     viewModel { MyDonutViewModel() }
     viewModel { LinkHistoryDetailViewModel(get()) }
     viewModel { WebViewViewModel() }
+    viewModel { IntroViewModel() }
+    viewModel { OnBoardingViewModel() }
     viewModel { LoginViewModel(get()) }
+
 }

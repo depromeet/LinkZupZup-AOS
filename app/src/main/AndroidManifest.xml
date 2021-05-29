@@ -16,16 +16,21 @@
         android:theme="@style/Theme.LinkZupZup"
         android:usesCleartextTraffic="true">
 
-        <activity
-            android:name=".view.login.LoginActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.LinkZupZup.NoActionBar">
+        <activity android:name=".view.intro.IntroActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".view.onBoarding.OnBoardingActivity" />
+
+        <activity
+            android:name=".view.login.LoginActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.LinkZupZup.NoActionBar">
+
         </activity>
 
         <activity android:name=".view.scrap.ScrapDetailActivity" />
@@ -47,6 +52,14 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"></action>
             </intent-filter>
         </receiver>
+
+        <service
+            android:name=".service.FCMService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
     </application>
 

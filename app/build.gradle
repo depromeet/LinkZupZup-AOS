@@ -3,6 +3,7 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-parcelize'
     id 'kotlin-kapt'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -39,9 +40,6 @@ android {
     buildFeatures {
         compose = true
         dataBinding = true
-    }
-    kapt {
-        generateStubs = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion composeVersion
@@ -97,6 +95,11 @@ dependencies {
     implementation lib.jsoup.runtime
     kapt lib.room.compiler
     implementation lib.kakao.runtime
+
+    // firebase
+    implementation platform(lib.firebase.bom)
+    implementation lib.firebase.analytics
+    implementation lib.firebase.messaging
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
