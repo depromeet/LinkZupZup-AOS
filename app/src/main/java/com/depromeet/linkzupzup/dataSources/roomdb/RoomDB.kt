@@ -16,13 +16,10 @@ abstract class RoomDB : RoomDatabase(){
 
         @Synchronized
         fun getInstance(context: Context) : RoomDB{
-            if(instance==null){
-                instance = Room.databaseBuilder(context.applicationContext, RoomDB::class.java, DB_NAME)
-                    .fallbackToDestructiveMigration()
-                    .allowMainThreadQueries()
-                    .build()
-            }
-            return instance!!
+            return instance ?: Room.databaseBuilder(context.applicationContext, RoomDB::class.java, DB_NAME)
+                .fallbackToDestructiveMigration()
+                .allowMainThreadQueries()
+                .build().also { instance = it }
         }
 
         fun destroyInstance(){
