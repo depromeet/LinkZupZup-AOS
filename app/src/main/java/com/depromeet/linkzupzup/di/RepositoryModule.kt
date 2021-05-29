@@ -7,7 +7,7 @@ import com.depromeet.linkzupzup.architecture.dataLayer.repositories.UserReposito
 import org.koin.dsl.module
 
 val repositoryModule = module {
-    factory { UserRepositoryImpl() }
+    factory { UserRepositoryImpl(get()) }
     factory { TagRepositoryImpl() }
     factory { AlarmRepositoryImpl() }
     factory { LinkRepositoryImpl(get(), get()) }
