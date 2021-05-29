@@ -2,7 +2,9 @@ package com.depromeet.linkzupzup.architecture.dataLayer.api
 
 import com.depromeet.linkzupzup.ApiUrl
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmResponseEntity
+import com.google.gson.JsonObject
 import io.reactivex.Observable
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.QueryMap
 

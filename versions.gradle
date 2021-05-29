@@ -14,6 +14,7 @@ ext {
     roomVersion = '2.4.0-alpha02'
     roomDebugVersion = '1.0.6'
     jsoupVersion = '1.13.1'
+    kakaoVersion = '2.5.1'
 }
 ext.lib = [:]
 
@@ -109,5 +110,9 @@ lib.room = room
 def jsoup = [:]
 jsoup.runtime = "org.jsoup:jsoup:$jsoupVersion"
 lib.jsoup = jsoup
+
+def kakao = [:]
+kakao.runtime = "com.kakao.sdk:v2-user:$kakaoVersion"
+lib.kakao = kakao
 
 ext.lib = lib

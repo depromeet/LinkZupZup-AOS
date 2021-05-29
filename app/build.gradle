@@ -96,6 +96,7 @@ dependencies {
     implementation lib.room.livedata
     implementation lib.jsoup.runtime
     kapt lib.room.compiler
+    implementation lib.kakao.runtime
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
