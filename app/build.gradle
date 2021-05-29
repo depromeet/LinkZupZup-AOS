@@ -41,9 +41,6 @@ android {
         compose = true
         dataBinding = true
     }
-    kapt {
-        generateStubs = true
-    }
     composeOptions {
         kotlinCompilerExtensionVersion composeVersion
         kotlinCompilerVersion kotlinVersion

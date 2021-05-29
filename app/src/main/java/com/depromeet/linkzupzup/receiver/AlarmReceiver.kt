@@ -9,6 +9,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import com.depromeet.linkzupzup.receiver.NotificationSetting.deliverNotification
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.main.MainActivity
 import java.util.*
@@ -63,32 +64,6 @@ class AlarmReceiver: BroadcastReceiver() {
         }
     }
 
-    /**
-     * 푸시 호출
-     */
-    private fun deliverNotification(context: Context,
-                                    notifiItem: NotifiItem = NotifiItem("Title", "content"),
-                                    contentIntent: Intent = Intent(context, MainActivity::class.java),
-                                    notificationId: Int = Calendar.getInstance().timeInMillis.toInt(),
-                                    intentFlag: Int = PendingIntent.FLAG_UPDATE_CURRENT) = with(notifiItem) {
 
-        PendingIntent.getActivity(context,
-            notificationId,
-            contentIntent,
-            intentFlag).let { contentPendingIntent ->
-
-                NotificationCompat.Builder(context, channel.channelId)
-                    .setSmallIcon(smallIcon)
-                    .setContentTitle(contentTitle)
-                    .setContentText(contentText)
-                    .setContentIntent(contentPendingIntent)
-                    .setPriority(priority)
-                    .setAutoCancel(isAutoCancel)
-                    .setDefaults(effectType).let { builder ->
-                        notificationManager?.notify(notificationId, builder.build())
-                }
-
-        }
-    }
 
 }
