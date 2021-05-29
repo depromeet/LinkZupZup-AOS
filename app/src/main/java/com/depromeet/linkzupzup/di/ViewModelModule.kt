@@ -14,4 +14,6 @@ val viewModelModule = module {
     viewModel { WebViewViewModel() }
     viewModel { IntroViewModel() }
     viewModel { OnBoardingViewModel() }
+    viewModel { LoginViewModel(get()) }
+
 }

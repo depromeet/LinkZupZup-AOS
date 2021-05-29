@@ -7,6 +7,10 @@ object AppConst {
     const val USER_FCM_TOKEN: String = "fcmToken"
     const val DEVICE_TYPE_KEY: String = "device_type"
     const val DEVICE_TYPE: String = "AOS"
+    const val KAKAO_TOKEN_KEY: String = "kakao_token"
+
+    const val OAUTH_KAKAO_TYPE: String = "oauth_kakao_type"
+    const val OAUTH_GOOGLE_TYPE: String = "oauth_google_type"
 
 
     // TCP Handshake가 완료되기까지 지속되는 시간

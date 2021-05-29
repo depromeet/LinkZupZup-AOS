@@ -62,3 +62,18 @@
 -dontwarn com.bumptech.glide.load.resource.bitmap.Downsampler
 -dontwarn com.bumptech.glide.load.resource.bitmap.HardwareConfigState
 ## Glide4 - End
+
+
+
+## Room - Start
+-keep class * extends androidx.room.RoomDatabase
+-keep @androidx.room.Entity class *
+-dontwarn androidx.room.paging.**
+## Room - End
+
+
+
+## Kakao - Start
+-keep class com.kakao.sdk.**.model.* { <fields>; }
+-keep class * extends com.google.gson.TypeAdapter
+## Kakao - End

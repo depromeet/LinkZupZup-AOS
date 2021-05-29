@@ -17,6 +17,8 @@ ext {
     googleServiceVersion = '4.3.8'
     firebaseBom = '28.0.1'
     firebaseMessaging = '22.0.0'
+    kakaoVersion = '2.5.1'
+
 }
 ext.lib = [:]
 
@@ -114,6 +116,7 @@ def jsoup = [:]
 jsoup.runtime = "org.jsoup:jsoup:$jsoupVersion"
 lib.jsoup = jsoup
 
+
 /* Firebase FCM */
 def firebase = [:]
 firebase.googleService = "com.google.gms:google-services:$googleServiceVersion"
@@ -121,4 +124,10 @@ firebase.bom = "com.google.firebase:firebase-bom:$firebaseBom"
 firebase.analytics = "com.google.firebase:firebase-analytics-ktx"
 firebase.messaging = "com.google.firebase:firebase-messaging-ktx:$firebaseMessaging"
 lib.firebase = firebase
+
+def kakao = [:]
+kakao.runtime = "com.kakao.sdk:v2-user:$kakaoVersion"
+lib.kakao = kakao
+
+
 ext.lib = lib

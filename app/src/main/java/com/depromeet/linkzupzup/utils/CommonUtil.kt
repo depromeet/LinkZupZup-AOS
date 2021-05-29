@@ -1,10 +1,15 @@
 package com.depromeet.linkzupzup.utils
 
+import android.content.Context
 import androidx.compose.ui.graphics.Color
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.TagColor
 import com.depromeet.linkzupzup.ui.theme.*
 import java.util.*
 import kotlin.collections.ArrayList
+import java.io.InputStream
+
+
+
 
 object CommonUtil {
 
@@ -32,5 +37,19 @@ object CommonUtil {
     /** Linear interpolation between `startValue` and `endValue` by `fraction`.  */
     fun lerp(startValue: Int, endValue: Int, fraction: Float): Int {
         return startValue + Math.round(fraction * (endValue - startValue))
+    }
+
+    fun <T> getPropertyValue(ctx: Context, key: String): T? {
+        val inputStream: InputStream = ctx.assets.open("config.properties")
+        try {
+            Properties().apply {
+                load(inputStream)
+            }.let { props -> return props.getProperty(key, "") as T }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        } finally {
+            inputStream.close()
+        }
     }
 }

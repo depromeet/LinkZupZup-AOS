@@ -1,17 +1,19 @@
 package com.depromeet.linkzupzup.architecture.dataLayer.repositories
 
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.UserEntity
-import io.reactivex.Single
+import com.depromeet.linkzupzup.architecture.dataLayer.MemberDataSource
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.SignInEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.SignResponseEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.SignUpEntity
+import io.reactivex.Observable
 
-class UserRepositoryImpl: UserRepository {
+class UserRepositoryImpl(private var memberDataSource: MemberDataSource): UserRepository {
 
-    override fun getUserInfo(): Single<UserEntity> {
-        // dataSource (API or Database) 를 참조하여 데이터를 반환합니다.
-        return Single.just(UserEntity(0, "JACKSON01", 31))
+    override fun signIn(signInEntity: SignInEntity): Observable<SignResponseEntity> {
+        return memberDataSource.signIn(signInEntity)
     }
 
-    override fun updateMyProfileUserInfo(user: UserEntity): Single<UserEntity> {
-        return Single.just(user)
+    override fun signUp(signUpEntity: SignUpEntity): Observable<SignResponseEntity> {
+        return memberDataSource.signUp(signUpEntity)
     }
 
 }
