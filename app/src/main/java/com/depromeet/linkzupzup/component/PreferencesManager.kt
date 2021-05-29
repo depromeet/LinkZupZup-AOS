@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import com.depromeet.linkzupzup.AppConst.AUTHHORIZATION_KEY
+import com.depromeet.linkzupzup.AppConst.USER_FCM_TOKEN
 import com.depromeet.linkzupzup.AppConst.USER_ID_KEY
 import com.depromeet.linkzupzup.BuildConfig
 
@@ -22,6 +23,11 @@ class PreferencesManager(ctx: Context, name: String = "pref") {
     fun setUserId(userId: String) {
         saver.putString(USER_ID_KEY, userId)
         saver.commit()
+    }
+
+    fun getFCMToken(): String = pref.getString(USER_FCM_TOKEN,"") ?: ""
+    fun setFCMToken(token : String){
+        saver.putString(USER_FCM_TOKEN,token)
     }
 
 

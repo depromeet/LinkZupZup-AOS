@@ -16,16 +16,20 @@
         android:theme="@style/Theme.LinkZupZup"
         android:usesCleartextTraffic="true">
 
-        <activity
-            android:name=".view.main.MainActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.LinkZupZup.NoActionBar">
+        <activity android:name=".view.intro.IntroActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".view.main.MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.LinkZupZup.NoActionBar">
+
         </activity>
 
         <activity android:name=".view.scrap.ScrapDetailActivity" />
