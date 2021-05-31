@@ -8,7 +8,7 @@ import org.koin.dsl.module
 
 val useCaseModule = module {
     factory { UserUseCases(get()) }
-    factory { ScrapUseCases(get()) }
-    factory { AlarmUseCases(get()) }
     factory { LinkUseCases(get()) }
+    factory { AlarmUseCases(get()) }
+    factory { ScrapUseCases(get()) }
 }

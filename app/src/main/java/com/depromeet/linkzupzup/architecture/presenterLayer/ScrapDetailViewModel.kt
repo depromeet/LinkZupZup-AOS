@@ -49,8 +49,9 @@ class ScrapDetailViewModel(private val scrapUseCases: ScrapUseCases): BaseViewMo
             DLog.e("addPersonalLinkAlarm", "add time, $it")
         }
         val pendingIntent = PendingIntent.getBroadcast(ctx, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeMillis, pendingIntent)
-
+        // Doze 모드에서 알람이 발생되지 않아, setExactAndAllowWhileIdle에서 setAlarmClock으로 대체
+        // alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeMillis, pendingIntent)
+        alarmManager.setAlarmClock(AlarmManager.AlarmClockInfo(timeMillis, pendingIntent), pendingIntent)
     }
 
 }

@@ -1,6 +1,8 @@
 package com.depromeet.linkzupzup.architecture.dataLayer.api
 
 import com.depromeet.linkzupzup.ApiUrl
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmDataEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmResponseEntity
 import io.reactivex.Observable
 import retrofit2.http.Body
@@ -21,6 +23,6 @@ interface LinkAPIService {
      * pageSize=1
      */
     @GET(ApiUrl.LINK_LIST)
-    fun getLinkList(@QueryMap query: HashMap<String, Any>): Observable<LinkAlarmResponseEntity>
+    fun getLinkList(@QueryMap query: HashMap<String, Any>): Observable<ResponseEntity<LinkAlarmDataEntity>>
 
 }
