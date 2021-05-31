@@ -49,6 +49,8 @@ import com.depromeet.linkzupzup.component.RoomDB
 import com.depromeet.linkzupzup.architecture.domainLayer.LinkUseCases
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmResponseEntity
 import com.depromeet.linkzupzup.architecture.dataLayer.repositories.LinkRepositoryImpl
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmDataEntity
 import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.*
 import com.depromeet.linkzupzup.extensions.noRippleClickable
@@ -103,7 +105,7 @@ fun MainPreview() {
     val ctx = LocalContext.current
     MainBodyUI(mainContentList, vm = MainViewModel(linkUseCases = LinkUseCases(LinkRepositoryImpl(
         RoomDB.getInstance(ctx), LinkDataSource(object: LinkAPIService {
-        override fun getLinkList(query: HashMap<String, Any>): Observable<LinkAlarmResponseEntity> {
+        override fun getLinkList(query: HashMap<String, Any>): Observable<ResponseEntity<LinkAlarmDataEntity>> {
             TODO("Not yet implemented")
         }
     })))))
@@ -120,7 +122,7 @@ fun BottomSheetPreview() {
     val ctx = LocalContext.current
     BottomSheet(bottomSheetScaffoldState,coroutineScope,
         MainViewModel(linkUseCases = LinkUseCases(LinkRepositoryImpl(RoomDB.getInstance(ctx), LinkDataSource(object: LinkAPIService {
-            override fun getLinkList(query: HashMap<String, Any>): Observable<LinkAlarmResponseEntity> {
+            override fun getLinkList(query: HashMap<String, Any>): Observable<ResponseEntity<LinkAlarmDataEntity>> {
                 TODO("Not yet implemented")
             }
         }))))

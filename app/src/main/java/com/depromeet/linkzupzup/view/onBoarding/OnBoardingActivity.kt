@@ -2,6 +2,7 @@ package com.depromeet.linkzupzup.view.onBoarding
 
 import android.content.Intent
 import android.os.Bundle
+import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.architecture.presenterLayer.OnBoardingViewModel
 import com.depromeet.linkzupzup.base.BaseActivity
 import com.depromeet.linkzupzup.view.main.MainActivity
@@ -17,6 +18,7 @@ class OnBoardingActivity : BaseActivity<OnBoardingUI, OnBoardingViewModel>()  {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        overridePendingTransition(R.anim.stay, R.anim.stay)
 
         Observable.timer(2, TimeUnit.SECONDS)
             .subscribe(this::nextPage)

@@ -14,7 +14,6 @@ class MainActivity : BaseActivity<MainUI, MainViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         with(viewModel) {
 
             getLinkList()
@@ -32,9 +31,11 @@ class MainActivity : BaseActivity<MainUI, MainViewModel>() {
                     DLog.e("TEST", it.comment)
                 }
             }
-
         }
-
     }
 
+    override fun onBackPressed() {
+        // super.onBackPressed()
+        backPressHandler.onBackPressed()
+    }
 }

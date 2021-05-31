@@ -80,7 +80,7 @@ fun LazyItemScope.topSpacer(index: Int, size: Dp) = if (index == 0) Spacer(Modif
 @Composable
 fun LazyItemScope.bottomSpacer(index: Int, items: List<*>, size: Dp) = if (index >= items.size - 1) Spacer(Modifier.height(size)) else null
 
-fun toast(ctx: Context, msg: String, duration: Int = Toast.LENGTH_SHORT) = Toast.makeText(ctx, msg, duration).show()
+fun toast(ctx: Context, msg: String, duration: Int = Toast.LENGTH_SHORT): Toast = Toast.makeText(ctx, msg, duration).also{ it.show() }
 
 /**
  * 참고 : https://meetup.toast.com/posts/130

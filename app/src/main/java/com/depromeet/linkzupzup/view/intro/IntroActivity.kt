@@ -2,14 +2,13 @@ package com.depromeet.linkzupzup.view.intro
 
 import android.content.Intent
 import android.os.Bundle
+import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.architecture.presenterLayer.IntroViewModel
 import com.depromeet.linkzupzup.base.BaseActivity
-import com.depromeet.linkzupzup.service.FCMService
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.intro.ui.IntroUI
 import com.depromeet.linkzupzup.view.onBoarding.OnBoardingActivity
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.messaging.FirebaseMessagingService
 import io.reactivex.Observable
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 import java.util.concurrent.TimeUnit
@@ -21,6 +20,7 @@ class IntroActivity : BaseActivity<IntroUI, IntroViewModel>()  {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        overridePendingTransition(R.anim.stay, R.anim.stay)
 
         getFCMToken()
 
