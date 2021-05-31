@@ -18,8 +18,8 @@ class OnBoardingActivity : BaseActivity<OnBoardingUI, OnBoardingViewModel>()  {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Observable.timer(2, TimeUnit.SECONDS)
-            .subscribe(this::nextPage)
+//        Observable.timer(2, TimeUnit.SECONDS)
+//            .subscribe(this::nextPage)
     }
 
     override fun onBackPressed() {
