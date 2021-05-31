@@ -8,6 +8,7 @@ object ApiUrl {
 
     const val LINKS = "links"
     const val ALARM = "alarm"
+    const val ALARMS = "alarms"
     const val MEMBERS = "members"
     const val RANKING = "ranking"
 
@@ -19,6 +20,11 @@ object ApiUrl {
     /**
      * Alarm
      */
+    const val ALARM_LIST = "$BASE_URL/$ALARMS"
+    const val ALARM_REGIST = "$BASE_URL/$ALARMS"
+    const val ALARM_DETAIL = "$BASE_URL/$ALARMS"
+    const val ALARM_UPDATE = "$BASE_URL/$ALARMS"
+    const val ALARM_DELETE = "$BASE_URL/$ALARMS"
 
     /**
      * Members

@@ -6,6 +6,8 @@ import com.depromeet.linkzupzup.ParamsInfo
 import com.depromeet.linkzupzup.base.BaseViewModel
 import com.depromeet.linkzupzup.component.MetaDataManager.extractUrlFormText
 import com.depromeet.linkzupzup.architecture.domainLayer.LinkUseCases
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmDataEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmResponseEntity
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkHashData
@@ -44,7 +46,7 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
 
 
 
-    val linkAlarmResponse: MutableLiveData<LinkAlarmResponseEntity> = MutableLiveData()
+    val linkAlarmResponse: MutableLiveData<ResponseEntity<LinkAlarmDataEntity>> = MutableLiveData()
 
     /**
      * 사용자가 저장한 링크 리스트 조회

@@ -9,6 +9,6 @@ import org.koin.dsl.module
 val repositoryModule = module {
     factory { UserRepositoryImpl(get()) }
     factory { TagRepositoryImpl() }
-    factory { AlarmRepositoryImpl() }
+    factory { AlarmRepositoryImpl(get()) }
     factory { LinkRepositoryImpl(get(), get()) }
 }
