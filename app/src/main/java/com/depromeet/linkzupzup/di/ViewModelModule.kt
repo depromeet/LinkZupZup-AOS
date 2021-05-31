@@ -1,6 +1,6 @@
 package com.depromeet.linkzupzup.di
 
-import com.depromeet.linkzupzup.presenter.*
+import com.depromeet.linkzupzup.architecture.presenterLayer.*
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -12,4 +12,8 @@ val viewModelModule = module {
     viewModel { MyDonutViewModel() }
     viewModel { LinkHistoryDetailViewModel(get()) }
     viewModel { WebViewViewModel() }
+    viewModel { IntroViewModel() }
+    viewModel { OnBoardingViewModel() }
+    viewModel { LoginViewModel(get()) }
+
 }

@@ -26,16 +26,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
+import com.depromeet.linkzupzup.extensions.clearMillis
 import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.extensions.toast
-import com.depromeet.linkzupzup.presenter.ScrapDetailViewModel
-import com.depromeet.linkzupzup.presenter.model.TagColor
+import com.depromeet.linkzupzup.architecture.presenterLayer.ScrapDetailViewModel
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.TagColor
 import com.depromeet.linkzupzup.ui.theme.BottomSheetShape
 import com.depromeet.linkzupzup.ui.theme.LinkZupZupTheme
 import com.depromeet.linkzupzup.utils.CommonUtil
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.utils.DateUtil
-import com.depromeet.linkzupzup.view.custom.*
+import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
+import com.depromeet.linkzupzup.view.custom.CustomDatePicker
+import com.depromeet.linkzupzup.view.custom.CustomTimePicker
+import com.depromeet.linkzupzup.view.custom.MultiBottomSheet
 import com.google.accompanist.pager.ExperimentalPagerApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -97,7 +101,7 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel? = null) {
             scaffoldState = bottomSheetScaffoldState,
             sheetContent = {
                 currentBottomSheet?.let { currentSheet ->
-                    BottomSheetLayout(bottomSheetScaffoldState, coroutineScope, currentSheet)
+                    BottomSheetLayout(bottomSheetScaffoldState, coroutineScope, currentSheet, viewModel)
                 }
             },
             sheetShape = BottomSheetShape,
@@ -329,13 +333,14 @@ fun ScrapMenuBtn(menuName: String, backgroundColor: Color = Color(0xFFEAF1FE), t
 @ExperimentalPagerApi
 @ExperimentalMaterialApi
 @Composable
-fun ScrapAlarmBottomSheet(type: Int, bottomSheetScaffoldState: BottomSheetScaffoldState, coroutineScope: CoroutineScope, data: Any? = null) {
+fun ScrapAlarmBottomSheet(type: Int, bottomSheetScaffoldState: BottomSheetScaffoldState, coroutineScope: CoroutineScope, viewModel: ScrapDetailViewModel? = null) {
     // in Column Scope
     Column(modifier = Modifier
         .fillMaxWidth()
         .height(606.dp)) {
 
         val ctx = LocalContext.current
+        val alarmDate = remember { mutableStateOf(Calendar.getInstance().clearMillis()) }
 
         // 닫기 버튼
         Row(horizontalArrangement = Arrangement.End,
@@ -399,11 +404,17 @@ fun ScrapAlarmBottomSheet(type: Int, bottomSheetScaffoldState: BottomSheetScaffo
         })
 
         // Time Picker
-        CustomTimePicker(modifier = Modifier
-            .fillMaxWidth()
-            .height(210.dp)
-            .padding(horizontal = 24.dp, vertical = 20.dp)) { amPm, hour, minute ->
-            DLog.e("TEST", "amPm: $amPm, hour: $hour, minute: $minute")
+        CustomTimePicker(date = alarmDate.value,
+            modifier = Modifier.fillMaxWidth()
+                .height(210.dp)
+                .padding(horizontal = 24.dp, vertical = 20.dp)) { type, timeVal ->
+
+            alarmDate.value = when (type) {
+                Calendar.AM_PM -> alarmDate.value.apply { set(Calendar.AM_PM, timeVal) }
+                Calendar.HOUR -> alarmDate.value.apply { set(Calendar.HOUR, timeVal) }
+                Calendar.MINUTE -> alarmDate.value.apply { set(Calendar.MINUTE, timeVal) }
+                else -> alarmDate.value
+            }
         }
 
         Spacer(Modifier.weight(1f))
@@ -458,9 +469,8 @@ fun ScrapAlarmBottomSheet(type: Int, bottomSheetScaffoldState: BottomSheetScaffo
                         .height(52.dp),
                     onClick = {
                         DLog.e("Jackson", "save click read button")
-                        coroutineScope.launch {
-                            bottomSheetScaffoldState.bottomSheetState.collapse()
-                        }
+                        viewModel?.addPersonalLinkAlarm(ctx, alarmDate.value)
+                        coroutineScope.launch { bottomSheetScaffoldState.bottomSheetState.collapse() }
                     }) {
 
                     Text("저장하기",
@@ -546,12 +556,13 @@ fun TagView(idx: Int, tagStr: String, backgroundColor: Color = Color(0xFFAAAAAA)
 @ExperimentalMaterialApi
 @Composable
 fun BottomSheetLayout(bottomSheetScaffoldState: BottomSheetScaffoldState,
-                coroutineScope: CoroutineScope,
-                currentScreen: BottomSheetScreen) {
+                      coroutineScope: CoroutineScope,
+                      currentScreen: BottomSheetScreen,
+                      viewModel: ScrapDetailViewModel? = null) {
 
     when(currentScreen){
         is BottomSheetScreen.MenuScreen -> ScrapMenuSheet(currentScreen.type, bottomSheetScaffoldState, coroutineScope)
-        is BottomSheetScreen.AlarmScreen -> ScrapAlarmBottomSheet(currentScreen.type, bottomSheetScaffoldState, coroutineScope)
+        is BottomSheetScreen.AlarmScreen -> ScrapAlarmBottomSheet(currentScreen.type, bottomSheetScaffoldState, coroutineScope, viewModel)
     }
 }
 

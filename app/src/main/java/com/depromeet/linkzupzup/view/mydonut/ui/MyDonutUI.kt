@@ -31,9 +31,9 @@ import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.extensions.digitFormat1000
 import com.depromeet.linkzupzup.extensions.noRippleClickable
-import com.depromeet.linkzupzup.presenter.MyDonutViewModel
-import com.depromeet.linkzupzup.presenter.model.DonutBadge
-import com.depromeet.linkzupzup.presenter.model.MyDonutData
+import com.depromeet.linkzupzup.architecture.presenterLayer.MyDonutViewModel
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.DonutBadge
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.MyDonutData
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.DLog
 

@@ -11,6 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -35,10 +36,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.component.SliderAdapter
-import com.depromeet.linkzupzup.extensions.compareDate
-import com.depromeet.linkzupzup.extensions.getDay
-import com.depromeet.linkzupzup.extensions.isToday
-import com.depromeet.linkzupzup.extensions.noRippleClickable
+import com.depromeet.linkzupzup.extensions.*
 import com.depromeet.linkzupzup.utils.CommonUtil
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.utils.DateUtil
@@ -152,7 +150,7 @@ fun CustomPreView() {
 //
 //            CustomViewPicker(datas = arrayListOf("abcd", "efgh", "ijkl"))
 
-            CustomTimePicker(onChangeListener = { amPm, hour, minute ->
+            CustomTimePicker(onChangeListener = { type, timeVal ->
 
             })
 
@@ -213,23 +211,20 @@ fun CustomViewPicker(datas: ArrayList<String>,
 
 @ExperimentalPagerApi
 @Composable
-fun CustomTimePicker(modifier: Modifier = Modifier.fillMaxWidth()
+fun CustomTimePicker(date: Calendar = Calendar.getInstance(), modifier: Modifier = Modifier
+    .fillMaxWidth()
     .padding(horizontal = 24.dp),
-    onChangeListener: (Int, Int, Int) -> Unit = { amPm, hour, minute -> }) {
+    onChangeListener: (Int, Int) -> Unit = { type, value -> }) {
     Box(modifier = modifier.height(170.dp), contentAlignment = Alignment.Center) {
-
-        val amPmVal = remember { mutableStateOf(0) }
-        val hourVal = remember { mutableStateOf(0) }
-        val minuteVal = remember { mutableStateOf(0) }
 
         Column(modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)) {
-            Divider(color = Color(0xFFC4C4C4), thickness = 1.dp)
+            Divider(color = Color(0xFFF1F2F5), thickness = 1.dp)
 
             Spacer(Modifier.weight(1f))
 
-            Divider(color = Color(0xFFC4C4C4), thickness = 1.dp)
+            Divider(color = Color(0xFFF1F2F5), thickness = 1.dp)
         }
 
         Row {
@@ -243,10 +238,9 @@ fun CustomTimePicker(modifier: Modifier = Modifier.fillMaxWidth()
 //                    amPmVal.value = idx
 //                    onChangeListener(amPmVal.value, hourVal.value, minuteVal.value)
 //                }
-
-                CustomTextPicker(datas = amPms, modifier = Modifier.fillMaxHeight()) { str, idx ->
-                    amPmVal.value = idx
-                    onChangeListener(amPmVal.value, hourVal.value, minuteVal.value)
+                val curIdx = if (date.get(Calendar.AM_PM) == Calendar.PM) 0 else 1
+                CustomTextPicker(curIdx = curIdx, datas = amPms, modifier = Modifier.fillMaxHeight()) { str, idx ->
+                    onChangeListener(Calendar.AM_PM, if (idx == 0) Calendar.PM else Calendar.AM)
                 }
             }
 
@@ -256,9 +250,12 @@ fun CustomTimePicker(modifier: Modifier = Modifier.fillMaxWidth()
             arrayListOf<String>().apply {
                 (1..12).forEach { i -> add(String.format("%02d시", i)) }
             }.let { hours ->
-                CustomTextPicker(datas = hours) { str, idx ->
-                    hourVal.value = idx
-                    onChangeListener(amPmVal.value, hourVal.value, minuteVal.value)
+                val curIdx = when {
+                    (date.get(Calendar.HOUR) == 0 || date.get(Calendar.HOUR) == 12) -> 11
+                    else -> date.get(Calendar.HOUR) - 1
+                }
+                CustomTextPicker(curIdx = curIdx, datas = hours) { str, idx ->
+                    onChangeListener(Calendar.HOUR, idx + 1)
                 }
             }
 
@@ -266,9 +263,9 @@ fun CustomTimePicker(modifier: Modifier = Modifier.fillMaxWidth()
             arrayListOf<String>().apply {
                 (0..5).forEach { i -> add("${i}0분") }
             }.let { minutes ->
-                CustomTextPicker(datas = minutes) { str, idx ->
-                    minuteVal.value = idx
-                    onChangeListener(amPmVal.value, hourVal.value, minuteVal.value)
+                val curIdx = date.get(Calendar.MINUTE) / 10
+                CustomTextPicker(curIdx = curIdx, datas = minutes) { str, idx ->
+                    onChangeListener(Calendar.MINUTE, DateUtil.datePickerMinutes[idx])
                 }
             }
 
@@ -354,8 +351,9 @@ fun CustomImgTextPicker(modifier: Modifier = Modifier.height(170.dp),
 
 @ExperimentalPagerApi
 @Composable
-fun CustomTextPicker(modifier: Modifier = Modifier.height(170.dp),
+fun CustomTextPicker(curIdx: Int = 0,
                      datas: ArrayList<String>,
+                     modifier: Modifier = Modifier.height(170.dp),
                      cardModifier: Modifier = Modifier
                          .height(56.dp)
                          .padding(horizontal = 16.dp),
@@ -363,7 +361,8 @@ fun CustomTextPicker(modifier: Modifier = Modifier.height(170.dp),
 
     Box(modifier) {
 
-        val datasState = rememberPagerState(pageCount = datas.size)
+        val coroutineScope = rememberCoroutineScope()
+        val datasState = rememberPagerState(pageCount = datas.size, initialPage = curIdx)
 
         LaunchedEffect(datasState) {
             snapshotFlow { datasState.currentPage }.collect {
@@ -391,11 +390,8 @@ fun CustomTextPicker(modifier: Modifier = Modifier.height(170.dp),
 
                             }
                             .noRippleClickable {
-                                GlobalScope.launch {
-                                    datasState.scrollToPage(
-                                        page = currentPage,
-                                        pageOffset = ((page + 1) / datas.size).toFloat()
-                                    )
+                                coroutineScope.launch {
+                                    datasState.animateScrollToPage(page = page)
                                 }
                             }) {
 
@@ -477,14 +473,24 @@ fun CustomTextCheckBox(modifier: Modifier = Modifier.height(20.dp), enableImg: I
 @Composable
 fun CustomDatePicker(pickDate: Calendar = Calendar.getInstance(),
                      items: ArrayList<Pair<String, Calendar>>,
-                     modifier: Modifier = Modifier.fillMaxWidth().background(Color(0xFFF8FAFB)),
+                     modifier: Modifier = Modifier
+                         .fillMaxWidth()
+                         .background(Color(0xFFF8FAFB)),
                      onClickListener: (Int, Pair<String, Calendar>)->Unit = { i, d -> }) {
     Row(modifier) {
-        LazyRow(Modifier.fillMaxWidth(),
+        val coroutineScope = rememberCoroutineScope()
+        val listState = rememberLazyListState()
+        LazyRow(state = listState,
+            modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(horizontal = 24.dp, vertical = 20.dp),
             horizontalArrangement = Arrangement.spacedBy(0.dp)) {
             itemsIndexed(items) { index, date ->
-                CustomDatePickerItemView(pickDate = pickDate, index = index, data = date, onClickListener = onClickListener)
+                CustomDatePickerItemView(pickDate = pickDate, index = index, data = date, onClickListener = { index, data ->
+                    onClickListener(index, data)
+                    coroutineScope.launch {
+                        listState.animateScrollToItem(index = index)
+                    }
+                })
             }
         }
     }
@@ -495,20 +501,23 @@ fun CustomDatePickerItemView(pickDate: Calendar = Calendar.getInstance(), dpSize
     Card(shape = MaterialTheme.shapes.large,
         backgroundColor = Color.Transparent,
         elevation = 0.dp,
-        modifier = Modifier.size(dpSize.width.dp, dpSize.height.dp)
+        modifier = Modifier
+            .size(dpSize.width.dp, dpSize.height.dp)
             .noRippleClickable {
                 onClickListener(index, data)
             }) {
 
         Column(horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .background(Color.Transparent)) {
 
             // week
             Text(text = data.first,
                 style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_regular, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = Color(0xFF292A2B)),
                 textAlign = TextAlign.Center,
-                modifier = Modifier.wrapContentWidth()
+                modifier = Modifier
+                    .wrapContentWidth()
                     .height(16.dp))
 
             Spacer(Modifier.weight(1f))
@@ -524,7 +533,8 @@ fun CustomDatePickerItemView(pickDate: Calendar = Calendar.getInstance(), dpSize
                     modifier = Modifier.size(24.dp)) {
                     Column(verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier
+                            .fillMaxSize()
                             .background(Color(0xFF4076F6))) {}
                 }
 

@@ -41,4 +41,6 @@ object DateUtil {
             }
         }
 
+    val datePickerMinutes = arrayListOf(0, 10, 20, 30, 40, 50)
+
 }

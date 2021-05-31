@@ -7,6 +7,7 @@ import com.depromeet.linkzupzup.component.PreferencesManager
 import com.depromeet.linkzupzup.utils.DLog
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import java.util.HashMap
 
 open class BaseViewModel : ViewModel() {
 
@@ -49,6 +50,14 @@ open class BaseViewModel : ViewModel() {
 
     fun defaultThrowable(throwable: Throwable) {
         DLog.e(TAG, "${throwable.message}")
+        throwable.printStackTrace()
+        progressStatus(false)
+    }
+
+    fun defaultParams(): HashMap<String, Any> {
+        return hashMapOf<String, Any>().apply {
+            // 기본적으로 상시 주입되는 parameter 들을 이것에소 주입합니다.
+        }
     }
 
 }

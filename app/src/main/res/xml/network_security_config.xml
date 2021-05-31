@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 현재 설정은 모든 도메인을 허용합니다. -->
+<!-- 참고: https://gun0912.tistory.com/80 -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

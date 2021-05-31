@@ -43,17 +43,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.MutableLiveData
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
-import com.depromeet.linkzupzup.dataSources.repositories.UserRepositoryImpl
-import com.depromeet.linkzupzup.domains.UserUseCases
-import com.depromeet.linkzupzup.extensions.noRippleClickable
-import com.depromeet.linkzupzup.presenter.MainViewModel
-import com.depromeet.linkzupzup.presenter.model.*
+import com.depromeet.linkzupzup.architecture.dataLayer.LinkDataSource
+import com.depromeet.linkzupzup.architecture.dataLayer.api.LinkAPIService
+import com.depromeet.linkzupzup.component.RoomDB
+import com.depromeet.linkzupzup.architecture.domainLayer.LinkUseCases
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmResponseEntity
+import com.depromeet.linkzupzup.architecture.dataLayer.repositories.LinkRepositoryImpl
+import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.*
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
+import io.reactivex.Observable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -98,7 +101,13 @@ fun MainPreview() {
         // 스크랩 링크 리스트
         addAll(MainContentData.mockMainContentList(5))
     }
-    MainBodyUI(mainContentList, MainViewModel(userUseCases = UserUseCases(UserRepositoryImpl())))
+    val ctx = LocalContext.current
+    MainBodyUI(mainContentList, vm = MainViewModel(linkUseCases = LinkUseCases(LinkRepositoryImpl(
+        RoomDB.getInstance(ctx), LinkDataSource(object: LinkAPIService {
+        override fun getLinkList(query: HashMap<String, Any>): Observable<LinkAlarmResponseEntity> {
+            TODO("Not yet implemented")
+        }
+    })))))
 }
 
 @ExperimentalMaterialApi
@@ -109,36 +118,14 @@ fun BottomSheetPreview() {
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
     )
+    val ctx = LocalContext.current
     BottomSheet(bottomSheetScaffoldState,coroutineScope,
-        MainViewModel(UserUseCases(UserRepositoryImpl()))
+        MainViewModel(linkUseCases = LinkUseCases(LinkRepositoryImpl(RoomDB.getInstance(ctx), LinkDataSource(object: LinkAPIService {
+            override fun getLinkList(query: HashMap<String, Any>): Observable<LinkAlarmResponseEntity> {
+                TODO("Not yet implemented")
+            }
+        }))))
     )
-}
-
-@Composable
-fun UserUI(vm: MainViewModel) {
-    val userInfo: MutableState<User?> = remember { mutableStateOf(null)}
-    vm.userInfo.observe(vm.lifecycleOwner!!) { user ->
-        userInfo.value = user
-    }
-
-    userInfo.value?.let { user ->
-        UserLoginStateUI(user)
-    } ?: NeedUserLoginUI()
-}
-
-@Composable
-fun UserLoginStateUI(user: User) {
-    val str = "name: ${user.name}, age: ${user.age}"
-    Text(str, textAlign = TextAlign.Center, modifier = Modifier
-        .fillMaxWidth()
-        .height(60.dp))
-}
-
-@Composable
-fun NeedUserLoginUI() {
-    Text("로그인이 필요합니다.", textAlign = TextAlign.Center, modifier = Modifier
-        .fillMaxWidth()
-        .height(60.dp))
 }
 
 /* MainUI */
@@ -444,7 +431,11 @@ fun MainHashtagCard(tagName : String, backColor : Color, textColor : Color){
 /* BottomSheet */
 @ExperimentalMaterialApi
 @Composable
-fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineScope : CoroutineScope, vm : MainViewModel){
+fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineScope : CoroutineScope, vm : MainViewModel? = null){
+
+    val saveBtnColor = remember { mutableStateOf(Gray50t) }
+    val saveTxtColor = remember { mutableStateOf(Gray70) }
+    val linkUrl = remember { mutableStateOf("") }
 
     // in Column Scope
     Column(modifier = Modifier
@@ -476,11 +467,20 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
             Spacer(Modifier.height(8.dp))
 
             /* Text field */
-            // BottomSheetLinkInput()
             CustomTextField(hintStr = "\uD83D\uDC49 링크주소를 여기에 붙여넣기 해주세요.",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp))
+                    .height(40.dp)){
+                linkUrl.value = it
+
+                if(it.isNullOrEmpty()){
+                    saveBtnColor.value = Gray50t
+                    saveTxtColor.value = Gray70
+                }else if(it.isNotEmpty()){
+                    saveBtnColor.value = Blue50
+                    saveTxtColor.value = Color.White
+                }
+            }
 
             Spacer(Modifier.height(20.dp))
 
@@ -500,13 +500,15 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
 
         /* 하단 저장하기 버튼 */
         Button(shape = RoundedCornerShape(4.dp),
-
-            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Gray50t, contentColor = Gray70),
-            modifier = Modifier
-                .fillMaxWidth()
+            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = saveBtnColor.value, contentColor = saveTxtColor.value),
+            modifier = Modifier.fillMaxWidth()
                 .height(52.dp)
                 .padding(start = 24.dp, end = 24.dp),
-            onClick = { DLog.e("MainUI", "BottomSheet/click save link button") }) {
+            onClick = {
+                // Room Link table 저장
+                vm?.insertLink(LinkData(linkURL = linkUrl.value))
+                // vm?.getMetadata(linkUrl.value)
+            }) {
 
             Text("저장하기",
                 textAlign = TextAlign.Center,
@@ -580,7 +582,7 @@ fun BottomSheetLinkInput(){
 }
 
 @Composable
-fun BottomSheetSelect(vm : MainViewModel){
+fun BottomSheetSelect(vm: MainViewModel? = null){
 
     val cnt = 0
     val size = 3
@@ -591,7 +593,7 @@ fun BottomSheetSelect(vm : MainViewModel){
         LinkHashData(2,"UX","",TagColor(TagBgColor03, TagTextColor03)),
         LinkHashData(3,"UI","",TagColor(TagBgColor04, TagTextColor04)),
         LinkHashData(4,"마케팅","",TagColor(TagBgColor05, TagTextColor05)),
-        LinkHashData(5,"인공지","",TagColor(TagBgColor06, TagTextColor06)))
+        LinkHashData(5,"인공지능","",TagColor(TagBgColor06, TagTextColor06)))
     val tc2 : List<LinkHashData> = listOf(
         LinkHashData(6,"프론트 개발","",TagColor(TagBgColor07, TagTextColor07)),
         LinkHashData(7,"그로스 해킹","",TagColor(TagBgColor03, TagTextColor03)),
@@ -705,13 +707,16 @@ fun ButtomSheetInputTag(){
 }
 
 @Composable
-fun BottomSheetHashtagCard(vm : MainViewModel, tag: LinkHashData, isSelected : Boolean = false){
+fun BottomSheetHashtagCard(vm: MainViewModel? = null, tag: LinkHashData, isSelected : Boolean = false){
+    val ctx = LocalContext.current
     Card(
         modifier = Modifier
             .height(32.dp)
-            .noRippleClickable {
-                if (isSelected) vm.removeHashtag(tag)
-                else vm.addHashtag(tag)
+            .clickable {
+                vm?.run {
+                    if (isSelected) removeHashtag(tag)
+                    else addHashtag(tag)
+                }
             },
         elevation = 0.dp,
         backgroundColor = tag.tagColor.bgColor){
@@ -743,11 +748,14 @@ fun BottomSheetHashtagCard(vm : MainViewModel, tag: LinkHashData, isSelected : B
 }
 
 @Composable
-fun BottomSheetSelectedTagList(vm: MainViewModel, modifier: Modifier = Modifier.fillMaxWidth()){
+fun BottomSheetSelectedTagList(vm: MainViewModel? = null, modifier: Modifier = Modifier.fillMaxWidth()){
     var selectedTag: List<LinkHashData> = listOf()
-    vm.liveSelectedTagList.observe(vm.lifecycleOwner!!){tag ->
-        selectedTag = tag
+    vm?.run {
+        liveSelectedTagList.observe(lifecycleOwner!!){tag ->
+            selectedTag = tag
+        }
     }
+
 
 
     LazyRow(modifier = modifier,
@@ -835,21 +843,21 @@ fun CustomTextField(modifier: Modifier = Modifier
 
                     Spacer(Modifier.weight(1f))
 
-                    Column(verticalArrangement = Arrangement.Center,
-                        modifier = Modifier
-                            .width(44.dp)
-                            .fillMaxHeight()
-                            .padding(start = 8.dp)
-                            .clickable {
-                                text.value = ""
-                                onValueChange(text.value)
-                                // 포커스 제거, 키보드 내리기!
-                                focusManager.clearFocus()
-                            }) {
+                Column(verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .width(44.dp)
+                        .fillMaxHeight()
+                        .padding(start = 8.dp)
+                        .clickable {
+                            text.value = ""
+                            onValueChange(text.value)
+                            // 포커스 제거, 키보드 내리기!
+                            focusManager.clearFocus()
+                        }) {
 
-                        Image(painter = painterResource(id = R.drawable.ic_gray_close),
-                            contentDescription = null,
-                            modifier = Modifier.size(24.dp))
+                    Image(painter = painterResource(id = R.drawable.ic_gray_close),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp))
 
                     }
                 }

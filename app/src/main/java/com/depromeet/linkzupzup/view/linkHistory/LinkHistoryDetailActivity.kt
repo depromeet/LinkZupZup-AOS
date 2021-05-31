@@ -2,7 +2,7 @@ package com.depromeet.linkzupzup.view.linkHistory
 
 import android.os.Bundle
 import com.depromeet.linkzupzup.base.BaseActivity
-import com.depromeet.linkzupzup.presenter.LinkHistoryDetailViewModel
+import com.depromeet.linkzupzup.architecture.presenterLayer.LinkHistoryDetailViewModel
 import com.depromeet.linkzupzup.view.linkHistory.ui.LinkHistoryDetailUI
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 

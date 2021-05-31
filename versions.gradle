@@ -10,7 +10,15 @@ ext {
     accompanistVersion = '0.9.1'
     glideVersion = '4.12.0'
     tedPermissionVersion = '2.2.3'
-    multidexVersion = "2.0.1"
+    multidexVersion = "2.1.0"
+    roomVersion = '2.4.0-alpha02'
+    roomDebugVersion = '1.0.6'
+    jsoupVersion = '1.13.1'
+    googleServiceVersion = '4.3.8'
+    firebaseBom = '28.0.1'
+    firebaseMessaging = '22.0.0'
+    kakaoVersion = '2.5.1'
+    gsonVersion = '2.8.7'
 }
 ext.lib = [:]
 
@@ -90,5 +98,39 @@ def multidex = [:]
 // multidex.runtime = "androidx.multidex:multidex:$multidexVersion"
 multidex.runtime = "com.android.support:multidex:$multidexVersion"
 lib.multidex = multidex
+
+/* room */
+def room = [:]
+room.runtime = "androidx.room:room-runtime:$roomVersion"
+room.ktx = "androidx.room:room-ktx:$roomVersion"
+room.legacy = "androidx.legacy:legacy-support-v4:1.0.0"
+room.lifecycle = "androidx.lifecycle:lifecycle-extensions:2.2.0"
+room.viewmodel = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1"
+room.livedata = "androidx.lifecycle:lifecycle-livedata-ktx:2.3.1"
+room.compiler = "androidx.room:room-compiler:$roomVersion"
+// room.debug = "com.amitshekhar.android:debug-db:$roomDebugVersion"    // Logcat 에서 D/DebugDB 검색한 결과링크에서 DB 시각화해 볼 수 있음
+lib.room = room
+
+/* JSoup */
+def jsoup = [:]
+jsoup.runtime = "org.jsoup:jsoup:$jsoupVersion"
+lib.jsoup = jsoup
+
+
+/* Firebase FCM */
+def firebase = [:]
+firebase.googleService = "com.google.gms:google-services:$googleServiceVersion"
+firebase.bom = "com.google.firebase:firebase-bom:$firebaseBom"
+firebase.analytics = "com.google.firebase:firebase-analytics-ktx"
+firebase.messaging = "com.google.firebase:firebase-messaging-ktx:$firebaseMessaging"
+lib.firebase = firebase
+
+def kakao = [:]
+kakao.runtime = "com.kakao.sdk:v2-user:$kakaoVersion"
+lib.kakao = kakao
+
+def gson = [:]
+gson.runtime = "com.google.code.gson:gson:$gsonVersion"
+lib.gson = gson
 
 ext.lib = lib

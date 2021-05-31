@@ -1,7 +1,9 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-    id 'kotlin-android-extensions'
+    id 'kotlin-parcelize'
+    id 'kotlin-kapt'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -36,11 +38,16 @@ android {
         useIR = true
     }
     buildFeatures {
-        compose true
+        compose = true
+        dataBinding = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion composeVersion
         kotlinCompilerVersion kotlinVersion
+    }
+    packagingOptions {
+        exclude 'META-INF/LGPL2.1'
+        exclude 'META-INF/AL2.0'
     }
 }
 
@@ -79,6 +86,21 @@ dependencies {
     implementation lib.insets.runtime
     implementation lib.pager.runtime
     implementation lib.multidex.runtime
+    implementation lib.room.runtime
+    implementation lib.room.ktx
+    implementation lib.room.legacy
+    implementation lib.room.lifecycle
+    implementation lib.room.viewmodel
+    implementation lib.room.livedata
+    implementation lib.jsoup.runtime
+    kapt lib.room.compiler
+    implementation lib.kakao.runtime
+    implementation lib.gson.runtime
+
+    // firebase
+    implementation platform(lib.firebase.bom)
+    implementation lib.firebase.analytics
+    implementation lib.firebase.messaging
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
