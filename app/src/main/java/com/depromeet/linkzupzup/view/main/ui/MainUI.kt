@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -36,7 +35,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -53,6 +51,7 @@ import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmR
 import com.depromeet.linkzupzup.architecture.dataLayer.repositories.LinkRepositoryImpl
 import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.*
+import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
@@ -490,7 +489,7 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
             Spacer(Modifier.height(24.dp))
 
             /* 커스텀 태그 입력 화면 */
-            ButtomSheetInputTag()
+            BottomSheetInputTag()
         }
 
         /* 클릭된 해시태그 보여주는 열 */
@@ -547,46 +546,11 @@ fun BottomHeaderCard(padding: PaddingValues = PaddingValues(0.dp)){
 }
 
 @Composable
-fun BottomSheetLinkInput(){
-    val inputLink = remember { mutableStateOf(TextFieldValue()) }
-
-    TextField(
-        value = inputLink.value,
-        onValueChange = { inputLink.value = it },
-        modifier = Modifier.fillMaxWidth(),
-        textStyle = TextStyle(
-            fontSize = 12.sp,
-            color = Gray100t,
-            fontFamily = FontFamily(Font(
-                resId = R.font.spoqa_hansansneo_regular,
-                weight = FontWeight.W500))),
-        placeholder = {
-            Text(text = "링크주소를 여기에 붙여넣기 해주세요.",
-                lineHeight = 17.5.sp,
-                style = TextStyle(
-                    fontSize = 12.sp,
-                    color = Gray70),
-                fontFamily = FontFamily(Font(
-                    resId = R.font.spoqa_hansansneo_regular,
-                    weight = FontWeight.W500))) },
-        leadingIcon = {
-            Text(text = "\uD83D\uDC49",
-                style = TextStyle(
-                    fontSize = 12.sp,
-                    fontFamily = FontFamily(Font(
-                        resId = R.font.spoqa_hansansneo_regular,
-                        weight = FontWeight.W500)))) },
-        colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = Gray20,
-            textColor = Gray100t))
-}
-
-@Composable
 fun BottomSheetSelect(vm: MainViewModel? = null){
 
     val cnt = 0
     val size = 3
-    val inputTag = remember { mutableStateOf(TextFieldValue()) }
+
     val tc1 : List<LinkHashData> = listOf(
         LinkHashData(0,"디자인","",TagColor(TagBgColor01, TagTextColor01)),
         LinkHashData(1,"포트폴리오","",TagColor(TagBgColor02, TagTextColor02)),
@@ -628,7 +592,7 @@ fun BottomSheetSelect(vm: MainViewModel? = null){
 
     LazyRow(modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(10.dp)){
-        itemsIndexed(tc1) { index, tag ->
+        items(tc1) { tag ->
             BottomSheetHashtagCard(vm, tag)
         }
     }
@@ -637,16 +601,16 @@ fun BottomSheetSelect(vm: MainViewModel? = null){
 
     LazyRow(modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(10.dp)){
-        itemsIndexed(tc2) { index, tag ->
+        items(tc2) { tag ->
             BottomSheetHashtagCard(vm, tag)
         }
     }
 }
 
 @Composable
-fun ButtomSheetInputTag(){
-    val beforeClickStr : String = "원하시는 해시태그가 없으신가요?"
-    val afterClickStr : String = "원하는 해시태그가 없다면 적어주세요!"
+fun BottomSheetInputTag(){
+    val beforeClickStr  = "원하시는 해시태그가 없으신가요?"
+    val afterClickStr = "원하는 해시태그가 없다면 적어주세요!"
 
     val isVisible = remember { mutableStateOf(false) }
     val clickStr = remember { mutableStateOf(beforeClickStr) }
@@ -708,7 +672,6 @@ fun ButtomSheetInputTag(){
 
 @Composable
 fun BottomSheetHashtagCard(vm: MainViewModel? = null, tag: LinkHashData, isSelected : Boolean = false){
-    val ctx = LocalContext.current
     Card(
         modifier = Modifier
             .height(32.dp)
@@ -748,7 +711,7 @@ fun BottomSheetHashtagCard(vm: MainViewModel? = null, tag: LinkHashData, isSelec
 }
 
 @Composable
-fun BottomSheetSelectedTagList(vm: MainViewModel? = null, modifier: Modifier = Modifier.fillMaxWidth()){
+fun BottomSheetSelectedTagList(modifier: Modifier = Modifier.fillMaxWidth(), vm: MainViewModel? = null){
     var selectedTag: List<LinkHashData> = listOf()
     vm?.run {
         liveSelectedTagList.observe(lifecycleOwner!!){tag ->
@@ -760,7 +723,7 @@ fun BottomSheetSelectedTagList(vm: MainViewModel? = null, modifier: Modifier = M
 
     LazyRow(modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(10.dp)){
-        itemsIndexed(selectedTag){ index, tag->
+        items(selectedTag){ tag->
             BottomSheetHashtagCard(vm, tag, isSelected = true)
         }
     }
