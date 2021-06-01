@@ -2,7 +2,7 @@ package com.depromeet.linkzupzup.architecture.domainLayer.entities
 
 import com.google.gson.annotations.SerializedName
 
-class ResponseEntity<T>(
+class ResponseArrayEntity<T> (
 
     @SerializedName("status")
     override var status: String = "",
@@ -11,4 +11,4 @@ class ResponseEntity<T>(
     override var comment: String = "",
 
     @SerializedName("data")
-    var data: T? = null): DefaultResponseEntity
+    var data: ArrayList<T> = arrayListOf()): DefaultResponseEntity
