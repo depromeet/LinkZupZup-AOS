@@ -71,14 +71,6 @@ class MainUI: BaseView<MainViewModel>() {
     override fun onCreateViewContent() {
         LinkZupZupTheme {
             Surface(color = Gray10) {
-                /*vm?.let{ viewModel -> UserUI(vm = viewModel) }
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Button(onClick = {
-                        vm?.getUserInfo()
-                    }, modifier = Modifier.fillMaxWidth()) {
-                        Text("로그인하기", textAlign = TextAlign.Center)
-                    }
-                }*/
 
                 Column(modifier = Modifier.fillMaxWidth()) {
 
@@ -91,7 +83,6 @@ class MainUI: BaseView<MainViewModel>() {
                                 // addAll(it)
                             })
                         }.mutableStateValue()
-
 
                     vm?.let{ viewModel -> MainBodyUI(contentDataList = mainContentList.value, vm = viewModel) }
                 }
@@ -111,7 +102,6 @@ fun MainPreview() {
         // 스크랩 링크 리스트
         addAll(MainContentData.mockMainContentList(5))
     }
-    val ctx = LocalContext.current
     MainBodyUI(mainContentList)
 }
 
@@ -123,14 +113,7 @@ fun BottomSheetPreview() {
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
     )
-    val ctx = LocalContext.current
-    BottomSheet(bottomSheetScaffoldState,coroutineScope,
-        MainViewModel(linkUseCases = LinkUseCases(LinkRepositoryImpl(RoomDB.getInstance(ctx), LinkDataSource(object: LinkAPIService {
-            override fun getLinkList(query: HashMap<String, Any>): Observable<ResponseEntity<LinkAlarmDataEntity>> {
-                TODO("Not yet implemented")
-            }
-        }))))
-    )
+    BottomSheet(bottomSheetScaffoldState,coroutineScope)
 }
 
 /* MainUI */
@@ -299,8 +282,7 @@ fun MainHeaderCard(name : String, padding: PaddingValues = PaddingValues(0.dp)){
 
 @Composable
 fun ReadProgress(readCnt: Int, padding: PaddingValues = PaddingValues(0.dp)){
-    Column(modifier = Modifier
-        .fillMaxWidth()
+    Column(modifier = Modifier.fillMaxWidth()
         .padding(padding)) {
 
         Card(elevation = 0.dp,
@@ -453,8 +435,7 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
             }
         }
 
-        Column(modifier = Modifier
-            .fillMaxWidth()
+        Column(modifier = Modifier.fillMaxWidth()
             .weight(1f)
             .padding(start = 23.dp, end = 23.dp)){
 
@@ -465,8 +446,7 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
 
             /* Text field */
             CustomTextField(hintStr = "\uD83D\uDC49 링크주소를 여기에 붙여넣기 해주세요.",
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
                     .height(40.dp)){
                 linkUrl.value = it
 
@@ -491,15 +471,14 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
         }
 
         /* 클릭된 해시태그 보여주는 열 */
-        BottomSheetSelectedTagList(vm = vm, modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp))
+        BottomSheetSelectedTagList(vm = vm,
+            modifier = Modifier.fillMaxWidth()
+                .padding(horizontal = 24.dp))
 
         /* 하단 저장하기 버튼 */
         Button(shape = RoundedCornerShape(4.dp),
             colors = ButtonDefaults.outlinedButtonColors(backgroundColor = saveBtnColor.value, contentColor = saveTxtColor.value),
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
                 .height(52.dp)
                 .padding(start = 24.dp, end = 24.dp),
             onClick = {
@@ -527,8 +506,7 @@ fun BottomHeaderCard(padding: PaddingValues = PaddingValues(0.dp)){
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
                 .background(Color.Transparent)
                 .padding(padding)) {
 
@@ -565,8 +543,7 @@ fun BottomSheetSelect(vm: MainViewModel? = null){
         LinkHashData(10,"ios","",TagColor(TagBgColor04, TagTextColor04)))
 
     Row(verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
             .height(18.dp)){
 
         Text(text = "해시태그를 선택해주세요.",
@@ -618,8 +595,7 @@ fun BottomSheetInputTag(){
     Column(modifier = Modifier.fillMaxWidth()){
         Text(
             text = clickStr.value,
-            modifier = Modifier
-                .noRippleClickable {
+            modifier = Modifier.noRippleClickable {
                     isVisible.value = !isVisible.value
                     if(isVisible.value) {
                         clickStr.value = afterClickStr
@@ -638,18 +614,15 @@ fun BottomSheetInputTag(){
 
         if(isVisible.value){
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
                     .padding(top = 8.dp)){
 
-                CustomTextField(modifier = Modifier
-                    .height(40.dp)
+                CustomTextField(modifier = Modifier.height(40.dp)
                     .weight(1f),
                     useClearBtn = false,
                     hintStr = "#")
 
-                Card(modifier = Modifier
-                    .width(40.dp)
+                Card(modifier = Modifier.width(40.dp)
                     .height(40.dp)
                     .align(Alignment.CenterVertically),
                     shape = RoundedCornerShape(4.dp),
@@ -672,9 +645,8 @@ fun BottomSheetInputTag(){
 @Composable
 fun BottomSheetHashtagCard(vm: MainViewModel? = null, tag: LinkHashData, isSelected : Boolean = false){
     Card(
-        modifier = Modifier
-            .height(32.dp)
-            .clickable {
+        modifier = Modifier.height(32.dp)
+            .noRippleClickable {
                 vm?.run {
                     if (isSelected) removeHashtag(tag)
                     else addHashtag(tag)
@@ -806,8 +778,7 @@ fun CustomTextField(modifier: Modifier = Modifier
                     Spacer(Modifier.weight(1f))
 
                 Column(verticalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .width(44.dp)
+                    modifier = Modifier.width(44.dp)
                         .fillMaxHeight()
                         .padding(start = 8.dp)
                         .clickable {
