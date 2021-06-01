@@ -11,6 +11,7 @@ import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmD
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmResponseEntity
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkHashData
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.MainContentData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.User
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -48,6 +49,9 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
 
     val linkAlarmResponse: MutableLiveData<ResponseEntity<LinkAlarmDataEntity>> = MutableLiveData()
 
+    private val _linkListLiveData: MutableLiveData<ArrayList<MainContentData<LinkData>>> = MutableLiveData()
+    val linkListLiveData: MutableLiveData<ArrayList<MainContentData<LinkData>>> get() = _linkListLiveData
+
     /**
      * 사용자가 저장한 링크 리스트 조회
      * completed=F
@@ -66,6 +70,8 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     linkAlarmResponse.value = it
+
+                    _linkListLiveData.postValue(arrayListOf())
 
                     progressStatus(false)
                 }, this@MainViewModel::defaultThrowable))

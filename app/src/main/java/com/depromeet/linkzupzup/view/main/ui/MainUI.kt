@@ -41,6 +41,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.architecture.dataLayer.LinkDataSource
@@ -82,7 +84,9 @@ class MainUI: BaseView<MainViewModel>() {
                         // 상단 영역
                         add(MainContentData<Any>(MainContentData.MAIN_TOP_HEADER))
                         // 링크 스크랩 리스트
-                        addAll(MainContentData.mockMainContentList(5))
+                        vm?.linkListLiveData?.observe(lifecycleOwner!!, {
+                            addAll(it)
+                        })
                     }
                     vm?.let{ viewModel -> MainBodyUI(contentDataList = mainContentList, vm = viewModel) }
                 }
