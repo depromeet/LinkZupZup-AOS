@@ -45,10 +45,16 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.VerticalPager
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
+import io.reactivex.Observable
+import io.reactivex.Scheduler
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 import kotlin.math.absoluteValue
 
@@ -211,10 +217,11 @@ fun CustomViewPicker(datas: ArrayList<String>,
 
 @ExperimentalPagerApi
 @Composable
-fun CustomTimePicker(date: Calendar = Calendar.getInstance(), modifier: Modifier = Modifier
-    .fillMaxWidth()
-    .padding(horizontal = 24.dp),
-    onChangeListener: (Int, Int) -> Unit = { type, value -> }) {
+fun CustomTimePicker(date: Calendar = Calendar.getInstance(),
+                     modifier: Modifier = Modifier.fillMaxWidth()
+                         .padding(horizontal = 24.dp),
+                     onChangeListener: (Int, Int) -> Unit = { type, value -> }) {
+
     Box(modifier = modifier.height(170.dp), contentAlignment = Alignment.Center) {
 
         Column(modifier = Modifier
@@ -240,6 +247,7 @@ fun CustomTimePicker(date: Calendar = Calendar.getInstance(), modifier: Modifier
 //                }
                 val curIdx = if (date.get(Calendar.AM_PM) == Calendar.PM) 0 else 1
                 CustomTextPicker(curIdx = curIdx, datas = amPms, modifier = Modifier.fillMaxHeight()) { str, idx ->
+                    DLog.e("CustomTimePicker", "오전,오후, str: $str, idx: $idx")
                     onChangeListener(Calendar.AM_PM, if (idx == 0) Calendar.PM else Calendar.AM)
                 }
             }
@@ -255,6 +263,7 @@ fun CustomTimePicker(date: Calendar = Calendar.getInstance(), modifier: Modifier
                     else -> date.get(Calendar.HOUR) - 1
                 }
                 CustomTextPicker(curIdx = curIdx, datas = hours) { str, idx ->
+                    DLog.e("CustomTimePicker", "시간, str: $str, idx: $idx")
                     onChangeListener(Calendar.HOUR, idx + 1)
                 }
             }
@@ -265,6 +274,7 @@ fun CustomTimePicker(date: Calendar = Calendar.getInstance(), modifier: Modifier
             }.let { minutes ->
                 val curIdx = date.get(Calendar.MINUTE) / 10
                 CustomTextPicker(curIdx = curIdx, datas = minutes) { str, idx ->
+                    DLog.e("CustomTimePicker", "분, str: $str, idx: $idx")
                     onChangeListener(Calendar.MINUTE, DateUtil.datePickerMinutes[idx])
                 }
             }
@@ -365,8 +375,14 @@ fun CustomTextPicker(curIdx: Int = 0,
         val datasState = rememberPagerState(pageCount = datas.size, initialPage = curIdx)
 
         LaunchedEffect(datasState) {
-            snapshotFlow { datasState.currentPage }.collect {
-                onChangeListener(datas[it], it)
+            snapshotFlow { datasState.currentPage }.collect { index ->
+//                아래에서 위로 빠르게 스크롤 할 경우, 누락되는 이슈가 있음... 방법이 없나
+//                PublishSubject.create<Unit>()
+//                    .debounce(3000L, TimeUnit.MILLISECONDS)
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribeOn(Schedulers.io())
+//                    .subscribe { onChangeListener(datas[index], index) }
+                onChangeListener(datas[index], index)
             }
         }
 
@@ -381,6 +397,16 @@ fun CustomTextPicker(curIdx: Int = 0,
                             .graphicsLayer {
 
                                 val pageOffset = calculateCurrentOffsetForPage(page).absoluteValue
+
+//                                CommonUtil.lerp(
+//                                        startValue = 0.85f,
+//                                        endValue = 1f,
+//                                        fraction = 1f - pageOffset.coerceIn(0f, 1f)
+//                                )
+//                                .also { scale ->
+//                                    scaleX = scale
+//                                    scaleY = scale
+//                                }
 
                                 alpha = CommonUtil.lerp(
                                     startValue = 0.5f,
@@ -412,12 +438,11 @@ fun CustomToogle(modifier: Modifier, spaceSize: Dp = 6.dp, datas: ArrayList<Stri
     Row(modifier) {
         datas.forEachIndexed { index, txt ->
             val backgroundColor = if (selectedState.value == index) Color(0xFF4D5256) else Color(0xFFFFFFFF)
-            val border = if (selectedState.value == index) null else BorderStroke(2.dp, Color(0xFFA9AFB3))
+            val border = if (selectedState.value == index) null else BorderStroke(1.dp, Color(0xFFA9AFB3))
             val textColor = if (selectedState.value == index) Color(0xFFFFFFFF) else Color(0xFF878D91)
 
             Card(shape = RoundedCornerShape(4.dp), elevation = 0.dp, backgroundColor = backgroundColor, border = border,
-                modifier = Modifier
-                    .fillMaxHeight()
+                modifier = Modifier.fillMaxHeight()
                     .clickable {
                         if (selectedState.value != index) {
                             selectedState.value = if (selectedState.value == 0) 1 else 0
@@ -426,8 +451,7 @@ fun CustomToogle(modifier: Modifier, spaceSize: Dp = 6.dp, datas: ArrayList<Stri
                     }) {
                 Column(verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxHeight()
+                    modifier = Modifier.fillMaxHeight()
                         .padding(horizontal = 16.dp)) {
                     Text(txt,
                         style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = textColor),
@@ -448,7 +472,7 @@ fun CustomTextCheckBox(modifier: Modifier = Modifier.height(20.dp), enableImg: I
     val checked = remember { mutableStateOf(false) }
     Card(elevation = 0.dp, backgroundColor = Color.Transparent, modifier = Modifier
         .wrapContentSize()
-        .clickable {
+        .noRippleClickable {
             checked.value = !checked.value
             onChangeListener(!checked.value)
         }) {

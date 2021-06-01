@@ -11,6 +11,9 @@ import com.google.gson.GsonBuilder
 import com.depromeet.linkzupzup.ApiUrl
 import com.depromeet.linkzupzup.AppConst.AUTHHORIZATION_KEY
 import com.depromeet.linkzupzup.AppConst.USER_ID_KEY
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.DefaultResponseEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
+import com.google.gson.Gson
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import okhttp3.Cache
 import okhttp3.Interceptor
@@ -62,5 +65,27 @@ val networkModule = module {
             }.build())
         }
     }
+
+//    single {
+//        Interceptor {  chain ->
+//            val newRequest = chain.request().newBuilder().build()
+//            chain.proceed(newRequest).also { response ->
+//
+//                response.body()?.let { responseBody ->
+//                    val buffer = responseBody.source()
+//                        .buffer()
+//                        .clone()
+//
+//                    val responseStr = buffer.readString(Charsets.UTF_8)
+//                    Gson().fromJson(responseStr, DefaultResponseEntity::class.java).let {
+//                        when (it.status) {
+//                            // 상태값이 다른 API들에서 중복되어 사용되고 있어 의논이 필요
+//
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
 }
