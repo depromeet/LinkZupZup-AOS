@@ -33,6 +33,7 @@ import com.depromeet.linkzupzup.extensions.timeBaseStr
 import com.depromeet.linkzupzup.extensions.timeStr
 import com.depromeet.linkzupzup.architecture.presenterLayer.AlarmDetailViewModel
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.WeeklyAlarm
+import com.depromeet.linkzupzup.ui.theme.BottomSheetShape
 import com.depromeet.linkzupzup.ui.theme.LinkZupZupTheme
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.CustomSwitchCompat
@@ -53,7 +54,8 @@ class AlarmDetailUI: BaseView<AlarmDetailViewModel>() {
         LinkZupZupTheme {
             Surface(color = Color(0xFFF8FAFB)) {
                 vm?.getWeeklyAlarmList()?.let { alarmList ->
-                    BodyContent(alarmList)
+                    // BodyContent(alarmList)
+                    AlarmDetailBodyContent(alarmList)
                 }
             }
         }
@@ -90,6 +92,70 @@ fun AlarmDetailAppBar(appBarColor: MutableState<Color> = remember { mutableState
             .height(52.dp)
             .padding(start = 12.dp))
 }
+
+@ExperimentalPagerApi
+@ExperimentalMaterialApi
+@Composable
+fun AlarmDetailBodyContent(alarms: ArrayList<WeeklyAlarm>) {
+    val alarmList = remember { mutableStateOf(alarms) }
+
+    val coroutineScope = rememberCoroutineScope()
+    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    ModalBottomSheetLayout(sheetState = sheetState,
+        sheetShape = BottomSheetShape,
+        sheetContent = { AlarmDetailModalBottomSheetContent(sheetState,coroutineScope) },
+        modifier = Modifier.fillMaxSize()) {
+
+        Scaffold(topBar = { AlarmDetailAppBar() },
+            backgroundColor = Color.Transparent,
+            modifier = Modifier.fillMaxSize()) {
+
+            Column(modifier = Modifier.fillMaxWidth()
+                .fillMaxHeight()) {
+
+                TopHeaderCard()
+
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                        .weight(1f)) {
+
+                    itemsIndexed(items= alarmList.value) { index, alarm ->
+                        WeeklyAlarmCard(alarmList, index)
+                    }
+                }
+
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(68.dp)
+                    .padding(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 16.dp)) {
+
+                    Button(onClick = {
+                        DLog.e("Jackson", "click read button")
+                        coroutineScope.launch {
+                            sheetState.show()
+                        }
+                    },
+                        colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color(0xFF4076F6), contentColor = Color.White),
+                        shape = RoundedCornerShape(4.dp),
+                        elevation = elevation(defaultElevation = 0.dp, pressedElevation = 0.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp)) {
+
+                        Text("알림 추가하기",
+                            style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700)), fontSize = 14.sp, lineHeight = 17.5.sp),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth())
+
+                    }
+                }
+            }
+
+        }
+    }
+}
+
 
 
 @ExperimentalMaterialApi
@@ -420,6 +486,176 @@ fun AlarmDetailBottomSheet(bottomSheetScaffoldState: BottomSheetScaffoldState, c
                         coroutineScope.launch {
                             Toast.makeText(ctx, "저장하기", Toast.LENGTH_SHORT).show()
                             bottomSheetScaffoldState.bottomSheetState.collapse()
+                        }
+                    }) {
+
+                    Text("저장하기",
+                        style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700)), fontSize = 14.sp, lineHeight = 17.5.sp),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth())
+
+                }
+            }
+        }
+
+    }
+}
+
+@ExperimentalPagerApi
+@ExperimentalMaterialApi
+@Composable
+fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, coroutineScope: CoroutineScope) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .height(606.dp)
+        .background(Color.White)) {
+
+        val ctx = LocalContext.current
+
+        // header, close btn
+        Row(horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)) {
+
+            Card(elevation = 0.dp,
+                modifier = Modifier
+                    .width(68.dp)
+                    .height(56.dp)
+                    .noRippleClickable {
+                        coroutineScope.launch {
+                            bottomSheetState.hide()
+                        }
+                    }) {
+
+                Row(verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(start = 20.dp, end = 16.dp)) {
+
+                    Image(painter = painterResource(id = R.drawable.ic_black_close),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp))
+                }
+            }
+        }
+
+        // guide title
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 24.dp, bottom = 28.dp)) {
+
+            Text("언제마다\n알림을 받으시겠어요?",
+                color = Color(0xFF292A2B),
+                style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700)), fontSize = 24.sp, lineHeight = 32.4.sp, color = Color(0xFF292A2B)))
+        }
+
+        // timepicker
+        val timeDate = remember { mutableStateOf(Calendar.getInstance()) }
+        CustomTimePicker(modifier = Modifier
+            .fillMaxWidth()
+            .height(210.dp)
+            .padding(horizontal = 24.dp, vertical = 20.dp)) { type, timeVal ->
+
+            when (type) {
+                Calendar.AM_PM -> timeDate.value.apply { set(Calendar.AM_PM, timeVal) }
+                Calendar.HOUR -> timeDate.value.apply { set(Calendar.HOUR, timeVal) }
+                Calendar.MINUTE -> timeDate.value.apply { set(Calendar.MINUTE, timeVal) }
+                else -> timeDate.value
+            }
+        }
+
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .height(96.dp)
+                .padding(horizontal = 24.dp, vertical = 20.dp)) {
+
+            Text("반복 설정",
+                color = Color(0xFF292A2B),
+                style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700)), fontSize = 12.sp, lineHeight = 16.8.sp, color = Color(0xFF292A2B)),
+                modifier = Modifier.height(16.dp))
+
+            Spacer(Modifier.height(12.dp))
+
+            Row(verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(28.dp)) {
+
+                val toogleValues = arrayListOf("주중", "주말")
+                CustomToogle(modifier = Modifier.height(28.dp), datas = toogleValues, onChangeListener = {
+                    DLog.e("TEST", toogleValues[it])
+                })
+
+                Spacer(Modifier.weight(1f))
+
+                CustomTextCheckBox(modifier = Modifier.height(20.dp),
+                    text = "공휴일엔 알람 끄기",
+                    enableImg = R.drawable.ic_holiday_on,
+                    disableImg = R.drawable.ic_holiday_off,
+                    enableColor = Color(0xFF4076F6),
+                    disableColor = Color(0xFF878D91),
+                    onChangeListener = {
+                        DLog.e("TEST", if (it) "공휴일 알람 비활성" else "공휴일 알람 활성")
+                    })
+
+            }
+        }
+
+        Spacer(Modifier.weight(1f))
+
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .height(68.dp)
+                .padding(start = 24.dp, top = 0.dp, end = 16.dp, bottom = 24.dp)) {
+
+            Row(Modifier.fillMaxSize()) {
+
+                val isAlready = remember { mutableStateOf(false) }
+                if (isAlready.value) Row(
+                    Modifier
+                        .width(64.dp)
+                        .fillMaxHeight()) {
+
+                    Button(colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.White, contentColor = Color(0xFF4076F6)),
+                        shape = RoundedCornerShape(4.dp),
+                        elevation = elevation(defaultElevation = 0.dp, pressedElevation = 0.dp),
+                        border = BorderStroke(width = 1.dp, Color(0xFF4076F6)),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp)
+                            .padding(end = 12.dp),
+                        onClick = {
+                            DLog.e("Jackson", "save click read button")
+                            coroutineScope.launch {
+                                Toast.makeText(ctx, "삭제", Toast.LENGTH_SHORT).show()
+                                bottomSheetState.hide()
+                            }
+                        }) {
+
+                        Image(painter = painterResource(id = R.drawable.ic_blue_trash),
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp))
+
+                    }
+
+                }
+
+                Button(colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color(0xFF4076F6), contentColor = Color.White),
+                    shape = RoundedCornerShape(4.dp),
+                    elevation = elevation(defaultElevation = 0.dp, pressedElevation = 0.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(52.dp),
+                    onClick = {
+                        DLog.e("Jackson", "save click read button")
+                        coroutineScope.launch {
+                            Toast.makeText(ctx, "저장하기", Toast.LENGTH_SHORT).show()
+                            bottomSheetState.hide()
                         }
                     }) {
 
