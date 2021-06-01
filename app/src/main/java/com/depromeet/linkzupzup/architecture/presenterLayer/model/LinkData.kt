@@ -34,6 +34,9 @@ data class LinkData(
         }
     }
 
+    fun isMetaSet() : Boolean = linkTitle.isNotEmpty()
+
+
     fun setMetaInfo(metaEntity: LinkMetaInfoEntity) {
         this.linkTitle = metaEntity.title
         this.description = metaEntity.content
@@ -41,11 +44,12 @@ data class LinkData(
     }
 
     constructor(linkEntity: LinkAlarmEntity) : this() {
+        this.linkURL = linkEntity.linkURL
         this.linkId = linkEntity.linkId
         this.userId = linkEntity.userId
         this.completed = linkEntity.completed
-        this.completedAt = linkEntity.completedAt.toDate()
-        this.createdAt = linkEntity.completedAt.toDate()
+        // this.completedAt = linkEntity.completedAt.toDate("yyyy-MM-dd HH:mm:ss")
+        // this.createdAt = linkEntity.completedAt.toDate("yyyy-MM-dd HH:mm:ss")
 
         this.hashtags.addAll(
             linkEntity.hashtags.map {

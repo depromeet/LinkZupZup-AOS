@@ -23,6 +23,4 @@ class LinkMetaInfoEntity (
     var imgUrl : String = "",
 
     @ColumnInfo(name="meta_created_dt")
-    var createdDt : Date
-
-    )
+    var createdDt : Date = Date())

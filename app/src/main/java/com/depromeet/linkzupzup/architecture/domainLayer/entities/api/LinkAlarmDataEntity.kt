@@ -9,7 +9,7 @@ import kotlinx.parcelize.Parcelize
 data class LinkAlarmDataEntity(
 
     @SerializedName("content")
-    val content: ArrayList<LinkAlarmEntity> = arrayListOf(),
+    var content: ArrayList<LinkAlarmEntity> = arrayListOf(),
 
     @SerializedName("empty")
     val empty: Boolean = false,

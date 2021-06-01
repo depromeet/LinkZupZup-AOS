@@ -26,4 +26,11 @@ data class LinkAlarmEntity (
     var completedAt: String = "",
 
     @SerializedName("completed")
-    var completed: Boolean = false): Parcelable
+    var completed: Boolean = false,
+
+    /**
+     * UI용 MetaData
+     */
+    var metaTitle: String = "",
+    var metaImageUrl: String = "",
+    var metaDescription: String = ""): Parcelable
