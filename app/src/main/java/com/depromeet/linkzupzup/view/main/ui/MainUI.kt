@@ -3,7 +3,6 @@ package com.depromeet.linkzupzup.view.main.ui
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -27,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -46,11 +46,11 @@ import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.*
-import com.depromeet.linkzupzup.extensions.mutableStateValue
 import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
+import com.google.accompanist.glide.rememberGlidePainter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -65,8 +65,7 @@ class MainUI: BaseView<MainViewModel>() {
                 Column(modifier = Modifier.fillMaxWidth()) {
 
                     val mainContentList = arrayListOf<MainContentData<*>>().apply{
-                            // 상단 영역
-                            add(MainContentData<Any>(MainContentData.MAIN_TOP_HEADER))
+                            add(MainContentData<Any>(MainContentData.MAIN_TOP_HEADER))  // 상단 영역
                     }
 
                     // 링크 스크랩 리스트
@@ -237,7 +236,7 @@ fun MainAppBarBtn(painter: Painter, onClick: ()->Unit) {
         backgroundColor = Color.Transparent,
         modifier = Modifier
             .wrapContentSize()
-            .clickable(onClick = onClick)) {
+            .noRippleClickable { onClick() }) {
 
         Row(verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
@@ -292,7 +291,7 @@ fun ReadProgress(readCnt: Int, padding: PaddingValues = PaddingValues(0.dp)){
             shape = RoundedCornerShape(10),
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { }) {
+                .noRippleClickable { }) {
 
             Column(modifier = Modifier
                 .fillMaxWidth()
@@ -346,9 +345,11 @@ fun MainLinkCard(linkData: LinkData, viewModel: MainViewModel? = null){
             .height(96.dp)) {
 
             // 링크 썸네일 이미지
-            Image(painter = painterResource(R.drawable.ic_link_profile_img),
+            Image(painter =  rememberGlidePainter(request = item.value.imgURL),
                 contentDescription = null,
-                modifier = Modifier.size(96.dp))
+                modifier = Modifier.size(96.dp),
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center)
 
             Spacer(modifier = Modifier.width(10.dp))
 
@@ -803,7 +804,7 @@ fun CustomTextField(modifier: Modifier = Modifier
                         .width(44.dp)
                         .fillMaxHeight()
                         .padding(start = 8.dp)
-                        .clickable {
+                        .noRippleClickable {
                             text.value = ""
                             onValueChange(text.value)
                             // 포커스 제거, 키보드 내리기!
