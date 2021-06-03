@@ -15,6 +15,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,18 +42,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
-import com.depromeet.linkzupzup.architecture.dataLayer.LinkDataSource
-import com.depromeet.linkzupzup.architecture.dataLayer.api.LinkAPIService
-import com.depromeet.linkzupzup.component.RoomDB
-import com.depromeet.linkzupzup.architecture.domainLayer.LinkUseCases
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmResponseEntity
-import com.depromeet.linkzupzup.architecture.dataLayer.repositories.LinkRepositoryImpl
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmDataEntity
 import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.*
 import com.depromeet.linkzupzup.extensions.mutableStateValue
@@ -60,7 +51,6 @@ import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
-import io.reactivex.Observable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -77,14 +67,19 @@ class MainUI: BaseView<MainViewModel>() {
                     val mainContentList = arrayListOf<MainContentData<*>>().apply{
                             // 상단 영역
                             add(MainContentData<Any>(MainContentData.MAIN_TOP_HEADER))
-                            // 링크 스크랩 리스트
-                            vm?.linkAlarmResponse?.observe(lifecycleOwner!!, {
-                                // list 구조 변경이 필요해 보임.
-                                // addAll(it)
-                            })
-                        }.mutableStateValue()
+                    }
 
-                    vm?.let{ viewModel -> MainBodyUI(contentDataList = mainContentList.value, vm = viewModel) }
+                    // 링크 스크랩 리스트
+                    vm?.linkAlarmResponse?.observeAsState().let{
+                        DLog.e("TEST","MainUI linkAlarmResponse observing")
+                        it?.value?.data?.content?.map { linkData->
+                            MainContentData(MainContentData.MAIN_LINK_ITEM,LinkData(linkData))
+                        }?.let { item ->
+                            mainContentList.addAll(item)
+                        }
+                    }
+
+                    vm?.let{ viewModel -> MainBodyUI(contentDataList = mainContentList, vm = viewModel) }
                 }
             }
         }
@@ -138,13 +133,15 @@ fun MainBodyUI(contentDataList : ArrayList<MainContentData<*>>, vm : MainViewMod
         backgroundColor = Color.Transparent,
         modifier = Modifier.fillMaxSize()){
 
-        Column(modifier = Modifier.fillMaxSize()
+        Column(modifier = Modifier
+            .fillMaxSize()
             .background(color = Color.Transparent)
             .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
 
             // 메인 리스트
             LazyColumn(verticalArrangement = Arrangement.spacedBy(24.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .weight(1f)
                     .padding(bottom = 16.dp)
                     .drawWithCache {
@@ -179,7 +176,8 @@ fun MainBodyUI(contentDataList : ArrayList<MainContentData<*>>, vm : MainViewMod
 
             Button(shape = RoundedCornerShape(4.dp),
                 colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Blue50, contentColor = Color.White),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .height(52.dp),
                 onClick = {
                     coroutineScope.launch {
@@ -226,7 +224,8 @@ fun MainAppBar(appBarColor : MutableState<Color> = remember { mutableStateOf(Gra
         },
         backgroundColor = appBarColor.value,
         elevation = 0.dp,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .height(52.dp))
 }
 
@@ -236,7 +235,8 @@ fun MainAppBarBtn(painter: Painter, onClick: ()->Unit) {
     Card(elevation = 0.dp,
         shape = RoundedCornerShape(0),
         backgroundColor = Color.Transparent,
-        modifier = Modifier.wrapContentSize()
+        modifier = Modifier
+            .wrapContentSize()
             .clickable(onClick = onClick)) {
 
         Row(verticalAlignment = Alignment.CenterVertically,
@@ -261,7 +261,8 @@ fun MainHeaderCard(name : String, padding: PaddingValues = PaddingValues(0.dp)){
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .height(96.dp)
                 .background(Color.Transparent)
                 .padding(padding)) {
@@ -282,16 +283,19 @@ fun MainHeaderCard(name : String, padding: PaddingValues = PaddingValues(0.dp)){
 
 @Composable
 fun ReadProgress(readCnt: Int, padding: PaddingValues = PaddingValues(0.dp)){
-    Column(modifier = Modifier.fillMaxWidth()
+    Column(modifier = Modifier
+        .fillMaxWidth()
         .padding(padding)) {
 
         Card(elevation = 0.dp,
             backgroundColor = Gray0t,
             shape = RoundedCornerShape(10),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .clickable { }) {
 
-            Column(modifier = Modifier.fillMaxWidth()
+            Column(modifier = Modifier
+                .fillMaxWidth()
                 .padding(16.dp)) {
 
                 Text(text = "오늘 ${readCnt}개만 읽어도 뿌듯! \uD83D\uDC4D\uD83D\uDC4D",
@@ -307,7 +311,8 @@ fun ReadProgress(readCnt: Int, padding: PaddingValues = PaddingValues(0.dp)){
                     progress = 0.7f,
                     backgroundColor = Gray20,
                     color = Blue50,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .height(16.dp))
             }
 
@@ -324,22 +329,24 @@ fun MainLinkCard(linkData: LinkData, viewModel: MainViewModel? = null){
     if(!linkData.isMetaSet()) {
         viewModel?.getMetadata(linkData.linkURL) { metaData ->
             item.value.setMetaInfo(metaData)    // 의심 구간 2. UI 갱신이 안될 경우 초기화 필요
+            item.value = item.value
         }
     }
 
     Card(elevation = 0.dp,
         shape = RoundedCornerShape(0),
         backgroundColor = Color.Transparent,
-        modifier = Modifier.clickable {
+        modifier = Modifier.noRippleClickable {
             Toast.makeText(ctx, "스크랩 링크 클릭", Toast.LENGTH_SHORT).show()
         }) {
 
-        Row(modifier = Modifier.fillMaxWidth()
+        Row(modifier = Modifier
+            .fillMaxWidth()
             .background(Color.Transparent)
             .height(96.dp)) {
 
             // 링크 썸네일 이미지
-            Image(painter = painterResource(id = R.drawable.ic_link_profile_img),
+            Image(painter = painterResource(R.drawable.ic_link_profile_img),
                 contentDescription = null,
                 modifier = Modifier.size(96.dp))
 
@@ -359,7 +366,8 @@ fun MainLinkCard(linkData: LinkData, viewModel: MainViewModel? = null){
 
                 // 링크 타이틀
                 Text(text=item.value.linkTitle,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
                         .weight(1f),
                     style = TextStyle(fontSize = 12.sp,
                         color = Gray100t,
@@ -367,7 +375,8 @@ fun MainLinkCard(linkData: LinkData, viewModel: MainViewModel? = null){
 
                 // 작성자
                 Row(
-                    Modifier.fillMaxWidth()
+                    Modifier
+                        .fillMaxWidth()
                         .height(16.dp)) {
 
                     Image(painter = painterResource(id = R.drawable.ic_link_user_img),
@@ -419,14 +428,16 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
     val linkUrl = remember { mutableStateOf("") }
 
     // in Column Scope
-    Column(modifier = Modifier.fillMaxWidth()
+    Column(modifier = Modifier
+        .fillMaxWidth()
         .height(580.dp)
         .padding(bottom = 16.dp)) {
 
         // 닫기 버튼
         Row(horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .height(56.dp)) {
 
             BottomSheetCloseBtn(painterResource(id = R.drawable.ic_close)){
@@ -435,7 +446,8 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
             }
         }
 
-        Column(modifier = Modifier.fillMaxWidth()
+        Column(modifier = Modifier
+            .fillMaxWidth()
             .weight(1f)
             .padding(start = 23.dp, end = 23.dp)){
 
@@ -446,7 +458,8 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
 
             /* Text field */
             CustomTextField(hintStr = "\uD83D\uDC49 링크주소를 여기에 붙여넣기 해주세요.",
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .height(40.dp)){
                 linkUrl.value = it
 
@@ -472,18 +485,20 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
 
         /* 클릭된 해시태그 보여주는 열 */
         BottomSheetSelectedTagList(vm = vm,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(horizontal = 24.dp))
 
         /* 하단 저장하기 버튼 */
         Button(shape = RoundedCornerShape(4.dp),
             colors = ButtonDefaults.outlinedButtonColors(backgroundColor = saveBtnColor.value, contentColor = saveTxtColor.value),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .height(52.dp)
                 .padding(start = 24.dp, end = 24.dp),
             onClick = {
                 // Room Link table 저장
-                vm?.insertLink(LinkData(linkURL = linkUrl.value))
+                // vm?.insertLink(LinkData(linkURL = linkUrl.value))
                 // vm?.getMetadata(linkUrl.value)
             }) {
 
@@ -506,7 +521,8 @@ fun BottomHeaderCard(padding: PaddingValues = PaddingValues(0.dp)){
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .background(Color.Transparent)
                 .padding(padding)) {
 
@@ -543,7 +559,8 @@ fun BottomSheetSelect(vm: MainViewModel? = null){
         LinkHashData(10,"ios","",TagColor(TagBgColor04, TagTextColor04)))
 
     Row(verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .height(18.dp)){
 
         Text(text = "해시태그를 선택해주세요.",
@@ -614,15 +631,18 @@ fun BottomSheetInputTag(){
 
         if(isVisible.value){
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(top = 8.dp)){
 
-                CustomTextField(modifier = Modifier.height(40.dp)
+                CustomTextField(modifier = Modifier
+                    .height(40.dp)
                     .weight(1f),
                     useClearBtn = false,
                     hintStr = "#")
 
-                Card(modifier = Modifier.width(40.dp)
+                Card(modifier = Modifier
+                    .width(40.dp)
                     .height(40.dp)
                     .align(Alignment.CenterVertically),
                     shape = RoundedCornerShape(4.dp),
@@ -645,7 +665,8 @@ fun BottomSheetInputTag(){
 @Composable
 fun BottomSheetHashtagCard(vm: MainViewModel? = null, tag: LinkHashData, isSelected : Boolean = false){
     Card(
-        modifier = Modifier.height(32.dp)
+        modifier = Modifier
+            .height(32.dp)
             .noRippleClickable {
                 vm?.run {
                     if (isSelected) removeHashtag(tag)
@@ -778,7 +799,8 @@ fun CustomTextField(modifier: Modifier = Modifier
                     Spacer(Modifier.weight(1f))
 
                 Column(verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.width(44.dp)
+                    modifier = Modifier
+                        .width(44.dp)
                         .fillMaxHeight()
                         .padding(start = 8.dp)
                         .clickable {

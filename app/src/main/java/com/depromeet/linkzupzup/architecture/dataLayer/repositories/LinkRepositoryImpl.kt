@@ -22,6 +22,7 @@ class LinkRepositoryImpl(private val roomDB: RoomDB, private val linkDataSource:
     }
 
     override suspend fun insertMetaInfo(metaInfoEntity: LinkMetaInfoEntity) {
+        DLog.e("TEST","INSERT INTO LinkMetaInfo : ${metaInfoEntity.url} ${metaInfoEntity.imgUrl}")
         roomDB.metaDao().insertMetaInfo(metaInfoEntity)
     }
 

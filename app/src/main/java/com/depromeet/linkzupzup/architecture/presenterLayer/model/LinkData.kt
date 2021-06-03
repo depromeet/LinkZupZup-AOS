@@ -57,10 +57,14 @@ data class LinkData(
                     it.hashtagId,
                     it.hashtagName,
                     it.createdAt,
-                    TagColor(TagTextColor01,
-                    TagBgColor01))
+                    TagColor(TagBgColor01,
+                    TagTextColor01))
             }
         )
+
+        this.linkTitle = linkEntity.metaTitle
+        this.description = linkEntity.metaDescription
+        this.imgURL = linkEntity.metaImageUrl
 
     }
 }
