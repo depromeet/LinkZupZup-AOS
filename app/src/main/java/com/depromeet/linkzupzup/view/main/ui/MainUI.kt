@@ -3,7 +3,6 @@ package com.depromeet.linkzupzup.view.main.ui
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -15,6 +14,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -43,21 +44,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
-import com.depromeet.linkzupzup.architecture.dataLayer.LinkDataSource
-import com.depromeet.linkzupzup.architecture.dataLayer.api.LinkAPIService
-import com.depromeet.linkzupzup.component.RoomDB
-import com.depromeet.linkzupzup.architecture.domainLayer.LinkUseCases
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmResponseEntity
-import com.depromeet.linkzupzup.architecture.dataLayer.repositories.LinkRepositoryImpl
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmDataEntity
 import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.*
 import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
-import io.reactivex.Observable
+import com.google.accompanist.glide.rememberGlidePainter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -68,22 +61,23 @@ class MainUI: BaseView<MainViewModel>() {
     override fun onCreateViewContent() {
         LinkZupZupTheme {
             Surface(color = Gray10) {
-                /*vm?.let{ viewModel -> UserUI(vm = viewModel) }
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Button(onClick = {
-                        vm?.getUserInfo()
-                    }, modifier = Modifier.fillMaxWidth()) {
-                        Text("로그인하기", textAlign = TextAlign.Center)
-                    }
-                }*/
 
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    val mainContentList : ArrayList<MainContentData<*>> = arrayListOf<MainContentData<*>>().apply{
-                        // 상단 영역
-                        add(MainContentData<Any>(MainContentData.MAIN_TOP_HEADER))
-                        // 링크 스크랩 리스트
-                        addAll(MainContentData.mockMainContentList(5))
+
+                    val mainContentList = arrayListOf<MainContentData<*>>().apply{
+                            add(MainContentData<Any>(MainContentData.MAIN_TOP_HEADER))  // 상단 영역
                     }
+
+                    // 링크 스크랩 리스트
+                    vm?.linkAlarmResponse?.observeAsState().let{
+                        DLog.e("TEST","MainUI linkAlarmResponse observing")
+                        it?.value?.data?.content?.map { linkData->
+                            MainContentData(MainContentData.MAIN_LINK_ITEM,LinkData(linkData))
+                        }?.let { item ->
+                            mainContentList.addAll(item)
+                        }
+                    }
+
                     vm?.let{ viewModel -> MainBodyUI(contentDataList = mainContentList, vm = viewModel) }
                 }
             }
@@ -102,13 +96,7 @@ fun MainPreview() {
         // 스크랩 링크 리스트
         addAll(MainContentData.mockMainContentList(5))
     }
-    val ctx = LocalContext.current
-    MainBodyUI(mainContentList, vm = MainViewModel(linkUseCases = LinkUseCases(LinkRepositoryImpl(
-        RoomDB.getInstance(ctx), LinkDataSource(object: LinkAPIService {
-        override fun getLinkList(query: HashMap<String, Any>): Observable<ResponseEntity<LinkAlarmDataEntity>> {
-            TODO("Not yet implemented")
-        }
-    })))))
+    MainBodyUI(mainContentList)
 }
 
 @ExperimentalMaterialApi
@@ -119,20 +107,13 @@ fun BottomSheetPreview() {
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
     )
-    val ctx = LocalContext.current
-    BottomSheet(bottomSheetScaffoldState,coroutineScope,
-        MainViewModel(linkUseCases = LinkUseCases(LinkRepositoryImpl(RoomDB.getInstance(ctx), LinkDataSource(object: LinkAPIService {
-            override fun getLinkList(query: HashMap<String, Any>): Observable<ResponseEntity<LinkAlarmDataEntity>> {
-                TODO("Not yet implemented")
-            }
-        }))))
-    )
+    BottomSheet(bottomSheetScaffoldState,coroutineScope)
 }
 
 /* MainUI */
 @ExperimentalMaterialApi
 @Composable
-fun MainBodyUI(contentDataList : ArrayList<MainContentData<*>>, vm : MainViewModel){
+fun MainBodyUI(contentDataList : ArrayList<MainContentData<*>>, vm : MainViewModel? = null){
     // 로그인 성공
     val coroutineScope = rememberCoroutineScope()
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
@@ -184,7 +165,7 @@ fun MainBodyUI(contentDataList : ArrayList<MainContentData<*>>, vm : MainViewMod
 
                         // 스크랩한 링크 아이템
                         MainContentData.MAIN_LINK_ITEM -> (contentData.data as? LinkData)?.let{ linkData ->
-                            MainLinkCard(linkData = linkData)
+                            MainLinkCard(linkData = linkData, vm)
                         }
 
                         else -> DLog.e("TEST","empty")
@@ -255,7 +236,7 @@ fun MainAppBarBtn(painter: Painter, onClick: ()->Unit) {
         backgroundColor = Color.Transparent,
         modifier = Modifier
             .wrapContentSize()
-            .clickable(onClick = onClick)) {
+            .noRippleClickable { onClick() }) {
 
         Row(verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
@@ -310,7 +291,7 @@ fun ReadProgress(readCnt: Int, padding: PaddingValues = PaddingValues(0.dp)){
             shape = RoundedCornerShape(10),
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { }) {
+                .noRippleClickable { }) {
 
             Column(modifier = Modifier
                 .fillMaxWidth()
@@ -339,15 +320,22 @@ fun ReadProgress(readCnt: Int, padding: PaddingValues = PaddingValues(0.dp)){
 }
 
 @Composable
-fun MainLinkCard(linkData: LinkData){
+fun MainLinkCard(linkData: LinkData, viewModel: MainViewModel? = null){
 
     val ctx = LocalContext.current
     val tagList : ArrayList<LinkHashData> = linkData.hashtags
+    val item = remember { mutableStateOf(linkData) }
+    if(!linkData.isMetaSet()) {
+        viewModel?.getMetadata(linkData.linkURL) { metaData ->
+            item.value.setMetaInfo(metaData)    // 의심 구간 2. UI 갱신이 안될 경우 초기화 필요
+            item.value = item.value
+        }
+    }
 
     Card(elevation = 0.dp,
         shape = RoundedCornerShape(0),
         backgroundColor = Color.Transparent,
-        modifier = Modifier.clickable {
+        modifier = Modifier.noRippleClickable {
             Toast.makeText(ctx, "스크랩 링크 클릭", Toast.LENGTH_SHORT).show()
         }) {
 
@@ -357,9 +345,11 @@ fun MainLinkCard(linkData: LinkData){
             .height(96.dp)) {
 
             // 링크 썸네일 이미지
-            Image(painter = painterResource(id = R.drawable.ic_link_profile_img),
+            Image(painter =  rememberGlidePainter(request = item.value.imgURL),
                 contentDescription = null,
-                modifier = Modifier.size(96.dp))
+                modifier = Modifier.size(96.dp),
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center)
 
             Spacer(modifier = Modifier.width(10.dp))
 
@@ -376,7 +366,7 @@ fun MainLinkCard(linkData: LinkData){
                 Spacer(Modifier.height(8.dp))
 
                 // 링크 타이틀
-                Text(text="스타트업과 안맞는 대기업 임원 DNA는 어떻게 찾아낼까?",
+                Text(text=item.value.linkTitle,
                     modifier = Modifier
                         .fillMaxSize()
                         .weight(1f),
@@ -495,19 +485,21 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
         }
 
         /* 클릭된 해시태그 보여주는 열 */
-        BottomSheetSelectedTagList(vm = vm, modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp))
+        BottomSheetSelectedTagList(vm = vm,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp))
 
         /* 하단 저장하기 버튼 */
         Button(shape = RoundedCornerShape(4.dp),
             colors = ButtonDefaults.outlinedButtonColors(backgroundColor = saveBtnColor.value, contentColor = saveTxtColor.value),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .height(52.dp)
                 .padding(start = 24.dp, end = 24.dp),
             onClick = {
                 // Room Link table 저장
-                vm?.insertLink(LinkData(linkURL = linkUrl.value))
+                // vm?.insertLink(LinkData(linkURL = linkUrl.value))
                 // vm?.getMetadata(linkUrl.value)
             }) {
 
@@ -621,8 +613,7 @@ fun BottomSheetInputTag(){
     Column(modifier = Modifier.fillMaxWidth()){
         Text(
             text = clickStr.value,
-            modifier = Modifier
-                .noRippleClickable {
+            modifier = Modifier.noRippleClickable {
                     isVisible.value = !isVisible.value
                     if(isVisible.value) {
                         clickStr.value = afterClickStr
@@ -642,8 +633,8 @@ fun BottomSheetInputTag(){
         if(isVisible.value){
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp)){
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)){
 
                 CustomTextField(modifier = Modifier
                     .height(40.dp)
@@ -677,7 +668,7 @@ fun BottomSheetHashtagCard(vm: MainViewModel? = null, tag: LinkHashData, isSelec
     Card(
         modifier = Modifier
             .height(32.dp)
-            .clickable {
+            .noRippleClickable {
                 vm?.run {
                     if (isSelected) removeHashtag(tag)
                     else addHashtag(tag)
@@ -813,7 +804,7 @@ fun CustomTextField(modifier: Modifier = Modifier
                         .width(44.dp)
                         .fillMaxHeight()
                         .padding(start = 8.dp)
-                        .clickable {
+                        .noRippleClickable {
                             text.value = ""
                             onValueChange(text.value)
                             // 포커스 제거, 키보드 내리기!

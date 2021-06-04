@@ -12,6 +12,9 @@ interface LinkMetaInfoDao {
     @Query("SELECT * FROM LinkMetaInfo WHERE meta_url =:url")
     suspend fun getMetaInfo(url: String) : LinkMetaInfoEntity?
 
-    @Query("SELECT * FROM LinkMetaInfo")
-    suspend fun getMetaInfoList() : List<LinkMetaInfoEntity>
+//    @Query("SELECT * FROM LinkMetaInfo")
+//    suspend fun getAllMetaInfoList() : List<LinkMetaInfoEntity>
+
+    @Query("SELECT * FROM LinkMetaInfo WHERE meta_url IN(:urls)")
+    suspend fun getMetaInfoList(urls: ArrayList<String>) : List<LinkMetaInfoEntity>
 }

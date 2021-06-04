@@ -1,7 +1,13 @@
 package com.depromeet.linkzupzup.architecture.presenterLayer.model
 
 import androidx.compose.ui.graphics.Color
-import java.sql.Date
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
+import com.depromeet.linkzupzup.extensions.toDate
+import com.depromeet.linkzupzup.ui.theme.TagBgColor01
+import com.depromeet.linkzupzup.ui.theme.TagTextColor01
+import java.util.*
+import kotlin.collections.ArrayList
 
 data class LinkData(
     var linkId: Int = 0,
@@ -13,7 +19,7 @@ data class LinkData(
     var hasReminder: Boolean = false,
     var hashtags: ArrayList<LinkHashData> = arrayListOf(),
     var createdAt: Date = Date(0),
-    var completedAt: String = "",
+    var completedAt: Date = Date(0),
     var completed: Boolean = false) {
 
     /* 향후 삭제 예정 */
@@ -26,6 +32,40 @@ data class LinkData(
                 return LinkData(hashtags = hashDataList)
             }
         }
+    }
+
+    fun isMetaSet() : Boolean = linkTitle.isNotEmpty()
+
+
+    fun setMetaInfo(metaEntity: LinkMetaInfoEntity) {
+        this.linkTitle = metaEntity.title
+        this.description = metaEntity.content
+        this.imgURL = metaEntity.imgUrl
+    }
+
+    constructor(linkEntity: LinkAlarmEntity) : this() {
+        this.linkURL = linkEntity.linkURL
+        this.linkId = linkEntity.linkId
+        this.userId = linkEntity.userId
+        this.completed = linkEntity.completed
+        // this.completedAt = linkEntity.completedAt.toDate("yyyy-MM-dd HH:mm:ss")
+        // this.createdAt = linkEntity.completedAt.toDate("yyyy-MM-dd HH:mm:ss")
+
+        this.hashtags.addAll(
+            linkEntity.hashtags.map {
+                LinkHashData(
+                    it.hashtagId,
+                    it.hashtagName,
+                    it.createdAt,
+                    TagColor(TagBgColor01,
+                    TagTextColor01))
+            }
+        )
+
+        this.linkTitle = linkEntity.metaTitle
+        this.description = linkEntity.metaDescription
+        this.imgURL = linkEntity.metaImageUrl
+
     }
 }
 

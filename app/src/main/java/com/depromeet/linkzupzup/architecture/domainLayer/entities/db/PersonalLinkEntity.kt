@@ -27,7 +27,6 @@ class PersonalLinkEntity (
     var alarmDt : Date,
 
     @ColumnInfo(name="link_created_dt")
-    var createdDt : Date
-)
+    var createdDt : Date)
 
 

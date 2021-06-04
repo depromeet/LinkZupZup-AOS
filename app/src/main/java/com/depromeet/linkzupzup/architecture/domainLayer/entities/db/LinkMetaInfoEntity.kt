@@ -3,7 +3,7 @@ package com.depromeet.linkzupzup.architecture.domainLayer.entities.db
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
-import java.sql.Date
+import java.util.Date
 
 @Entity(tableName = "LinkMetaInfo",
     primaryKeys = ["meta_url"],
@@ -23,6 +23,4 @@ class LinkMetaInfoEntity (
     var imgUrl : String = "",
 
     @ColumnInfo(name="meta_created_dt")
-    var createdDt : Date
-
-    )
+    var createdDt : Date = Date())

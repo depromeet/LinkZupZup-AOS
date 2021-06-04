@@ -1,5 +1,7 @@
 package com.depromeet.linkzupzup.component
 
+import android.util.Log
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
 import com.depromeet.linkzupzup.utils.DLog
 import org.jsoup.Jsoup
@@ -36,6 +38,7 @@ object MetaDataManager {
     }
 
     fun extractUrlFormText(url : String) : String? {
+        DLog.e("TEST",url)
         val urlRegex = "((https?|ftp|gopher|telnet|file):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)"
         val urlPattern : Pattern = Pattern.compile(urlRegex, Pattern.CASE_INSENSITIVE)
         val urlMatcher : Matcher = urlPattern.matcher(url)
@@ -56,21 +59,21 @@ object MetaDataManager {
         return resultUrl
     }
 
-    fun getMetaDataFromUrl(url : String) : LinkData{
-        val linkData = LinkData(linkURL = url)
+    fun getMetaDataFromUrl(url : String) : LinkMetaInfoEntity{
+        val metaData = LinkMetaInfoEntity(url = url)
         try{
             val doc : Document = Jsoup.connect(url).get()
-            linkData.linkTitle = doc.select("meta[property=og:title]").first().attr("content")
-            linkData.description = doc.select("meta[property=og:description]")[0].attr("content")
-            linkData.imgURL = doc.select("meta[property=og:image]")[0].attr("content")
+            metaData.title = doc.select("meta[property=og:title]").first().attr("content")
+            metaData.content = doc.select("meta[property=og:description]")[0].attr("content")
+            metaData.imgUrl = doc.select("meta[property=og:image]")[0].attr("content")
 
-            DLog.d(
-                "LinkMetaData",
-                "${linkData.linkTitle} ${linkData.description} ${linkData.imgURL}"
+            DLog.e(
+                "TEST",
+                "${metaData.title} ${metaData.content} ${metaData.imgUrl}"
             )
         }catch (e : Exception){
             e.printStackTrace()
         }
-        return linkData
+        return metaData
     }
 }

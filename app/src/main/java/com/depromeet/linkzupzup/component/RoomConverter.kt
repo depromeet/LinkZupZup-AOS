@@ -1,7 +1,7 @@
 package com.depromeet.linkzupzup.component
 
 import androidx.room.TypeConverter
-import java.sql.*
+import java.util.Date
 
 class RoomConverter {
 
