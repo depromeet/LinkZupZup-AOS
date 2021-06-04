@@ -14,6 +14,12 @@ class MainContentData <T: Any> {
                 }
             }
         }
+
+        fun mockLinkDataList(cnt: Int): ArrayList<LinkData> = arrayListOf<LinkData>().apply {
+            repeat(cnt) {
+                add(LinkData.mockData())
+            }
+        }
     }
 
     var type: Int = EMPTY_TYPE

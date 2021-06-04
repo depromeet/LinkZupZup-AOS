@@ -3,11 +3,9 @@ package com.depromeet.linkzupzup.architecture.presenterLayer.model
 import androidx.compose.ui.graphics.Color
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
-import com.depromeet.linkzupzup.extensions.toDate
 import com.depromeet.linkzupzup.ui.theme.TagBgColor01
 import com.depromeet.linkzupzup.ui.theme.TagTextColor01
 import java.util.*
-import kotlin.collections.ArrayList
 
 data class LinkData(
     var linkId: Int = 0,
@@ -32,6 +30,19 @@ data class LinkData(
                 return LinkData(hashtags = hashDataList)
             }
         }
+
+        fun mockLinkList(): ArrayList<LinkData> = arrayListOf<LinkData>().apply {
+            add(LinkData(linkURL = "https://brunch.co.kr/@dalgudot/94",
+                linkTitle = "02화 UI 디자인을 위한 UX 원칙 5가지",
+                imgURL = "https://img1.daumcdn.net/thumb/R1280x0.fjpg/?fname=http://t1.daumcdn.net/brunch/service/user/6C10/image/tsRBVaNg7vWkcMZ4M_aMQSLpMr8.jpg",
+                description = "디자인 독학하기 02 | UI/UX 디자인 경험을 공유합니다 :) [Contents] 01 실무 UX 디자인의 정의 02 모바일 UI 디자인을 위한 UX 원칙 1_ [대원칙] 쉽고, 쉽고, 쉽게 2_ 단순하게 3_ 자연스럽게 4_ 사용자 중심 글쓰기 5_ 버튼의 원칙 03 참고자료  최근 한 IT 스타트업에서 UI/UX 디자이너로 일하기 시작했다. 스타트업인 만큼 입사 첫날부터 바"))
+            add(LinkData(linkURL = "https://brunch.co.kr/@delight412/351",
+                linkTitle = "스타트업과 안맞는 대기업 임원 DNA는 어떻게 찾아낼까",
+                imgURL = "https://img1.daumcdn.net/thumb/R1280x0.fjpg/?fname=http://t1.daumcdn.net/brunch/service/user/ZVA/image/Z99yCKXyWxClKX5FhzSF0IZlVEg.jpg",
+                description = "이직을 하면 새로운 회사에 적응하는 것이 만만한 일은 아니다. 문화적인 변화가 주는 부담감이 적지 않다. 개인적으로도 그랬던 것 같다.  잉글랜드 프리미어리그에선 잘 나가던 축구 선수가 스페인 프리메라리가로 이적하면 기대 이하의 성적을 보이는 경우가 종종 있는 것처럼 기업도 마찬가지지 싶다. 특히 회사 규모가 다를 경우 변화의 충격은 더욱 클 수 있다."))
+        }
+
+        fun ArrayList<LinkAlarmEntity>.converter(): ArrayList<LinkData> = ArrayList(map { LinkData(it) })
     }
 
     fun isMetaSet() : Boolean = linkTitle.isNotEmpty()
