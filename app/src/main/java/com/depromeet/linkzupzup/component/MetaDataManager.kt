@@ -1,8 +1,7 @@
 package com.depromeet.linkzupzup.component
 
-import android.util.Log
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
-import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
+import com.depromeet.linkzupzup.extensions.verifyImgUrlDomain
 import com.depromeet.linkzupzup.utils.DLog
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -65,12 +64,7 @@ object MetaDataManager {
             val doc : Document = Jsoup.connect(url).get()
             metaData.title = doc.select("meta[property=og:title]").first().attr("content")
             metaData.content = doc.select("meta[property=og:description]")[0].attr("content")
-            metaData.imgUrl = doc.select("meta[property=og:image]")[0].attr("content")
-
-            DLog.e(
-                "TEST",
-                "${metaData.title} ${metaData.content} ${metaData.imgUrl}"
-            )
+            metaData.imgUrl = doc.select("meta[property=og:image]")[0].attr("content").verifyImgUrlDomain()
         }catch (e : Exception){
             e.printStackTrace()
         }

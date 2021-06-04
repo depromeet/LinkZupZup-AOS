@@ -78,7 +78,7 @@ fun LinkHistoryBodyContent(items: ArrayList<MainContentData<*>>) {
 
                     // 스크랩한 링크 아이템
                     MainContentData.MAIN_LINK_ITEM -> (item.data as? LinkData)?.let { linkData ->
-                        MainLinkCard(linkData = linkData)
+                        MainLinkCard(index = index, linkData = linkData)
                     }
 
                 }
