@@ -73,7 +73,7 @@ class MainUI: BaseView<MainViewModel>() {
 
                     vm?.run {
                         val list by linkList.observeAsState(arrayListOf())
-                        MainBodyUI(linkList = list.converter().apply { addAll(LinkData.mockLinkList()) }, vm = this)
+                        MainBodyUI(linkList = list.converter(), vm = this)
                     }
 
                 }
