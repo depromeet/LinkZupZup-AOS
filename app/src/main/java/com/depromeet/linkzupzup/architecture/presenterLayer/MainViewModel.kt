@@ -1,5 +1,6 @@
 package com.depromeet.linkzupzup.architecture.presenterLayer
 
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
@@ -26,26 +27,11 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
 
     companion object {
         val TAG = MainViewModel::class.java.simpleName
+        val MAX_HASH_TAG_SELECT = 3
     }
 
     val userInfo: MutableLiveData<User?> = MutableLiveData()
-
-    private val list = mutableListOf<LinkHashData>()
-    private val selectedTagList = MutableLiveData<List<LinkHashData>>()
-    val liveSelectedTagList: LiveData<List<LinkHashData>> = selectedTagList
-
-    init {
-        selectedTagList.value = list
-    }
-
-    fun addHashtag(item: LinkHashData) {
-        list.add(item)
-        selectedTagList.value = list
-    }
-    fun removeHashtag(item: LinkHashData) {
-        list.remove(item)
-        selectedTagList.value = list
-    }
+    val selectTagList: MutableLiveData<ArrayList<LinkHashData>> = MutableLiveData(arrayListOf())
 
 
     val linkAlarmResponse: MutableLiveData<ResponseEntity<LinkAlarmDataEntity>> = MutableLiveData()
@@ -110,6 +96,22 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
                     linkUseCases.insertMetaInfo(metaData)
                     callback(metaData)
                 }
+            }
+        }
+    }
+
+    fun insertSelectedTag(tag: LinkHashData){
+        selectTagList.value?.apply {
+            if(this.size < MAX_HASH_TAG_SELECT && !this.contains(tag)){
+                this.add(tag)
+            }
+        }
+    }
+
+    fun removeSelectedTag(tag: LinkHashData){
+        selectTagList.value?.apply {
+            if(this.contains(tag)){
+                this.remove(tag)
             }
         }
     }
