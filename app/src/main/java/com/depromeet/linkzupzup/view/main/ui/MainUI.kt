@@ -48,7 +48,6 @@ import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData.Companion.converter
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkHashData
-import com.depromeet.linkzupzup.architecture.presenterLayer.model.MainContentData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.TagColor
 import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.extensions.itemsWithHeaderIndexed

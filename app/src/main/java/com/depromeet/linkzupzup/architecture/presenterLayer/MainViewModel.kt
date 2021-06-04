@@ -2,6 +2,7 @@ package com.depromeet.linkzupzup.architecture.presenterLayer
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.depromeet.linkzupzup.ParamsInfo
 import com.depromeet.linkzupzup.architecture.domainLayer.LinkUseCases
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
@@ -147,11 +148,7 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
                 // List UI를 갱신하기 위해 콜백
                 callback(metaData)
                 // 별도 db 갱신
-                runBlocking {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        linkUseCases.insertMetaInfo(metaData)
-                    }
-                }
+                viewModelScope.launch(Dispatchers.IO) { linkUseCases.insertMetaInfo(metaData) }
             }
         }
     }

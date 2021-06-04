@@ -107,8 +107,7 @@ fun Color.isEquals(target: Color): Boolean {
  * 특이한 경우이기는 하지만, 이미지 URL의 첫 시작이 "//" 으로 시작될 경우, Url의 프로토콜이 생략된 경우이므로,
  * "https" 프로토콜을 prefix로 응답합니다.
  */
-fun String.verifyImgUrlDomain(): String
-        = if (indexOf("//") == 0) "https:$this" else this
+fun String.verifyImgUrlDomain(): String = if (indexOf("//") == 0) "https:$this" else this
 
 /**
  * List에 header를 포함하여 사용가능하도록 커스텀
