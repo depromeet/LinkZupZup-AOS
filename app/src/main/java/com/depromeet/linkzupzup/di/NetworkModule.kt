@@ -1,18 +1,19 @@
 package com.depromeet.linkzupzup.di
 
-import com.depromeet.linkzupzup.AppConst.CONNECTION_TIMEOUT
-import com.depromeet.linkzupzup.AppConst.READ_TIMEOUT
-import com.depromeet.linkzupzup.AppConst.WRITE_TIMEOUT
-import com.depromeet.linkzupzup.BuildConfig
-
-import com.depromeet.linkzupzup.component.PreferencesManager
-import com.depromeet.linkzupzup.extensions.applySSL
-import com.google.gson.GsonBuilder
+import android.content.Intent
 import com.depromeet.linkzupzup.ApiUrl
 import com.depromeet.linkzupzup.AppConst.AUTHHORIZATION_KEY
+import com.depromeet.linkzupzup.AppConst.CONNECTION_TIMEOUT
+import com.depromeet.linkzupzup.AppConst.READ_TIMEOUT
 import com.depromeet.linkzupzup.AppConst.USER_ID_KEY
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.DefaultResponseEntity
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
+import com.depromeet.linkzupzup.AppConst.WRITE_TIMEOUT
+import com.depromeet.linkzupzup.BuildConfig
+import com.depromeet.linkzupzup.StatusConst
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseArrayEntity
+import com.depromeet.linkzupzup.component.PreferencesManager
+import com.depromeet.linkzupzup.extensions.applySSL
+import com.depromeet.linkzupzup.utils.DLog
+import com.depromeet.linkzupzup.view.login.LoginActivity
 import com.google.gson.Gson
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import okhttp3.Cache
@@ -55,37 +56,47 @@ val networkModule = module {
             .build()
     }
 
+//    single {
+//        Interceptor { chain ->
+//            val pref: PreferencesManager = get()
+//            chain.proceed(chain.request().newBuilder().apply {
+//                header(AUTHHORIZATION_KEY, pref.getAuthorization())
+//                // header(USER_ID_KEY, pref.getUserId())
+//                header(USER_ID_KEY, "2131")
+//            }.build())
+//        }
+//    }
+
     single {
-        Interceptor { chain ->
+        Interceptor {  chain ->
             val pref: PreferencesManager = get()
-            chain.proceed(chain.request().newBuilder().apply {
+            val newRequest = chain.request().newBuilder().apply {
                 header(AUTHHORIZATION_KEY, pref.getAuthorization())
                 // header(USER_ID_KEY, pref.getUserId())
                 header(USER_ID_KEY, "2131")
-            }.build())
+            }.build()
+
+            chain.proceed(newRequest).also { response ->
+
+                response.body()?.let { responseBody ->
+                    val buffer = responseBody.source()
+                        .buffer()
+                        .clone()
+
+                    val responseStr = buffer.readString(Charsets.UTF_8)
+                    Gson().fromJson(responseStr, ResponseArrayEntity::class.java).let {
+                        when (it.status.toInt()) {
+                            // 토큰 만료된 경우 이므로, 강제로 로그인 화면으로 이동!
+                            StatusConst.ACCESS_TOKEN_EXPIRED_STATUS -> androidApplication().let { ctx ->
+                                Intent(ctx, LoginActivity::class.java).apply {
+                                }.let(ctx::startActivity)
+                            }
+                            else -> DLog.e("STATUS", it.status)
+                        }
+                    }
+                }
+            }
         }
     }
-
-//    single {
-//        Interceptor {  chain ->
-//            val newRequest = chain.request().newBuilder().build()
-//            chain.proceed(newRequest).also { response ->
-//
-//                response.body()?.let { responseBody ->
-//                    val buffer = responseBody.source()
-//                        .buffer()
-//                        .clone()
-//
-//                    val responseStr = buffer.readString(Charsets.UTF_8)
-//                    Gson().fromJson(responseStr, DefaultResponseEntity::class.java).let {
-//                        when (it.status) {
-//                            // 상태값이 다른 API들에서 중복되어 사용되고 있어 의논이 필요
-//
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
 
 }

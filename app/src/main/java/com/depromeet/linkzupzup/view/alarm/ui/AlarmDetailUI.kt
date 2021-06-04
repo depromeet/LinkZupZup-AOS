@@ -5,7 +5,6 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.ButtonDefaults.elevation
@@ -24,9 +23,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.depromeet.linkzupzup.R
-import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.architecture.presenterLayer.AlarmDetailViewModel
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.WeeklyAlarm
+import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.extensions.*
 import com.depromeet.linkzupzup.ui.theme.BottomSheetShape
 import com.depromeet.linkzupzup.ui.theme.LinkZupZupTheme
@@ -108,24 +107,25 @@ fun AlarmDetailBodyContent(alarms: ArrayList<WeeklyAlarm>) {
             Column(modifier = Modifier.fillMaxWidth()
                 .fillMaxHeight()) {
 
-                TopHeaderCard()
+                val columnModifier = if (alarmList.value.size > 0) Modifier.fillMaxWidth().weight(1f)
+                else Modifier.fillMaxWidth()
 
-                if (alarmList.value.size > 0) {
-                    LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        modifier = Modifier.fillMaxWidth()
-                            .weight(1f)) {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    modifier = columnModifier) {
 
-                        itemsIndexed(items= alarmList.value) { index, alarm ->
-                            WeeklyAlarmCard(alarmList, index)
-                        }
+                    itemsWithHeaderIndexed (
+                        items = alarmList.value,
+                        useHeader = true,
+                        headerContent = { TopHeaderCard() }) { idx, alarm ->
+                            WeeklyAlarmCard(alarmList, idx)
                     }
-                } else EmptyGuideCard(modifier = Modifier.fillMaxWidth()
-                    .weight(1f))
+                }
+                if (alarmList.value.size <= 0) EmptyGuideCard(Modifier.fillMaxWidth().weight(1f))
 
-                Column(modifier = Modifier.fillMaxWidth()
+                Box(modifier = Modifier.fillMaxWidth()
                     .height(68.dp)
-                    .padding(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 16.dp)) {
+                    .padding(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 16.dp), contentAlignment = Alignment.BottomCenter) {
 
                     Button(onClick = { coroutineScope.launch { sheetState.show() } },
                         colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color(0xFF4076F6), contentColor = Color.White),
@@ -148,10 +148,11 @@ fun AlarmDetailBodyContent(alarms: ArrayList<WeeklyAlarm>) {
 }
 
 @Composable
-fun EmptyGuideCard(modifier: Modifier) {
+fun EmptyGuideCard(modifier: Modifier = Modifier) {
     Column(horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = modifier.padding(bottom = 24.dp)
+        modifier = modifier.fillMaxWidth()
+            .padding(bottom = 24.dp)
             .background(Color.Transparent)) {
 
         // 도넛 이미지
@@ -161,7 +162,8 @@ fun EmptyGuideCard(modifier: Modifier) {
                 .weight(1f)) {
 
             Image(painter = painterResource(id = R.drawable.ic_donut05),
-                contentDescription = null)
+                contentDescription = null,
+                modifier = Modifier.size(168.dp, 124.dp))
         }
 
         Text("잊어버리지 않고 링크를 읽을 수 있도록\n원하는 시간에 알림을 받아보세요!\n\n\uD83D\uDC47\uD83D\uDC47\uD83D\uDC47 ",
@@ -246,7 +248,7 @@ fun WeeklyAlarmCard(list: MutableState<ArrayList<WeeklyAlarm>>, index: Int) {
 
                         Column(horizontalAlignment = Alignment.End,
                                 modifier = Modifier.fillMaxHeight()
-                                        .padding(top = 10.dp)) {
+                                    .padding(top = 10.dp)) {
 
                             CustomSwitchCompat(instanceCallback = {
                                     switchCompat.value = it
@@ -455,7 +457,7 @@ fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, 
     Column(modifier = Modifier.fillMaxWidth()
         .height(606.dp)
         .background(Color.White)
-        .noRippleClickable {  }) {
+        .noRippleClickable { }) {
 
         val ctx = LocalContext.current
 
@@ -509,8 +511,8 @@ fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, 
         }
 
         Column(Modifier.fillMaxWidth()
-                .height(96.dp)
-                .padding(horizontal = 24.dp, vertical = 20.dp)) {
+            .height(96.dp)
+            .padding(horizontal = 24.dp, vertical = 20.dp)) {
 
             Text("반복 설정",
                 color = Color(0xFF292A2B),
@@ -546,8 +548,8 @@ fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, 
         Spacer(Modifier.weight(1f))
 
         Column(Modifier.fillMaxWidth()
-                .height(68.dp)
-                .padding(start = 24.dp, top = 0.dp, end = 16.dp, bottom = 24.dp)) {
+            .height(68.dp)
+            .padding(start = 24.dp, top = 0.dp, end = 16.dp, bottom = 24.dp)) {
 
             Row(Modifier.fillMaxSize()) {
 
@@ -612,9 +614,9 @@ fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, 
 fun previewSample() {
 
     val listDatas = arrayListOf<WeeklyAlarm>().apply {
-        add(WeeklyAlarm("2021-04-28 08:30:00", 0, 1, 1))
-        add(WeeklyAlarm("2021-04-28 08:30:00", 1, 1, 0))
-        add(WeeklyAlarm("2021-04-28 08:30:00", 2, 0, 1))
+        add(WeeklyAlarm(dateTime = "2021-04-28 08:30:00", isWeekday = 0, isHolidayUse = 1, enableAlarm = 1))
+        add(WeeklyAlarm(dateTime = "2021-04-28 08:30:00", isWeekday = 1, isHolidayUse = 1, enableAlarm = 0))
+        add(WeeklyAlarm(dateTime = "2021-04-28 08:30:00", isWeekday = 2, isHolidayUse = 0, enableAlarm = 1))
     }
 
     LinkZupZupTheme {

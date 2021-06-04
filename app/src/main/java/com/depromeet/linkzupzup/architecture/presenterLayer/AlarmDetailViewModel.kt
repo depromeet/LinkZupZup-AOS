@@ -1,5 +1,8 @@
 package com.depromeet.linkzupzup.architecture.presenterLayer
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.depromeet.linkzupzup.StatusConst
 import com.depromeet.linkzupzup.architecture.domainLayer.AlarmUseCases
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseArrayEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
@@ -19,6 +22,9 @@ class AlarmDetailViewModel(private val alarmUseCases: AlarmUseCases): BaseViewMo
     fun getWeeklyAlarmList(): ArrayList<WeeklyAlarm>
         = alarmUseCases.getWeeklyAlarmList()
 
+    private var _alarmList: MutableLiveData<ArrayList<AlarmEntity>> = MutableLiveData(arrayListOf())
+    val alarmList: LiveData<ArrayList<AlarmEntity>> = _alarmList
+
     /**
      * 어플 알람 리스트 조회
      */
@@ -29,8 +35,15 @@ class AlarmDetailViewModel(private val alarmUseCases: AlarmUseCases): BaseViewMo
             .subscribeOn(Schedulers.io())
             .subscribe({
 
-                // TODO: 로직 추가 필요
-                callback?.invoke(it)
+                when (it.getStatus()) {
+                    StatusConst.SELECT_SUSSCESS_STATUS -> {
+                        _alarmList.value = it.data
+
+                        // TODO: 로직 추가 필요
+                        callback?.invoke(it)
+                    }
+                }
+
                 progressStatus(false)
             }, this@AlarmDetailViewModel::defaultThrowable))
     }
