@@ -1,6 +1,5 @@
 package com.depromeet.linkzupzup.view.main.ui
 
-import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -43,6 +42,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.LiveData
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
@@ -55,6 +55,7 @@ import com.depromeet.linkzupzup.extensions.itemsWithHeaderIndexed
 import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.extensions.toast
 import com.depromeet.linkzupzup.ui.theme.*
+import com.depromeet.linkzupzup.utils.CommonUtil
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
 import com.google.accompanist.glide.rememberGlidePainter
@@ -420,6 +421,7 @@ fun BottomSheet(sheetState : ModalBottomSheetState, coroutineScope : CoroutineSc
     val saveBtnColor = remember { mutableStateOf(Gray50t) }
     val saveTxtColor = remember { mutableStateOf(Gray70) }
     val linkUrl = remember { mutableStateOf("") }
+    val liveCnt = vm?.selectTagList?.value
 
     // in Column Scope
     Column(modifier = Modifier
@@ -470,19 +472,25 @@ fun BottomSheet(sheetState : ModalBottomSheetState, coroutineScope : CoroutineSc
             Spacer(Modifier.height(20.dp))
 
             /* 해시태그 선택 */
-            BottomSheetSelect(vm)
+            BottomSheetSelect(liveCnt?.size){
+                vm?.insertSelectedTag(it)
+            }
 
             Spacer(Modifier.height(24.dp))
 
             /* 커스텀 태그 입력 화면 */
-            BottomSheetInputTag()
+            BottomSheetInputTag{ tagName ->
+                vm?.insertSelectedTag(LinkHashData(0,tagName,"", CommonUtil.getRandomeTagColor()))
+            }
         }
 
         /* 클릭된 해시태그 보여주는 열 */
         BottomSheetSelectedTagList(vm = vm,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp))
+                .padding(horizontal = 24.dp)){
+            vm?.removeSelectedTag(it)
+        }
 
         /* 하단 저장하기 버튼 */
         Button(shape = RoundedCornerShape(4.dp),
@@ -493,13 +501,18 @@ fun BottomSheet(sheetState : ModalBottomSheetState, coroutineScope : CoroutineSc
                 .padding(start = 24.dp, end = 24.dp),
             onClick = {
                 // link register api 호출
-                vm?.let {
-                    it.registerLink(LinkRegisterEntity(linkUrl.value)){
+                vm?.let { viewModel ->
+
+                    // 링크 저장 TODO : 추후 LinkRegisterEntity 개선 필요
+                    viewModel.registerLink(LinkRegisterEntity(
+                        linkURL = linkUrl.value,
+                        hashtags = ArrayList(viewModel.selectTagList.value?.map { it.hashtagName }))){
+
                         coroutineScope.launch {
+                            viewModel.getLinkList()
                             sheetState.hide()
                         }
                     }
-                    it.getLinkList()
                 }
             }) {
 
@@ -540,9 +553,9 @@ fun BottomHeaderCard(padding: PaddingValues = PaddingValues(0.dp)){
 }
 
 @Composable
-fun BottomSheetSelect(vm: MainViewModel? = null){
+fun BottomSheetSelect(cnt: Int? = 0, onClick: (LinkHashData) -> Unit){
     val size = 3
-    val cnt = vm?.selectTagList?.observeAsState()?.value?.size
+    // val cnt = vm?.selectTagList?.observeAsState()?.value?.size
 
     val tc1 : List<LinkHashData> = listOf(
         LinkHashData(0,"디자인","",TagColor(TagBgColor01, TagTextColor01)),
@@ -587,7 +600,7 @@ fun BottomSheetSelect(vm: MainViewModel? = null){
         horizontalArrangement = Arrangement.spacedBy(10.dp)){
         items(tc1) { tag ->
             BottomSheetHashtagCard(tag){
-                vm?.insertSelectedTag(tag)
+                onClick(tag)
             }
         }
     }
@@ -598,20 +611,21 @@ fun BottomSheetSelect(vm: MainViewModel? = null){
         horizontalArrangement = Arrangement.spacedBy(10.dp)){
         items(tc2) { tag ->
             BottomSheetHashtagCard(tag){
-                vm?.insertSelectedTag(tag)
+                onClick(tag)
             }
         }
     }
 }
 
 @Composable
-fun BottomSheetInputTag(){
+fun BottomSheetInputTag(onClick: (String) -> Unit){
     val beforeClickStr  = "원하시는 해시태그가 없으신가요?"
     val afterClickStr = "원하는 해시태그가 없다면 적어주세요!"
 
     val isVisible = remember { mutableStateOf(false) }
     val clickStr = remember { mutableStateOf(beforeClickStr) }
     val strColor = remember { mutableStateOf(Gray70)}
+    val tagName = remember { mutableStateOf("") }
 
     Column(modifier = Modifier.fillMaxWidth()){
         Text(
@@ -642,13 +656,19 @@ fun BottomSheetInputTag(){
                 CustomTextField(modifier = Modifier
                     .height(40.dp)
                     .weight(1f),
-                    useClearBtn = false,
-                    hintStr = "#")
+                    useClearBtn = true,
+                    hintStr = "#"){
+                    tagName.value = it
+                }
 
                 Card(modifier = Modifier
                     .width(40.dp)
                     .height(40.dp)
-                    .align(Alignment.CenterVertically),
+                    .align(Alignment.CenterVertically)
+                    .noRippleClickable {
+                        onClick(tagName.value)
+                        tagName.value = ""
+                    },
                     shape = RoundedCornerShape(4.dp),
                     backgroundColor = Gray70,
                     elevation = 0.dp){
@@ -702,7 +722,7 @@ fun BottomSheetHashtagCard(tag: LinkHashData, isSelected : Boolean = false, onCl
 }
 
 @Composable
-fun BottomSheetSelectedTagList(modifier: Modifier = Modifier.fillMaxWidth(), vm: MainViewModel? = null){
+fun BottomSheetSelectedTagList(modifier: Modifier = Modifier.fillMaxWidth(), vm: MainViewModel? = null, onClick: (LinkHashData) -> Unit){
 
     vm?.run {
         val tagList by selectTagList.observeAsState(arrayListOf())
@@ -712,7 +732,7 @@ fun BottomSheetSelectedTagList(modifier: Modifier = Modifier.fillMaxWidth(), vm:
             horizontalArrangement = Arrangement.spacedBy(10.dp)){
                 items(tagList){ tag->
                     BottomSheetHashtagCard(tag, isSelected = true){
-                        vm.removeSelectedTag(tag)
+                        onClick(tag)
                     }
                 }
         }
