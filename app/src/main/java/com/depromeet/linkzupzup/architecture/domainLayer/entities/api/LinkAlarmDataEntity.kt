@@ -27,7 +27,7 @@ data class LinkAlarmDataEntity(
     val numberOfElements: Int = 0,
 
     @SerializedName("pageable")
-    val pageable: String = "",
+    val pageable: LinkAlarmPageableEntity = LinkAlarmPageableEntity(),
 
     @SerializedName("size")
     val size: Int = 0,

@@ -19,7 +19,7 @@ class PreferencesManager(ctx: Context, name: String = "pref") {
         saver.commit()
     }
 
-    fun getUserId(): String = pref.getString(USER_ID_KEY, "") ?: ""
+    fun getUserId(): String = pref.getString(USER_ID_KEY, "") ?: "0"
     fun setUserId(userId: String) {
         saver.putString(USER_ID_KEY, userId)
         saver.commit()

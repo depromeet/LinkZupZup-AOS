@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.depromeet.linkzupzup.StatusConst
 import com.depromeet.linkzupzup.architecture.domainLayer.AlarmUseCases
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseArrayEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmRegistEntity
@@ -28,7 +27,7 @@ class AlarmDetailViewModel(private val alarmUseCases: AlarmUseCases): BaseViewMo
     /**
      * 어플 알람 리스트 조회
      */
-    fun getAlarmList(callback: ((ResponseArrayEntity<AlarmEntity>)->Unit)? = null) {
+    fun getAlarmList(callback: ((ResponseEntity<ArrayList<AlarmEntity>>)->Unit)? = null) {
         progressStatus(true)
         addDisposable(alarmUseCases.getAlarmList()
             .observeOn(AndroidSchedulers.mainThread())

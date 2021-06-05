@@ -1,7 +1,6 @@
 package com.depromeet.linkzupzup.architecture.dataLayer.repositories
 
 import com.depromeet.linkzupzup.architecture.dataLayer.AlarmDataSource
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseArrayEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmRegistEntity
@@ -23,7 +22,7 @@ class AlarmRepositoryImpl(private val alarmDataSource: AlarmDataSource): AlarmRe
     /**
      * 어플 알람 리스트 조회
      */
-    override fun getAlarmList(): Observable<ResponseArrayEntity<AlarmEntity>>
+    override fun getAlarmList(): Observable<ResponseEntity<ArrayList<AlarmEntity>>>
         = alarmDataSource.getAlarmList()
 
     /**

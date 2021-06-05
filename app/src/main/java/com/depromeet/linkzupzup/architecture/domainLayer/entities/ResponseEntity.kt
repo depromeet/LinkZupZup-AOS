@@ -5,10 +5,12 @@ import com.google.gson.annotations.SerializedName
 class ResponseEntity<T>(
 
     @SerializedName("status")
-    override var status: String = "",
+    var status: String = "",
 
     @SerializedName("comment")
-    override var comment: String = "",
+    var comment: String = "",
 
     @SerializedName("data")
-    var data: T? = null): DefaultResponseEntity
+    var data: T? = null) {
+    fun getStatus(): Int = status.toInt()
+}

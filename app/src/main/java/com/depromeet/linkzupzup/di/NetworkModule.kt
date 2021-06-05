@@ -9,7 +9,7 @@ import com.depromeet.linkzupzup.AppConst.USER_ID_KEY
 import com.depromeet.linkzupzup.AppConst.WRITE_TIMEOUT
 import com.depromeet.linkzupzup.BuildConfig
 import com.depromeet.linkzupzup.StatusConst
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseArrayEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.component.PreferencesManager
 import com.depromeet.linkzupzup.extensions.applySSL
 import com.depromeet.linkzupzup.utils.DLog
@@ -72,8 +72,7 @@ val networkModule = module {
             val pref: PreferencesManager = get()
             val newRequest = chain.request().newBuilder().apply {
                 header(AUTHHORIZATION_KEY, pref.getAuthorization())
-                // header(USER_ID_KEY, pref.getUserId())
-                header(USER_ID_KEY, "2131")
+                header(USER_ID_KEY, pref.getUserId())
             }.build()
 
             chain.proceed(newRequest).also { response ->
@@ -84,7 +83,7 @@ val networkModule = module {
                         .clone()
 
                     val responseStr = buffer.readString(Charsets.UTF_8)
-                    Gson().fromJson(responseStr, ResponseArrayEntity::class.java).let {
+                    Gson().fromJson(responseStr, ResponseEntity::class.java).let {
                         when (it.status.toInt()) {
                             // 토큰 만료된 경우 이므로, 강제로 로그인 화면으로 이동!
                             StatusConst.ACCESS_TOKEN_EXPIRED_STATUS -> androidApplication().let { ctx ->
