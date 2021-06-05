@@ -2,7 +2,7 @@ package com.depromeet.linkzupzup.di
 
 import android.content.Intent
 import com.depromeet.linkzupzup.ApiUrl
-import com.depromeet.linkzupzup.AppConst.AUTHHORIZATION_KEY
+import com.depromeet.linkzupzup.AppConst.AUTHORIZATION_KEY
 import com.depromeet.linkzupzup.AppConst.CONNECTION_TIMEOUT
 import com.depromeet.linkzupzup.AppConst.READ_TIMEOUT
 import com.depromeet.linkzupzup.AppConst.USER_ID_KEY
@@ -61,8 +61,8 @@ val networkModule = module {
 //            val pref: PreferencesManager = get()
 //            chain.proceed(chain.request().newBuilder().apply {
 //                header(AUTHHORIZATION_KEY, pref.getAuthorization())
-//                // header(USER_ID_KEY, pref.getUserId())
-//                header(USER_ID_KEY, "2131")
+//                header(USER_ID_KEY, pref.getUserId().toString())
+//                //header(USER_ID_KEY, "2131")
 //            }.build())
 //        }
 //    }
@@ -71,7 +71,7 @@ val networkModule = module {
         Interceptor {  chain ->
             val pref: PreferencesManager = get()
             val newRequest = chain.request().newBuilder().apply {
-                header(AUTHHORIZATION_KEY, pref.getAuthorization())
+                header(AUTHORIZATION_KEY, pref.getAuthorization())
                 header(USER_ID_KEY, pref.getUserId().toString())
             }.build()
 
