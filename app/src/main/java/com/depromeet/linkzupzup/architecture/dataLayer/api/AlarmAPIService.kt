@@ -1,7 +1,6 @@
 package com.depromeet.linkzupzup.architecture.dataLayer.api
 
 import com.depromeet.linkzupzup.ApiUrl
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseArrayEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmRegistEntity
@@ -14,7 +13,7 @@ interface AlarmAPIService {
      * 어플 알람 리스트 조회
      */
     @GET(ApiUrl.ALARM_LIST)
-    fun getAlarmList(): Observable<ResponseArrayEntity<AlarmEntity>>
+    fun getAlarmList(): Observable<ResponseEntity<ArrayList<AlarmEntity>>>
 
     /**
      * 어플 알람 등록

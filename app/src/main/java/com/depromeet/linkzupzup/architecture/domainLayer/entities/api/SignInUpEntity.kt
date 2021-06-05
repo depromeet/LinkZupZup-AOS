@@ -5,25 +5,16 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class SignInEntity(
+data class SignInUpEntity (
 
     @SerializedName("email")
-    var email: String,
+    var email: String = "",
 
     @SerializedName("name")
-    var name: String,
+    var name: String = "",
 
     @SerializedName("token")
-    var token: String,
+    var token: String = "",
 
     @SerializedName("userId")
-    var userId: Int): Parcelable
-
-@Parcelize
-data class SignUpEntity(
-
-    @SerializedName("email")
-    var email: String,
-
-    @SerializedName("name")
-    var name: String): Parcelable
+    var userId: Int = 0): Parcelable

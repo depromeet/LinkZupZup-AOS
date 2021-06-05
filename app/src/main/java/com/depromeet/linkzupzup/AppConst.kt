@@ -2,7 +2,7 @@ package com.depromeet.linkzupzup
 
 object AppConst {
 
-    const val AUTHHORIZATION_KEY: String = "Authorization"
+    const val AUTHORIZATION_KEY: String = "Authorization"
     const val USER_ID_KEY: String = "userId"
     const val USER_FCM_TOKEN: String = "fcmToken"
     const val DEVICE_TYPE_KEY: String = "device_type"
