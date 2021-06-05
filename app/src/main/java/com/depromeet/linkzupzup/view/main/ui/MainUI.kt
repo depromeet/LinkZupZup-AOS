@@ -1,6 +1,7 @@
 package com.depromeet.linkzupzup.view.main.ui
 
 import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -43,13 +44,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.depromeet.linkzupzup.R
-import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
-import com.depromeet.linkzupzup.architecture.presenterLayer.model.*
-import com.depromeet.linkzupzup.extensions.mutableStateValue
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData.Companion.converter
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkHashData
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.TagColor
+import com.depromeet.linkzupzup.base.BaseView
+import com.depromeet.linkzupzup.extensions.itemsWithHeaderIndexed
 import com.depromeet.linkzupzup.extensions.noRippleClickable
+import com.depromeet.linkzupzup.extensions.toast
 import com.depromeet.linkzupzup.ui.theme.*
-import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
 import com.google.accompanist.glide.rememberGlidePainter
 import kotlinx.coroutines.CoroutineScope
@@ -57,6 +61,7 @@ import kotlinx.coroutines.launch
 
 class MainUI: BaseView<MainViewModel>() {
 
+    @ExperimentalFoundationApi
     @ExperimentalMaterialApi
     @Composable
     override fun onCreateViewContent() {
@@ -65,39 +70,23 @@ class MainUI: BaseView<MainViewModel>() {
 
                 Column(modifier = Modifier.fillMaxWidth()) {
 
-                    val mainContentList = arrayListOf<MainContentData<*>>().apply{
-                            add(MainContentData<Any>(MainContentData.MAIN_TOP_HEADER))  // 상단 영역
+                    vm?.run {
+                        val list by linkList.observeAsState(arrayListOf())
+                        MainBodyUI(linkList = list.converter(), vm = this)
                     }
 
-                    // 링크 스크랩 리스트
-                    vm?.linkAlarmResponse?.observeAsState().let{
-                        DLog.e("TEST","MainUI linkAlarmResponse observing")
-                        it?.value?.data?.content?.map { linkData->
-                            MainContentData(MainContentData.MAIN_LINK_ITEM,LinkData(linkData))
-                        }?.let { item ->
-                            mainContentList.addAll(item)
-                        }
-                    }
-
-                    vm?.let{ viewModel -> MainBodyUI(contentDataList = mainContentList, vm = viewModel) }
                 }
             }
         }
     }
-
 }
 
+@ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Preview
 @Composable
 fun MainPreview() {
-    val mainContentList : ArrayList<MainContentData<*>> = arrayListOf<MainContentData<*>>().apply {
-        // 상단 영역
-        add(MainContentData<Any>(MainContentData.MAIN_TOP_HEADER))
-        // 스크랩 링크 리스트
-        addAll(MainContentData.mockMainContentList(5))
-    }
-    MainBodyUI(mainContentList)
+    MainBodyUI(linkList = LinkData.mockLinkList())
 }
 
 @ExperimentalMaterialApi
@@ -112,15 +101,16 @@ fun BottomSheetPreview() {
 }
 
 /* MainUI */
+@ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun MainBodyUI(contentDataList : ArrayList<MainContentData<*>>, vm : MainViewModel? = null){
+fun MainBodyUI(linkList: ArrayList<LinkData> = arrayListOf(), vm : MainViewModel? = null){
+
     // 로그인 성공
     val coroutineScope = rememberCoroutineScope()
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
     )
-
 
     BottomSheetScaffold(
         topBar = { MainAppBar() },
@@ -156,22 +146,13 @@ fun MainBodyUI(contentDataList : ArrayList<MainContentData<*>>, vm : MainViewMod
                         }
                     }) {
 
-                items(contentDataList) {contentData ->
-                    when(contentData.type){
-
-                        // 상단 영역 ( 환영 문구 + 스크랩 링크 읽은 횟수 )
-                        MainContentData.MAIN_TOP_HEADER -> {
-                            MainHeaderCard(name = "김나경")
-                        }
-
-                        // 스크랩한 링크 아이템
-                        MainContentData.MAIN_LINK_ITEM -> (contentData.data as? LinkData)?.let{ linkData ->
-                            MainLinkCard(linkData = linkData, vm)
-                        }
-
-                        else -> DLog.e("TEST","empty")
-                    }
+                itemsWithHeaderIndexed (
+                    items = linkList,
+                    useHeader = true,
+                    headerContent = { MainHeaderCard(name = "김나경") }) { idx, linkItem ->
+                    MainLinkCard(index = idx, linkData = linkItem, vm)
                 }
+
             }
 
             Button(shape = RoundedCornerShape(4.dp),
@@ -182,7 +163,8 @@ fun MainBodyUI(contentDataList : ArrayList<MainContentData<*>>, vm : MainViewMod
                 onClick = {
                     coroutineScope.launch {
                         bottomSheetScaffoldState.bottomSheetState.expand()
-                    } }) {
+                    }
+                }) {
 
                 Text("링크 줍기",
                     textAlign = TextAlign.Center,
@@ -321,24 +303,26 @@ fun ReadProgress(readCnt: Int, padding: PaddingValues = PaddingValues(0.dp)){
 }
 
 @Composable
-fun MainLinkCard(linkData: LinkData, viewModel: MainViewModel? = null){
+fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = null){
 
     val ctx = LocalContext.current
     val tagList : ArrayList<LinkHashData> = linkData.hashtags
-    val item = remember { mutableStateOf(linkData) }
-    if(!linkData.isMetaSet()) {
-        viewModel?.getMetadata(linkData.linkURL) { metaData ->
-            item.value.setMetaInfo(metaData)    // 의심 구간 2. UI 갱신이 안될 경우 초기화 필요
-            item.value = item.value
-        }
+    val metaTitle = remember { mutableStateOf(linkData.linkTitle)}
+    val metaImgUrl = remember { mutableStateOf(linkData.imgURL)}
+
+    // meta data가 없으면 비동기로 호출하여 업데이트합니다.
+    viewModel?.loadMetadata(index, linkData) {
+        /**
+         * UI 갱신이 되지 않아, 비동기 콜백으로 데이터를 교체하여 갱신하였습니다.
+         */
+        metaTitle.value = it.title
+        metaImgUrl.value = it.imgUrl
     }
 
     Card(elevation = 0.dp,
         shape = RoundedCornerShape(0),
         backgroundColor = Color.Transparent,
-        modifier = Modifier.noRippleClickable {
-            Toast.makeText(ctx, "스크랩 링크 클릭", Toast.LENGTH_SHORT).show()
-        }) {
+        modifier = Modifier.noRippleClickable { toast(ctx, "스크랩 링크 클릭") }) {
 
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -346,7 +330,7 @@ fun MainLinkCard(linkData: LinkData, viewModel: MainViewModel? = null){
             .height(96.dp)) {
 
             // 링크 썸네일 이미지
-            Image(painter =  rememberGlidePainter(request = item.value.imgURL),
+            Image(painter =  rememberGlidePainter (request = metaImgUrl.value, fadeIn = true),
                 contentDescription = null,
                 modifier = Modifier.size(96.dp),
                 contentScale = ContentScale.Crop,
@@ -367,7 +351,7 @@ fun MainLinkCard(linkData: LinkData, viewModel: MainViewModel? = null){
                 Spacer(Modifier.height(8.dp))
 
                 // 링크 타이틀
-                Text(text=item.value.linkTitle,
+                Text(text= metaTitle.value,
                     modifier = Modifier
                         .fillMaxSize()
                         .weight(1f),

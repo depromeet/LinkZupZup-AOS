@@ -11,4 +11,8 @@ class ResponseArrayEntity<T> (
     override var comment: String = "",
 
     @SerializedName("data")
-    var data: ArrayList<T> = arrayListOf()): DefaultResponseEntity
+    var data: ArrayList<T> = arrayListOf()): DefaultResponseEntity {
+
+    fun getStatus(): Int = status.toInt()
+
+}

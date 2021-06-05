@@ -1,6 +1,7 @@
 package com.depromeet.linkzupzup.architecture.presenterLayer.model
 
 data class WeeklyAlarm (
+    var alarmId: Int = -1,
     var dateTime: String = "",
     var isWeekday: Int = 0, // 0: 주중, 1: 주말, 3: 매일
     var isHolidayUse: Int = 0,
