@@ -21,9 +21,6 @@ class IntroActivity : BaseActivity<IntroUI, IntroViewModel>()  {
 
         getFCMToken()
 
-        pref.setAuthorization("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJpc3N1ZXJKd3QiLCJJRCI6OX0.fgAp3wj6gGVx_rIgGUWKAVDnbodj4LiVtO2LEBRLH2c")
-        pref.setUserId(9)
-
         movePageDelay(OnBoardingActivity::class.java, 2000, true)
 
     }
