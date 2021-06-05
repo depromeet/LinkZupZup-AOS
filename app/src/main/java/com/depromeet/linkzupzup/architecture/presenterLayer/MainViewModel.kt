@@ -6,10 +6,13 @@ import androidx.lifecycle.viewModelScope
 import com.depromeet.linkzupzup.ParamsInfo
 import com.depromeet.linkzupzup.architecture.domainLayer.LinkUseCases
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmRegistEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmDataEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData.Companion.converter
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkHashData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.User
 import com.depromeet.linkzupzup.base.BaseViewModel
@@ -33,8 +36,8 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
 
     private var _linkAlarmResponse: MutableLiveData<ResponseEntity<LinkAlarmDataEntity>> = MutableLiveData()
     val linkAlarmResponse: LiveData<ResponseEntity<LinkAlarmDataEntity>> = _linkAlarmResponse
-    private var _linkList: MutableLiveData<ArrayList<LinkAlarmEntity>> = MutableLiveData(arrayListOf())
-    val linkList: LiveData<ArrayList<LinkAlarmEntity>> = _linkList
+    private var _linkList: MutableLiveData<ArrayList<LinkData>> = MutableLiveData(arrayListOf())
+    val linkList: LiveData<ArrayList<LinkData>> = _linkList
 
     /**
      * 사용자가 저장한 링크 리스트 조회
@@ -58,7 +61,7 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
                         listObs.observeOn(AndroidSchedulers.mainThread())
                             .subscribeOn(Schedulers.io())
                             .subscribe { list ->
-                            _linkList.postValue(list)
+                            _linkList.postValue(list.converter())
                         }
 
                     }
@@ -114,13 +117,9 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
             .subscribe { metaData ->
                 _linkList.value = _linkList.value?.apply {
                     get(index).let {
-                        it.metaTitle = metaData.title
-                        it.metaDescription = metaData.content
-                        it.metaImageUrl = metaData.imgUrl
-                    }
-                }?.also { list ->
-                    _linkAlarmResponse.value = _linkAlarmResponse.value?.apply {
-                        data?.content = list
+                        it.linkTitle = metaData.title
+                        it.description = metaData.content
+                        it.imgURL = metaData.imgUrl
                     }
                 }
                 callback(metaData)
@@ -155,6 +154,21 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
                 viewModelScope.launch(Dispatchers.IO) { linkUseCases.insertMetaInfo(metaData) }
             }
         }
+    }
+
+    /**
+     * 링크 저장
+     */
+    fun registerLink(linkInfo: LinkRegisterEntity, callback: ((ResponseEntity<AlarmRegistEntity>)->Unit)? = null) {
+        progressStatus(true)
+        addDisposable(linkUseCases.registerLink(linkInfo)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+
+
+                progressStatus(false)
+            }, this@MainViewModel::defaultThrowable))
     }
 
 }
