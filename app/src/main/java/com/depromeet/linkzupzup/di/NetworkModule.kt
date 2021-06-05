@@ -72,7 +72,7 @@ val networkModule = module {
             val pref: PreferencesManager = get()
             val newRequest = chain.request().newBuilder().apply {
                 header(AUTHHORIZATION_KEY, pref.getAuthorization())
-                header(USER_ID_KEY, pref.getUserId())
+                header(USER_ID_KEY, pref.getUserId().toString())
             }.build()
 
             chain.proceed(newRequest).also { response ->

@@ -1,6 +1,5 @@
 package com.depromeet.linkzupzup.view.intro
 
-import android.content.Intent
 import android.os.Bundle
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.architecture.presenterLayer.IntroViewModel
@@ -9,9 +8,7 @@ import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.intro.ui.IntroUI
 import com.depromeet.linkzupzup.view.onBoarding.OnBoardingActivity
 import com.google.firebase.messaging.FirebaseMessaging
-import io.reactivex.Observable
 import org.koin.androidx.viewmodel.ext.android.getViewModel
-import java.util.concurrent.TimeUnit
 
 class IntroActivity : BaseActivity<IntroUI, IntroViewModel>()  {
 
@@ -24,8 +21,8 @@ class IntroActivity : BaseActivity<IntroUI, IntroViewModel>()  {
 
         getFCMToken()
 
-        Observable.timer(2, TimeUnit.SECONDS)
-            .subscribe(this::nextPage)
+        movePageDelay(OnBoardingActivity::class.java, 2000, true)
+
     }
 
     private fun getFCMToken(){
@@ -40,14 +37,6 @@ class IntroActivity : BaseActivity<IntroUI, IntroViewModel>()  {
         }
     }
 
-    private fun nextPage(time: Long) {
-        Intent(this,OnBoardingActivity::class.java)
-            .let(this::startActivity)
-        finish()
-    }
-
-    override fun onBackPressed() {
-        // super.onBackPressed()
-    }
+    override fun onBackPressed() { /* super.onBackPressed() */ }
 
 }

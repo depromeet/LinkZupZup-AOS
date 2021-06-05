@@ -28,10 +28,10 @@ object ApiUrl {
 
     /**
      * Members
+     * 첫 호출은 회원가입되고 (token은 공백, userId는 상수 ( 0) ),
+     * 응답으로 내려오는 token과 userId를 body에 포함하여 재호출시 로그인
      */
     const val MEMBERS_SIGN_IN = "$BASE_URL/$MEMBERS/login"
-
-    const val MEMBERS_SIGN_UP = "$BASE_URL/$MEMBERS/register"
 
     /**
      * Ranking

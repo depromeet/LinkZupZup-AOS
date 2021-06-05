@@ -1,5 +1,6 @@
 package com.depromeet.linkzupzup.base
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -13,8 +14,10 @@ import com.depromeet.linkzupzup.component.BackPressCloseHandler
 import com.depromeet.linkzupzup.component.NetworkProgressDialog
 import com.depromeet.linkzupzup.component.PreferencesManager
 import com.depromeet.linkzupzup.utils.DLog
+import io.reactivex.Observable
 import org.koin.android.ext.android.inject
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 abstract class BaseActivity<VIEW: BaseView<VIEWMODEL>, VIEWMODEL: BaseViewModel>: ComponentActivity() {
 
@@ -57,6 +60,17 @@ abstract class BaseActivity<VIEW: BaseView<VIEWMODEL>, VIEWMODEL: BaseViewModel>
 
         mProgressView = NetworkProgressDialog.getInstance(this@BaseActivity)
         backPressHandler = BackPressCloseHandler(this@BaseActivity)
+    }
+
+    fun isLogin(): Boolean = pref.isLogin()
+
+    fun movePageDelay(cls: Class<*>, time: Long = 500L, isFinish: Boolean = false) {
+        Observable.timer(time, TimeUnit.MILLISECONDS)
+            .subscribe { movePage(cls, isFinish) }
+    }
+    fun movePage(cls: Class<*>, isFinish: Boolean = false) {
+        Intent(this@BaseActivity, cls).let(this::startActivity)
+        if (isFinish) finish()
     }
 
     fun onVisibleProgress() {
