@@ -72,7 +72,7 @@ class MainUI: BaseView<MainViewModel>() {
 
                     vm?.run {
                         val list by linkList.observeAsState(arrayListOf())
-                        MainBodyUI(linkList = list.converter(), vm = this)
+                        MainBodyUI(links = list.converter(), vm = this)
                     }
 
                 }
@@ -86,7 +86,7 @@ class MainUI: BaseView<MainViewModel>() {
 @Preview
 @Composable
 fun MainPreview() {
-    MainBodyUI(linkList = LinkData.mockLinkList())
+    MainBodyUI(links = LinkData.mockLinkList())
 }
 
 @ExperimentalMaterialApi
@@ -104,7 +104,8 @@ fun BottomSheetPreview() {
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun MainBodyUI(linkList: ArrayList<LinkData> = arrayListOf(), vm : MainViewModel? = null){
+fun MainBodyUI(links: ArrayList<LinkData> = arrayListOf(), vm : MainViewModel? = null){
+    val linkList = remember { mutableStateOf(links) }
 
     // 로그인 성공
     val coroutineScope = rememberCoroutineScope()
@@ -128,26 +129,30 @@ fun MainBodyUI(linkList: ArrayList<LinkData> = arrayListOf(), vm : MainViewModel
             .background(color = Color.Transparent)
             .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
 
+            val columnModifier = if (linkList.value.size > 0) Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(bottom = 16.dp)
+                .drawWithCache {
+                    val gradient = Brush.linearGradient(
+                        colors = listOf(Color.Transparent, Gray10),
+                        start = Offset(0f, size.height - 100.dp.toPx()),
+                        end = Offset(0f, size.height)
+                    )
+                    onDrawWithContent {
+                        drawContent()
+                        drawRect(gradient)
+                    }
+                }
+            else Modifier.fillMaxWidth()
+
+
             // 메인 리스트
             LazyColumn(verticalArrangement = Arrangement.spacedBy(24.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(bottom = 16.dp)
-                    .drawWithCache {
-                        val gradient = Brush.linearGradient(
-                            colors = listOf(Color.Transparent, Gray10),
-                            start = Offset(0f, size.height - 100.dp.toPx()),
-                            end = Offset(0f, size.height)
-                        )
-                        onDrawWithContent {
-                            drawContent()
-                            drawRect(gradient)
-                        }
-                    }) {
+                modifier = columnModifier) {
 
                 itemsWithHeaderIndexed (
-                    items = linkList,
+                    items = linkList.value,
                     useHeader = true,
                     headerContent = { MainHeaderCard(name = "김나경") }) { idx, linkItem ->
 
@@ -155,7 +160,7 @@ fun MainBodyUI(linkList: ArrayList<LinkData> = arrayListOf(), vm : MainViewModel
                 }
             }
 
-            if(linkList.size==0){ EmptyLinkGuideCard(
+            if(linkList.value.size==0){ EmptyLinkGuideCard(
                 Modifier
                     .fillMaxWidth()
                     .weight(1f)) }
