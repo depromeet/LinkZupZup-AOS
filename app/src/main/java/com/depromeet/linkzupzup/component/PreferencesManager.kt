@@ -3,7 +3,7 @@ package com.depromeet.linkzupzup.component
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
-import com.depromeet.linkzupzup.AppConst.AUTHHORIZATION_KEY
+import com.depromeet.linkzupzup.AppConst.AUTHORIZATION_KEY
 import com.depromeet.linkzupzup.AppConst.USER_FCM_TOKEN
 import com.depromeet.linkzupzup.AppConst.USER_ID_KEY
 
@@ -12,9 +12,9 @@ class PreferencesManager(ctx: Context, name: String = "pref") {
     private val pref : SharedPreferences = ctx.getSharedPreferences(name, Activity.MODE_PRIVATE)
     private val saver : SharedPreferences.Editor = pref.edit()
 
-    fun getAuthorization(): String = pref.getString(AUTHHORIZATION_KEY, "") ?: ""
+    fun getAuthorization(): String = pref.getString(AUTHORIZATION_KEY, "") ?: ""
     fun setAuthorization(token: String) {
-        saver.putString(AUTHHORIZATION_KEY, token)
+        saver.putString(AUTHORIZATION_KEY, token)
         saver.commit()
     }
 
