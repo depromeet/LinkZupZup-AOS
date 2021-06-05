@@ -28,7 +28,8 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
     }
 
     val userInfo: MutableLiveData<User?> = MutableLiveData()
-    val selectTagList: MutableLiveData<ArrayList<LinkHashData>> = MutableLiveData(arrayListOf())
+    private var _selectTagList: MutableLiveData<ArrayList<LinkHashData>> = MutableLiveData(arrayListOf())
+    val selectTagList: LiveData<ArrayList<LinkHashData>> = _selectTagList
 
     private var _linkAlarmResponse: MutableLiveData<ResponseEntity<LinkAlarmDataEntity>> = MutableLiveData()
     val linkAlarmResponse: LiveData<ResponseEntity<LinkAlarmDataEntity>> = _linkAlarmResponse
@@ -129,27 +130,19 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
 
 
     fun insertSelectedTag(tag: LinkHashData){
-        viewModelScope.launch {
-            selectTagList.value?.apply {
-                if(this.size < Companion.MAX_HASH_TAG_SELECT && !this.contains(tag)){
-                    this.add(tag)
-
-                }
+        _selectTagList.value = selectTagList.value?.apply {
+            if(this.size < MAX_HASH_TAG_SELECT && !this.contains(tag)){
+                this.add(tag)
             }
-            selectTagList.postValue(selectTagList.value)
         }
     }
 
     fun removeSelectedTag(tag: LinkHashData){
-        viewModelScope.launch {
-            selectTagList.value?.apply {
-                if(this.contains(tag)){
-                    this.remove(tag)
-                }
+        _selectTagList.value = selectTagList.value?.apply {
+            if(this.contains(tag)){
+                this.remove(tag)
             }
-            selectTagList.postValue(selectTagList.value)
         }
-
     }
 
 
