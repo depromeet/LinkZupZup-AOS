@@ -89,6 +89,7 @@ val networkModule = module {
                             StatusConst.ACCESS_TOKEN_EXPIRED_STATUS -> androidApplication().let { ctx ->
                                 Intent(ctx, LoginActivity::class.java).apply {
                                 }.let(ctx::startActivity)
+                                // TODO: current activity를 참조하여 finish를 호출해야될것 같습니다.
                             }
                             else -> DLog.e("STATUS", it.status)
                         }
