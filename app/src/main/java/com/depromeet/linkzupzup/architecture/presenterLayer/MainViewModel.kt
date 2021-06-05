@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import com.depromeet.linkzupzup.ParamsInfo
 import com.depromeet.linkzupzup.base.BaseViewModel
 import com.depromeet.linkzupzup.component.MetaDataManager.extractUrlFormText
@@ -27,7 +28,7 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
 
     companion object {
         val TAG = MainViewModel::class.java.simpleName
-        val MAX_HASH_TAG_SELECT = 3
+        const val MAX_HASH_TAG_SELECT = 3
     }
 
     val userInfo: MutableLiveData<User?> = MutableLiveData()
@@ -89,9 +90,9 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
     }
 
 
-    fun getMetadata(url : String, callback: (LinkMetaInfoEntity) -> Unit){
+    fun getMetadata(url : String, callback: (LinkMetaInfoEntity) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            extractUrlFormText(url)?.let{ rightUrl ->
+            extractUrlFormText(url)?.let { rightUrl ->
                 getMetaDataFromUrl(rightUrl).let { metaData ->
                     linkUseCases.insertMetaInfo(metaData)
                     callback(metaData)
@@ -101,19 +102,27 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
     }
 
     fun insertSelectedTag(tag: LinkHashData){
-        selectTagList.value?.apply {
-            if(this.size < MAX_HASH_TAG_SELECT && !this.contains(tag)){
-                this.add(tag)
+        viewModelScope.launch {
+            selectTagList.value?.apply {
+                if(this.size < Companion.MAX_HASH_TAG_SELECT && !this.contains(tag)){
+                    this.add(tag)
+
+                }
             }
+            selectTagList.postValue(selectTagList.value)
         }
     }
 
     fun removeSelectedTag(tag: LinkHashData){
-        selectTagList.value?.apply {
-            if(this.contains(tag)){
-                this.remove(tag)
+        viewModelScope.launch {
+            selectTagList.value?.apply {
+                if(this.contains(tag)){
+                    this.remove(tag)
+                }
             }
+            selectTagList.postValue(selectTagList.value)
         }
+
     }
 
 }

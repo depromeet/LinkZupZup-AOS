@@ -542,9 +542,8 @@ fun BottomHeaderCard(padding: PaddingValues = PaddingValues(0.dp)){
 
 @Composable
 fun BottomSheetSelect(vm: MainViewModel? = null){
-
-    val cnt = vm?.selectTagList?.observeAsState()?.value?.size
     val size = 3
+    val cnt = vm?.selectTagList?.observeAsState()?.value?.size
 
     val tc1 : List<LinkHashData> = listOf(
         LinkHashData(0,"디자인","",TagColor(TagBgColor01, TagTextColor01)),
@@ -706,7 +705,9 @@ fun BottomSheetHashtagCard(tag: LinkHashData, isSelected : Boolean = false, onCl
 @Composable
 fun BottomSheetSelectedTagList(modifier: Modifier = Modifier.fillMaxWidth(), vm: MainViewModel? = null){
 
-    vm?.selectTagList?.observeAsState()?.value?.let {
+    val tagList = vm?.selectTagList?.observeAsState()
+
+    tagList?.value?.let {
         LazyRow(modifier = modifier,
             horizontalArrangement = Arrangement.spacedBy(10.dp)){
             items(it){ tag->
