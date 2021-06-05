@@ -526,9 +526,8 @@ fun BottomHeaderCard(padding: PaddingValues = PaddingValues(0.dp)){
 
 @Composable
 fun BottomSheetSelect(vm: MainViewModel? = null){
-
-    val cnt = 0
     val size = 3
+    val cnt = vm?.selectTagList?.observeAsState()?.value?.size
 
     val tc1 : List<LinkHashData> = listOf(
         LinkHashData(0,"디자인","",TagColor(TagBgColor01, TagTextColor01)),
@@ -572,7 +571,9 @@ fun BottomSheetSelect(vm: MainViewModel? = null){
     LazyRow(modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(10.dp)){
         items(tc1) { tag ->
-            BottomSheetHashtagCard(vm, tag)
+            BottomSheetHashtagCard(tag){
+                vm?.insertSelectedTag(tag)
+            }
         }
     }
 
@@ -581,7 +582,9 @@ fun BottomSheetSelect(vm: MainViewModel? = null){
     LazyRow(modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(10.dp)){
         items(tc2) { tag ->
-            BottomSheetHashtagCard(vm, tag)
+            BottomSheetHashtagCard(tag){
+                vm?.insertSelectedTag(tag)
+            }
         }
     }
 }
@@ -649,18 +652,13 @@ fun BottomSheetInputTag(){
 }
 
 @Composable
-fun BottomSheetHashtagCard(vm: MainViewModel? = null, tag: LinkHashData, isSelected : Boolean = false){
+fun BottomSheetHashtagCard(tag: LinkHashData, isSelected : Boolean = false, onClick: () -> Unit){
     Card(
+        elevation = 0.dp,
+        backgroundColor = tag.tagColor.bgColor,
         modifier = Modifier
             .height(32.dp)
-            .noRippleClickable {
-                vm?.run {
-                    if (isSelected) removeHashtag(tag)
-                    else addHashtag(tag)
-                }
-            },
-        elevation = 0.dp,
-        backgroundColor = tag.tagColor.bgColor){
+            .noRippleClickable { onClick() }){
 
         Box(contentAlignment = Alignment.Center){
 
@@ -690,22 +688,20 @@ fun BottomSheetHashtagCard(vm: MainViewModel? = null, tag: LinkHashData, isSelec
 
 @Composable
 fun BottomSheetSelectedTagList(modifier: Modifier = Modifier.fillMaxWidth(), vm: MainViewModel? = null){
-    var selectedTag: List<LinkHashData> = listOf()
-    vm?.run {
-        liveSelectedTagList.observe(lifecycleOwner!!){tag ->
-            selectedTag = tag
+
+    val tagList = vm?.selectTagList?.observeAsState()
+
+    tagList?.value?.let {
+        LazyRow(modifier = modifier,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)){
+            items(it){ tag->
+                BottomSheetHashtagCard(tag, isSelected = true){
+                    vm.removeSelectedTag(tag)
+                }
+            }
         }
     }
 
-
-
-    LazyRow(modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)){
-        items(selectedTag){ tag->
-            BottomSheetHashtagCard(vm, tag, isSelected = true)
-        }
-    }
-    
     Spacer(modifier = Modifier.height(20.dp))
 }
 
