@@ -150,10 +150,15 @@ fun MainBodyUI(linkList: ArrayList<LinkData> = arrayListOf(), vm : MainViewModel
                     items = linkList,
                     useHeader = true,
                     headerContent = { MainHeaderCard(name = "김나경") }) { idx, linkItem ->
+
                     MainLinkCard(index = idx, linkData = linkItem, vm)
                 }
-
             }
+
+            if(linkList.size==0){ EmptyLinkGuideCard(
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1f)) }
 
             Button(shape = RoundedCornerShape(4.dp),
                 colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Blue50, contentColor = Color.White),
@@ -689,20 +694,51 @@ fun BottomSheetHashtagCard(tag: LinkHashData, isSelected : Boolean = false, onCl
 @Composable
 fun BottomSheetSelectedTagList(modifier: Modifier = Modifier.fillMaxWidth(), vm: MainViewModel? = null){
 
-    val tagList = vm?.selectTagList?.observeAsState()
+    vm?.run {
+        val tagList by selectTagList.observeAsState(arrayListOf())
 
-    tagList?.value?.let {
+
         LazyRow(modifier = modifier,
             horizontalArrangement = Arrangement.spacedBy(10.dp)){
-            items(it){ tag->
-                BottomSheetHashtagCard(tag, isSelected = true){
-                    vm.removeSelectedTag(tag)
+                items(tagList){ tag->
+                    BottomSheetHashtagCard(tag, isSelected = true){
+                        vm.removeSelectedTag(tag)
+                    }
                 }
-            }
         }
     }
 
     Spacer(modifier = Modifier.height(20.dp))
+}
+
+@Composable
+fun EmptyLinkGuideCard(modifier: Modifier = Modifier) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(bottom = 24.dp)
+            .background(Color.Transparent)) {
+
+        // 도넛 이미지
+        Column(horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)) {
+
+            Image(painter = painterResource(id = R.drawable.ic_donut05),
+                contentDescription = null,
+                modifier = Modifier.size(168.dp, 124.dp))
+        }
+
+        Text("링크를 저장하고 읽으면 포인트가 부여됩니다.\n아래 링크줍기 버튼을 눌러 링크를 저장해보세요!\n\n\uD83D\uDC47\uD83D\uDC47\uD83D\uDC47 ",
+            style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp),
+            textAlign = TextAlign.Center,
+            color = Blue50)
+
+
+    }
 }
 
 /**
