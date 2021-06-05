@@ -1,6 +1,5 @@
 package com.depromeet.linkzupzup.view.main.ui
 
-import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -43,7 +42,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.LiveData
 import com.depromeet.linkzupzup.R
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData.Companion.converter
@@ -54,6 +55,8 @@ import com.depromeet.linkzupzup.extensions.itemsWithHeaderIndexed
 import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.extensions.toast
 import com.depromeet.linkzupzup.ui.theme.*
+import com.depromeet.linkzupzup.utils.CommonUtil
+import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
 import com.google.accompanist.glide.rememberGlidePainter
 import kotlinx.coroutines.CoroutineScope
@@ -72,7 +75,7 @@ class MainUI(var clickListener: (id: Int) -> Unit = {}): BaseView<MainViewModel>
 
                     vm?.run {
                         val list by linkList.observeAsState(arrayListOf())
-                        MainBodyUI(links = list.converter(), vm = this, clickListener = clickListener)
+                        MainBodyUI(links = list, vm = this, clickListener = clickListener)
                     }
 
                 }
@@ -94,10 +97,8 @@ fun MainPreview() {
 @Composable
 fun BottomSheetPreview() {
     val coroutineScope = rememberCoroutineScope()
-    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
-    )
-    BottomSheet(bottomSheetScaffoldState,coroutineScope)
+    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    BottomSheet(sheetState,coroutineScope)
 }
 
 /* MainUI */
@@ -109,84 +110,82 @@ fun MainBodyUI(links: ArrayList<LinkData> = arrayListOf(), vm : MainViewModel? =
 
     // 로그인 성공
     val coroutineScope = rememberCoroutineScope()
-    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
-    )
+    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
-    BottomSheetScaffold(
-        topBar = { MainAppBar(clickListener = clickListener) },
-        scaffoldState = bottomSheetScaffoldState,
-        sheetContent = { BottomSheet(bottomSheetScaffoldState,coroutineScope,vm) },   // sheetContent -  Column scope
-        sheetShape = RoundedCornerShape(topStartPercent = 5,topEndPercent = 5),
-        sheetPeekHeight = 0.dp,
-        sheetBackgroundColor = Gray0t,
-        sheetGesturesEnabled = false,
-        backgroundColor = Color.Transparent,
-        modifier = Modifier.fillMaxSize()){
+    ModalBottomSheetLayout(sheetState = sheetState,
+        sheetShape = BottomSheetShape,
+        sheetContent = { BottomSheet(sheetState,coroutineScope,vm) },
+        modifier = Modifier.fillMaxSize()) {
 
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color.Transparent)
-            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+        Scaffold(topBar = { MainAppBar(clickListener = clickListener) },
+            backgroundColor = Color.Transparent,
+            modifier = Modifier.fillMaxSize()) {
 
-            val columnModifier = if (linkList.value.size > 0) Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .padding(bottom = 16.dp)
-                .drawWithCache {
-                    val gradient = Brush.linearGradient(
-                        colors = listOf(Color.Transparent, Gray10),
-                        start = Offset(0f, size.height - 100.dp.toPx()),
-                        end = Offset(0f, size.height)
-                    )
-                    onDrawWithContent {
-                        drawContent()
-                        drawRect(gradient)
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .background(color = Color.Transparent)
+                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+
+                val columnModifier = if (linkList.value.size > 0) Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(bottom = 16.dp)
+                    .drawWithCache {
+                        val gradient = Brush.linearGradient(
+                            colors = listOf(Color.Transparent, Gray10),
+                            start = Offset(0f, size.height - 100.dp.toPx()),
+                            end = Offset(0f, size.height)
+                        )
+                        onDrawWithContent {
+                            drawContent()
+                            drawRect(gradient)
+                        }
+                    }
+                else Modifier.fillMaxWidth()
+
+
+                // 메인 리스트
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(24.dp),
+                    modifier = columnModifier) {
+
+                    itemsWithHeaderIndexed (
+                        items = linkList.value,
+                        useHeader = true,
+                        headerContent = { MainHeaderCard(name = "김나경") }) { idx, linkItem ->
+
+                        MainLinkCard(index = idx, linkData = linkItem, vm)
                     }
                 }
-            else Modifier.fillMaxWidth()
 
+                if(linkList.value.size==0){ EmptyLinkGuideCard(
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f)) }
 
-            // 메인 리스트
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(24.dp),
-                modifier = columnModifier) {
+                Button(shape = RoundedCornerShape(4.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Blue50, contentColor = Color.White),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    onClick = {
+                        coroutineScope.launch {
+                            DLog.e("TEST","링크 줍기 클릭")
+                            sheetState.show()
+                        }
+                    }) {
 
-                itemsWithHeaderIndexed (
-                    items = linkList.value,
-                    useHeader = true,
-                    headerContent = { MainHeaderCard(name = "김나경") }) { idx, linkItem ->
-
-                    MainLinkCard(index = idx, linkData = linkItem, vm)
+                    Text("링크 줍기",
+                        textAlign = TextAlign.Center,
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            lineHeight = 17.5.sp,
+                            fontFamily = FontFamily(Font(
+                                resId = R.font.spoqa_hansansneo_bold,
+                                weight = FontWeight.W700))))
                 }
             }
 
-            if(linkList.value.size==0){ EmptyLinkGuideCard(
-                Modifier
-                    .fillMaxWidth()
-                    .weight(1f)) }
-
-            Button(shape = RoundedCornerShape(4.dp),
-                colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Blue50, contentColor = Color.White),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                onClick = {
-                    coroutineScope.launch {
-                        bottomSheetScaffoldState.bottomSheetState.expand()
-                    }
-                }) {
-
-                Text("링크 줍기",
-                    textAlign = TextAlign.Center,
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        lineHeight = 17.5.sp,
-                        fontFamily = FontFamily(Font(
-                            resId = R.font.spoqa_hansansneo_bold,
-                            weight = FontWeight.W700))))
-            }
         }
-
     }
 }
 
@@ -417,11 +416,12 @@ fun MainHashtagCard(tagName : String, backColor : Color, textColor : Color){
 /* BottomSheet */
 @ExperimentalMaterialApi
 @Composable
-fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineScope : CoroutineScope, vm : MainViewModel? = null){
+fun BottomSheet(sheetState : ModalBottomSheetState, coroutineScope : CoroutineScope, vm : MainViewModel? = null){
 
     val saveBtnColor = remember { mutableStateOf(Gray50t) }
     val saveTxtColor = remember { mutableStateOf(Gray70) }
     val linkUrl = remember { mutableStateOf("") }
+    val liveCnt = vm?.selectTagList?.value
 
     // in Column Scope
     Column(modifier = Modifier
@@ -438,7 +438,8 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
 
             BottomSheetCloseBtn(painterResource(id = R.drawable.ic_close)){
                 coroutineScope.launch {
-                    bottomSheetScaffoldState.bottomSheetState.collapse() }
+                    sheetState.hide()
+                }
             }
         }
 
@@ -471,19 +472,25 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
             Spacer(Modifier.height(20.dp))
 
             /* 해시태그 선택 */
-            BottomSheetSelect(vm)
+            BottomSheetSelect(liveCnt?.size){
+                vm?.insertSelectedTag(it)
+            }
 
             Spacer(Modifier.height(24.dp))
 
             /* 커스텀 태그 입력 화면 */
-            BottomSheetInputTag()
+            BottomSheetInputTag{ tagName ->
+                vm?.insertSelectedTag(LinkHashData(0,tagName,"", CommonUtil.getRandomeTagColor()))
+            }
         }
 
         /* 클릭된 해시태그 보여주는 열 */
         BottomSheetSelectedTagList(vm = vm,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp))
+                .padding(horizontal = 24.dp)){
+            vm?.removeSelectedTag(it)
+        }
 
         /* 하단 저장하기 버튼 */
         Button(shape = RoundedCornerShape(4.dp),
@@ -493,9 +500,20 @@ fun BottomSheet(bottomSheetScaffoldState : BottomSheetScaffoldState,coroutineSco
                 .height(52.dp)
                 .padding(start = 24.dp, end = 24.dp),
             onClick = {
-                // Room Link table 저장
-                // vm?.insertLink(LinkData(linkURL = linkUrl.value))
-                // vm?.getMetadata(linkUrl.value)
+                // link register api 호출
+                vm?.let { viewModel ->
+
+                    // 링크 저장 TODO : 추후 LinkRegisterEntity 개선 필요
+                    viewModel.registerLink(LinkRegisterEntity(
+                        linkURL = linkUrl.value,
+                        hashtags = ArrayList(viewModel.selectTagList.value?.map { it.hashtagName }))){
+
+                        coroutineScope.launch {
+                            viewModel.getLinkList()
+                            sheetState.hide()
+                        }
+                    }
+                }
             }) {
 
             Text("저장하기",
@@ -535,9 +553,9 @@ fun BottomHeaderCard(padding: PaddingValues = PaddingValues(0.dp)){
 }
 
 @Composable
-fun BottomSheetSelect(vm: MainViewModel? = null){
+fun BottomSheetSelect(cnt: Int? = 0, onClick: (LinkHashData) -> Unit){
     val size = 3
-    val cnt = vm?.selectTagList?.observeAsState()?.value?.size
+    // val cnt = vm?.selectTagList?.observeAsState()?.value?.size
 
     val tc1 : List<LinkHashData> = listOf(
         LinkHashData(0,"디자인","",TagColor(TagBgColor01, TagTextColor01)),
@@ -582,7 +600,7 @@ fun BottomSheetSelect(vm: MainViewModel? = null){
         horizontalArrangement = Arrangement.spacedBy(10.dp)){
         items(tc1) { tag ->
             BottomSheetHashtagCard(tag){
-                vm?.insertSelectedTag(tag)
+                onClick(tag)
             }
         }
     }
@@ -593,20 +611,21 @@ fun BottomSheetSelect(vm: MainViewModel? = null){
         horizontalArrangement = Arrangement.spacedBy(10.dp)){
         items(tc2) { tag ->
             BottomSheetHashtagCard(tag){
-                vm?.insertSelectedTag(tag)
+                onClick(tag)
             }
         }
     }
 }
 
 @Composable
-fun BottomSheetInputTag(){
+fun BottomSheetInputTag(onClick: (String) -> Unit){
     val beforeClickStr  = "원하시는 해시태그가 없으신가요?"
     val afterClickStr = "원하는 해시태그가 없다면 적어주세요!"
 
     val isVisible = remember { mutableStateOf(false) }
     val clickStr = remember { mutableStateOf(beforeClickStr) }
     val strColor = remember { mutableStateOf(Gray70)}
+    val tagName = remember { mutableStateOf("") }
 
     Column(modifier = Modifier.fillMaxWidth()){
         Text(
@@ -637,13 +656,19 @@ fun BottomSheetInputTag(){
                 CustomTextField(modifier = Modifier
                     .height(40.dp)
                     .weight(1f),
-                    useClearBtn = false,
-                    hintStr = "#")
+                    useClearBtn = true,
+                    hintStr = "#"){
+                    tagName.value = it
+                }
 
                 Card(modifier = Modifier
                     .width(40.dp)
                     .height(40.dp)
-                    .align(Alignment.CenterVertically),
+                    .align(Alignment.CenterVertically)
+                    .noRippleClickable {
+                        onClick(tagName.value)
+                        tagName.value = ""
+                    },
                     shape = RoundedCornerShape(4.dp),
                     backgroundColor = Gray70,
                     elevation = 0.dp){
@@ -697,7 +722,7 @@ fun BottomSheetHashtagCard(tag: LinkHashData, isSelected : Boolean = false, onCl
 }
 
 @Composable
-fun BottomSheetSelectedTagList(modifier: Modifier = Modifier.fillMaxWidth(), vm: MainViewModel? = null){
+fun BottomSheetSelectedTagList(modifier: Modifier = Modifier.fillMaxWidth(), vm: MainViewModel? = null, onClick: (LinkHashData) -> Unit){
 
     vm?.run {
         val tagList by selectTagList.observeAsState(arrayListOf())
@@ -707,7 +732,7 @@ fun BottomSheetSelectedTagList(modifier: Modifier = Modifier.fillMaxWidth(), vm:
             horizontalArrangement = Arrangement.spacedBy(10.dp)){
                 items(tagList){ tag->
                     BottomSheetHashtagCard(tag, isSelected = true){
-                        vm.removeSelectedTag(tag)
+                        onClick(tag)
                     }
                 }
         }
