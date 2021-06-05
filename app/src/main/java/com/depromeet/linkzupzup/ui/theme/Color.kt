@@ -47,3 +47,4 @@ val Blue20 = Color(0xffEAF1FE)
 
 val Blue50Op8 = Color(0x144076F6)
 val BlackOp20 = Color(0x33222222)
+val WhiteOp85 = Color(0xD9ffffff)

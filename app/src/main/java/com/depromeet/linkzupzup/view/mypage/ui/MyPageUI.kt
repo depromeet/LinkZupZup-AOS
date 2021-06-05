@@ -29,8 +29,8 @@ import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.extensions.digitFormat1000
 import com.depromeet.linkzupzup.extensions.noRippleClickable
-import com.depromeet.linkzupzup.presenter.MyPageViewModel
-import com.depromeet.linkzupzup.presenter.model.MyPageData
+import com.depromeet.linkzupzup.architecture.presenterLayer.MyPageViewModel
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.MyPageData
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.view.custom.CustomSwitchCompat
 import com.depromeet.linkzupzup.view.mydonut.MyDonutActivity

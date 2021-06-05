@@ -16,3 +16,7 @@ val BottomSheetShape = RoundedCornerShape(
     bottomEnd = 0.dp,
     bottomStart = 0.dp
 )
+
+// tag
+val Round8RectShape = RoundedCornerShape(8.dp)
+val Round2RectShape = RoundedCornerShape(2.dp)

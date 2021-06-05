@@ -1,17 +1,20 @@
 package com.depromeet.linkzupzup.di
 
+import android.content.Intent
+import com.depromeet.linkzupzup.ApiUrl
+import com.depromeet.linkzupzup.AppConst.AUTHORIZATION_KEY
 import com.depromeet.linkzupzup.AppConst.CONNECTION_TIMEOUT
-import com.depromeet.linkzupzup.AppConst.DEVICE_TOKEN_KEY
-import com.depromeet.linkzupzup.AppConst.DEVICE_TYPE
-import com.depromeet.linkzupzup.AppConst.DEVICE_TYPE_KEY
 import com.depromeet.linkzupzup.AppConst.READ_TIMEOUT
+import com.depromeet.linkzupzup.AppConst.USER_ID_KEY
 import com.depromeet.linkzupzup.AppConst.WRITE_TIMEOUT
 import com.depromeet.linkzupzup.BuildConfig
-
+import com.depromeet.linkzupzup.StatusConst
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.component.PreferencesManager
 import com.depromeet.linkzupzup.extensions.applySSL
-import com.google.gson.GsonBuilder
-import com.depromeet.linkzupzup.ApiUrl
+import com.depromeet.linkzupzup.utils.DLog
+import com.depromeet.linkzupzup.view.login.LoginActivity
+import com.google.gson.Gson
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import okhttp3.Cache
 import okhttp3.Interceptor
@@ -27,7 +30,7 @@ val networkModule = module {
 
     single { Cache(androidApplication().cacheDir, 10L * 1024 * 1024) }
 
-    single { GsonBuilder().create() }
+    // single { GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create() }
 
     single {
         OkHttpClient().newBuilder()
@@ -53,13 +56,46 @@ val networkModule = module {
             .build()
     }
 
+//    single {
+//        Interceptor { chain ->
+//            val pref: PreferencesManager = get()
+//            chain.proceed(chain.request().newBuilder().apply {
+//                header(AUTHHORIZATION_KEY, pref.getAuthorization())
+//                header(USER_ID_KEY, pref.getUserId().toString())
+//                //header(USER_ID_KEY, "2131")
+//            }.build())
+//        }
+//    }
+
     single {
-        Interceptor { chain ->
+        Interceptor {  chain ->
             val pref: PreferencesManager = get()
-            chain.proceed(chain.request().newBuilder().apply {
-                header(DEVICE_TYPE_KEY, DEVICE_TYPE)
-                header(DEVICE_TOKEN_KEY, pref.getDeviceToken())
-            }.build())
+            val newRequest = chain.request().newBuilder().apply {
+                header(AUTHORIZATION_KEY, pref.getAuthorization())
+                header(USER_ID_KEY, pref.getUserId().toString())
+            }.build()
+
+            chain.proceed(newRequest).also { response ->
+
+                response.body()?.let { responseBody ->
+                    val buffer = responseBody.source()
+                        .buffer()
+                        .clone()
+
+                    val responseStr = buffer.readString(Charsets.UTF_8)
+                    Gson().fromJson(responseStr, ResponseEntity::class.java).let {
+                        when (it.status.toInt()) {
+                            // 토큰 만료된 경우 이므로, 강제로 로그인 화면으로 이동!
+                            StatusConst.ACCESS_TOKEN_EXPIRED_STATUS -> androidApplication().let { ctx ->
+                                Intent(ctx, LoginActivity::class.java).apply {
+                                }.let(ctx::startActivity)
+                                // TODO: current activity를 참조하여 finish를 호출해야될것 같습니다.
+                            }
+                            else -> DLog.e("STATUS", it.status)
+                        }
+                    }
+                }
+            }
         }
     }
 

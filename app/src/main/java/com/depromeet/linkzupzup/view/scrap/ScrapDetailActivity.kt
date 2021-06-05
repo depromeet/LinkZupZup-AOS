@@ -2,7 +2,7 @@ package com.depromeet.linkzupzup.view.scrap
 
 import android.os.Bundle
 import com.depromeet.linkzupzup.base.BaseActivity
-import com.depromeet.linkzupzup.presenter.ScrapDetailViewModel
+import com.depromeet.linkzupzup.architecture.presenterLayer.ScrapDetailViewModel
 import com.depromeet.linkzupzup.view.scrap.ui.ScrapDetailUI
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 

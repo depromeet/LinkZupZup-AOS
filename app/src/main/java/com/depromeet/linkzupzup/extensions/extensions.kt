@@ -9,6 +9,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -80,7 +81,7 @@ fun LazyItemScope.topSpacer(index: Int, size: Dp) = if (index == 0) Spacer(Modif
 @Composable
 fun LazyItemScope.bottomSpacer(index: Int, items: List<*>, size: Dp) = if (index >= items.size - 1) Spacer(Modifier.height(size)) else null
 
-fun toast(ctx: Context, msg: String, duration: Int = Toast.LENGTH_SHORT) = Toast.makeText(ctx, msg, duration).show()
+fun toast(ctx: Context, msg: String, duration: Int = Toast.LENGTH_SHORT): Toast = Toast.makeText(ctx, msg, duration).also{ it.show() }
 
 /**
  * 참고 : https://meetup.toast.com/posts/130
@@ -101,3 +102,37 @@ fun Color.isEquals(target: Color): Boolean {
             blue == target.blue &&
             green == target.green
 }
+
+/**
+ * 특이한 경우이기는 하지만, 이미지 URL의 첫 시작이 "//" 으로 시작될 경우, Url의 프로토콜이 생략된 경우이므로,
+ * "https" 프로토콜을 prefix로 응답합니다.
+ */
+fun String.verifyImgUrlDomain(): String = if (indexOf("//") == 0) "https:$this" else this
+
+/**
+ * List에 header를 포함하여 사용가능하도록 커스텀
+ * 리스트와 함께 해더도 스크롤이 가능합니다.
+ */
+inline fun <T> LazyListScope.itemsWithHeaderIndexed(
+    items: List<T>,
+    useHeader: Boolean = false,
+    crossinline headerContent: @Composable LazyItemScope.() -> Unit = {},
+    noinline key: ((index: Int, item: T) -> Any)? = null,
+    crossinline itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
+) = items(items.size + if (useHeader) 1 else 0, if (key != null) { index: Int -> key(index - if (useHeader) 1 else 0, items[index - if (useHeader) 1 else 0]) } else null) {
+    val idx = it - if (useHeader) 1 else 0
+    if (useHeader && it == 0) headerContent()
+    else itemContent(idx, items[idx])
+}
+
+
+
+
+
+
+
+
+
+
+
+
