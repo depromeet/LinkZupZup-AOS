@@ -430,7 +430,7 @@ fun InfoSheetHeader(){
         Column(horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()){
             Image(
-                painter = painterResource(id = R.drawable.ic_jubjub),
+                painter = painterResource(id = R.drawable.ic_small_logo_title),
                 contentDescription = null,
                 modifier = Modifier.size(123.dp,49.dp))
 
