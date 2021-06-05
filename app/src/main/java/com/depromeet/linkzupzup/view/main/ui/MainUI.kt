@@ -59,7 +59,7 @@ import com.google.accompanist.glide.rememberGlidePainter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class MainUI: BaseView<MainViewModel>() {
+class MainUI(var clickListener: (id: Int) -> Unit = {}): BaseView<MainViewModel>() {
 
     @ExperimentalFoundationApi
     @ExperimentalMaterialApi
@@ -72,7 +72,7 @@ class MainUI: BaseView<MainViewModel>() {
 
                     vm?.run {
                         val list by linkList.observeAsState(arrayListOf())
-                        MainBodyUI(linkList = list.converter(), vm = this)
+                        MainBodyUI(linkList = list.converter(), vm = this, clickListener = clickListener)
                     }
 
                 }
@@ -104,7 +104,7 @@ fun BottomSheetPreview() {
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun MainBodyUI(linkList: ArrayList<LinkData> = arrayListOf(), vm : MainViewModel? = null){
+fun MainBodyUI(linkList: ArrayList<LinkData> = arrayListOf(), vm : MainViewModel? = null, clickListener: (id: Int) -> Unit = {}){
 
     // 로그인 성공
     val coroutineScope = rememberCoroutineScope()
@@ -113,7 +113,7 @@ fun MainBodyUI(linkList: ArrayList<LinkData> = arrayListOf(), vm : MainViewModel
     )
 
     BottomSheetScaffold(
-        topBar = { MainAppBar() },
+        topBar = { MainAppBar(clickListener = clickListener) },
         scaffoldState = bottomSheetScaffoldState,
         sheetContent = { BottomSheet(bottomSheetScaffoldState,coroutineScope,vm) },   // sheetContent -  Column scope
         sheetShape = RoundedCornerShape(topStartPercent = 5,topEndPercent = 5),
@@ -186,7 +186,7 @@ fun MainBodyUI(linkList: ArrayList<LinkData> = arrayListOf(), vm : MainViewModel
 }
 
 @Composable
-fun MainAppBar(appBarColor : MutableState<Color> = remember { mutableStateOf(Gray10) }){
+fun MainAppBar(appBarColor : MutableState<Color> = remember { mutableStateOf(Gray10) }, clickListener: (id: Int) -> Unit = {}){
     val ctx = LocalContext.current
     // in ColumnScope
     
@@ -195,17 +195,17 @@ fun MainAppBar(appBarColor : MutableState<Color> = remember { mutableStateOf(Gra
 
             // 알람
             MainAppBarBtn(painterResource(id = R.drawable.ic_alram)) {
-                Toast.makeText(ctx, "알람", Toast.LENGTH_SHORT).show()
+                clickListener(R.drawable.ic_alram)
             }
 
             // 랭킹
             MainAppBarBtn(painterResource(id = R.drawable.ic_ranking)) {
-                Toast.makeText(ctx, "랭킹", Toast.LENGTH_SHORT).show()
+                clickListener(R.drawable.ic_ranking)
             }
 
             // 마이페이지
             MainAppBarBtn(painterResource(id = R.drawable.ic_mypage)) {
-                Toast.makeText(ctx, "마이페이지", Toast.LENGTH_SHORT).show()
+                clickListener(R.drawable.ic_mypage)
             }
             
         },
