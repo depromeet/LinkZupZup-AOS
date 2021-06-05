@@ -159,14 +159,14 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
     /**
      * 링크 저장
      */
-    fun registerLink(linkInfo: LinkRegisterEntity, callback: ((ResponseEntity<AlarmRegistEntity>)->Unit)? = null) {
+    fun registerLink(linkInfo: LinkRegisterEntity, callback: ((ResponseEntity<LinkAlarmEntity>)->Unit)? = null) {
         progressStatus(true)
         addDisposable(linkUseCases.registerLink(linkInfo)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
 
-
+                callback?.invoke(it)
                 progressStatus(false)
             }, this@MainViewModel::defaultThrowable))
     }
