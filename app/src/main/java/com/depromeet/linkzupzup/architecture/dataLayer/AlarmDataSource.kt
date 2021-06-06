@@ -5,6 +5,7 @@ import com.depromeet.linkzupzup.architecture.dataLayer.api.AlarmAPIService
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmRegistEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmUpdateEntity
 import io.reactivex.Observable
 
 class AlarmDataSource(private val api: AlarmAPIService) {
@@ -18,33 +19,20 @@ class AlarmDataSource(private val api: AlarmAPIService) {
     /**
      * 어플 알람 등록
      */
-    fun registAlarm(alarmInfo: String): Observable<ResponseEntity<AlarmRegistEntity>>
+    fun registAlarm(alarmInfo: AlarmUpdateEntity): Observable<ResponseEntity<AlarmRegistEntity>>
         = api.registAlarm(alarmInfo)
-    fun registAlarm(params: HashMap<String, Any?>): Observable<ResponseEntity<AlarmRegistEntity>> = with(params) {
-        val alarmInfo = params[ParamsInfo.ALARM_INFO] as? String ?: ""
-        registAlarm(alarmInfo)
-    }
 
     /**
      * 특정 어플 알람의 세부 내용 조회
      */
     fun getAlarmDetail(alarmId: Int): Observable<ResponseEntity<AlarmEntity>>
         = api.getAlarmDetail(alarmId)
-    fun getAlarmDetail(params: HashMap<String, Any?>): Observable<ResponseEntity<AlarmEntity>> = with(params) {
-        val alarmId = params[ParamsInfo.ALARM_ID] as? Int ?: 0
-        getAlarmDetail(alarmId)
-    }
 
     /**
      * 특정 어플 알람 수정
      */
-    fun updateAlarm(alarmId: Int, alarmInfo: String): Observable<ResponseEntity<AlarmEntity>>
+    fun updateAlarm(alarmId: Int, alarmInfo: AlarmUpdateEntity): Observable<ResponseEntity<AlarmEntity>>
         = api.updateAlarm(alarmId, alarmInfo)
-    fun updateAlarm(params: HashMap<String, Any?>): Observable<ResponseEntity<AlarmEntity>> = with(params) {
-        val alarmId = params[ParamsInfo.ALARM_ID] as? Int ?: 0
-        val alarmInfo = params[ParamsInfo.ALARM_INFO] as? String ?: ""
-        updateAlarm(alarmId, alarmInfo)
-    }
 
     /**
      * 특정 어플 알람 삭제

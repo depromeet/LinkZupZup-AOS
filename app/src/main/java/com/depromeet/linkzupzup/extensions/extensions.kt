@@ -103,6 +103,9 @@ fun Color.isEquals(target: Color): Boolean {
             green == target.green
 }
 
+fun Boolean.getInt(): Int = if (this) 1 else 0
+fun Int.getBoolean(): Boolean = this == 1
+
 /**
  * 특이한 경우이기는 하지만, 이미지 URL의 첫 시작이 "//" 으로 시작될 경우, Url의 프로토콜이 생략된 경우이므로,
  * "https" 프로토콜을 prefix로 응답합니다.
@@ -124,15 +127,3 @@ inline fun <T> LazyListScope.itemsWithHeaderIndexed(
     if (useHeader && it == 0) headerContent()
     else itemContent(idx, items[idx])
 }
-
-
-
-
-
-
-
-
-
-
-
-

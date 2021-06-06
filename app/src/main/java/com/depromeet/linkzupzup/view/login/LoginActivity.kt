@@ -46,6 +46,7 @@ class LoginActivity : BaseActivity<LoginUI, LoginViewModel>() {
                                 when (status) {
                                     StatusConst.SELECT_SUSSCESS_STATUS -> {
                                         toast(this@LoginActivity, "$nickName 님, 안녕하세요.")
+                                        pref.setUserName(nickName)
                                         movePageDelay(MainActivity::class.java, 500L, true)
                                     }
                                     else -> {}

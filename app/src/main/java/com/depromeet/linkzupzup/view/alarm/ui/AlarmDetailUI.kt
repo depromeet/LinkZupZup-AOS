@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.ButtonDefaults.elevation
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,7 +50,9 @@ class AlarmDetailUI: BaseView<AlarmDetailViewModel>() {
     override fun onCreateViewContent() {
         LinkZupZupTheme {
             Surface(color = Color(0xFFF8FAFB)) {
-                vm?.getWeeklyAlarmList()?.let { alarmList ->
+                vm?.run {
+                    val alarmList by alarmList.observeAsState(arrayListOf())
+
                     // BodyContent(alarmList)
                     AlarmDetailBodyContent(alarmList)
                 }
@@ -81,7 +84,8 @@ fun AlarmDetailAppBar(appBarColor: MutableState<Color> = remember { mutableState
         },
         backgroundColor = appBarColor.value,
         elevation = 0.dp,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .height(52.dp)
             .padding(start = 12.dp))
 }
@@ -104,10 +108,13 @@ fun AlarmDetailBodyContent(alarms: ArrayList<WeeklyAlarm>) {
             backgroundColor = Color.Transparent,
             modifier = Modifier.fillMaxSize()) {
 
-            Column(modifier = Modifier.fillMaxWidth()
+            Column(modifier = Modifier
+                .fillMaxWidth()
                 .fillMaxHeight()) {
 
-                val columnModifier = if (alarmList.value.size > 0) Modifier.fillMaxWidth().weight(1f)
+                val columnModifier = if (alarmList.value.size > 0) Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
                 else Modifier.fillMaxWidth()
 
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -121,9 +128,13 @@ fun AlarmDetailBodyContent(alarms: ArrayList<WeeklyAlarm>) {
                             WeeklyAlarmCard(alarmList, idx)
                     }
                 }
-                if (alarmList.value.size <= 0) EmptyGuideCard(Modifier.fillMaxWidth().weight(1f))
+                if (alarmList.value.size <= 0) EmptyGuideCard(
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f))
 
-                Box(modifier = Modifier.fillMaxWidth()
+                Box(modifier = Modifier
+                    .fillMaxWidth()
                     .height(68.dp)
                     .padding(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 16.dp), contentAlignment = Alignment.BottomCenter) {
 
@@ -131,7 +142,8 @@ fun AlarmDetailBodyContent(alarms: ArrayList<WeeklyAlarm>) {
                         colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color(0xFF4076F6), contentColor = Color.White),
                         shape = RoundedCornerShape(4.dp),
                         elevation = elevation(defaultElevation = 0.dp, pressedElevation = 0.dp),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .height(52.dp)) {
 
                         Text("알림 추가하기",
@@ -151,14 +163,16 @@ fun AlarmDetailBodyContent(alarms: ArrayList<WeeklyAlarm>) {
 fun EmptyGuideCard(modifier: Modifier = Modifier) {
     Column(horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
             .padding(bottom = 24.dp)
             .background(Color.Transparent)) {
 
         // 도넛 이미지
         Column(horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .weight(1f)) {
 
             Image(painter = painterResource(id = R.drawable.ic_donut05),
@@ -210,10 +224,13 @@ fun WeeklyAlarmCard(list: MutableState<ArrayList<WeeklyAlarm>>, index: Int) {
                 toast(ctx, "Long Click")
             })) {
 
-            Box(Modifier.fillMaxWidth()
-                .height(110.dp)) {
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .height(110.dp)) {
 
-                Column(modifier = Modifier.fillMaxWidth()
+                Column(modifier = Modifier
+                    .fillMaxWidth()
                     .height(110.dp)
                     .padding(horizontal = 24.dp, vertical = 19.dp)) {
 
@@ -224,7 +241,8 @@ fun WeeklyAlarmCard(list: MutableState<ArrayList<WeeklyAlarm>>, index: Int) {
                     val holidayTagTextColor = Color(if (enableAlarm.value) 0xFFF24147 else 0xFFCED3D6)
 
                     Row(verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .height(40.dp)) {
 
                         Image(painter = painterResource(id = R.drawable.ic_sun_img),
@@ -247,7 +265,8 @@ fun WeeklyAlarmCard(list: MutableState<ArrayList<WeeklyAlarm>>, index: Int) {
                         Spacer(Modifier.weight(1f))
 
                         Column(horizontalAlignment = Alignment.End,
-                                modifier = Modifier.fillMaxHeight()
+                                modifier = Modifier
+                                    .fillMaxHeight()
                                     .padding(top = 10.dp)) {
 
                             CustomSwitchCompat(instanceCallback = {
@@ -261,7 +280,8 @@ fun WeeklyAlarmCard(list: MutableState<ArrayList<WeeklyAlarm>>, index: Int) {
 
                     Spacer(Modifier.height(10.dp))
 
-                    Row(modifier = Modifier.fillMaxWidth()
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
                         .height(22.dp)) {
 
                         Card(shape = RoundedCornerShape(2.dp),
@@ -270,7 +290,8 @@ fun WeeklyAlarmCard(list: MutableState<ArrayList<WeeklyAlarm>>, index: Int) {
                                 Text(alarm.weekDayStr(),
                                     style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 10.sp, lineHeight = 14.sp, color = weeksTagTextColor),
                                     textAlign = TextAlign.Center,
-                                    modifier = Modifier.height(22.dp)
+                                    modifier = Modifier
+                                        .height(22.dp)
                                         .padding(horizontal = 8.dp, vertical = 4.dp))
                             }
                         }
@@ -285,7 +306,8 @@ fun WeeklyAlarmCard(list: MutableState<ArrayList<WeeklyAlarm>>, index: Int) {
                                     Text("#공휴일에 울려요",
                                         style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 10.sp, lineHeight = 14.sp, color = holidayTagTextColor),
                                         textAlign = TextAlign.Center,
-                                        modifier = Modifier.height(22.dp)
+                                        modifier = Modifier
+                                            .height(22.dp)
                                             .padding(horizontal = 8.dp, vertical = 4.dp))
                                 }
                             }
@@ -311,11 +333,13 @@ fun AlarmDetailBottomSheet(bottomSheetScaffoldState: BottomSheetScaffoldState, c
         // header, close btn
         Row(horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .height(56.dp)) {
 
             Card(elevation = 0.dp,
-                modifier = Modifier.width(68.dp)
+                modifier = Modifier
+                    .width(68.dp)
                     .height(56.dp)
                     .noRippleClickable {
                         coroutineScope.launch {
@@ -325,7 +349,8 @@ fun AlarmDetailBottomSheet(bottomSheetScaffoldState: BottomSheetScaffoldState, c
 
                 Row(verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
                         .padding(start = 20.dp, end = 16.dp)) {
 
                     Image(painter = painterResource(id = R.drawable.ic_black_close),
@@ -336,7 +361,8 @@ fun AlarmDetailBottomSheet(bottomSheetScaffoldState: BottomSheetScaffoldState, c
         }
 
         // guide title
-        Row(modifier = Modifier.fillMaxWidth()
+        Row(modifier = Modifier
+            .fillMaxWidth()
             .padding(start = 24.dp, bottom = 28.dp)) {
 
             Text("언제마다\n알림을 받으시겠어요?",
@@ -346,7 +372,8 @@ fun AlarmDetailBottomSheet(bottomSheetScaffoldState: BottomSheetScaffoldState, c
 
         // timepicker
         val timeDate = remember { mutableStateOf(Calendar.getInstance()) }
-        CustomTimePicker(modifier = Modifier.fillMaxWidth()
+        CustomTimePicker(modifier = Modifier
+            .fillMaxWidth()
             .height(210.dp)
             .padding(horizontal = 24.dp, vertical = 20.dp)) { type, timeVal ->
 
@@ -358,9 +385,11 @@ fun AlarmDetailBottomSheet(bottomSheetScaffoldState: BottomSheetScaffoldState, c
             }
         }
 
-        Column(Modifier.fillMaxWidth()
-            .height(96.dp)
-            .padding(horizontal = 24.dp, vertical = 20.dp)) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .height(96.dp)
+                .padding(horizontal = 24.dp, vertical = 20.dp)) {
 
             Text("반복 설정",
                 color = Color(0xFF292A2B),
@@ -370,7 +399,8 @@ fun AlarmDetailBottomSheet(bottomSheetScaffoldState: BottomSheetScaffoldState, c
             Spacer(Modifier.height(12.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .height(28.dp)) {
 
                 val toogleValues = arrayListOf("주중", "주말")
@@ -395,21 +425,28 @@ fun AlarmDetailBottomSheet(bottomSheetScaffoldState: BottomSheetScaffoldState, c
 
         Spacer(Modifier.weight(1f))
 
-        Column(Modifier.fillMaxWidth()
-            .height(68.dp)
-            .padding(start = 24.dp, top = 0.dp, end = 16.dp, bottom = 24.dp)) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .height(68.dp)
+                .padding(start = 24.dp, top = 0.dp, end = 16.dp, bottom = 24.dp)) {
 
             Row(Modifier.fillMaxSize()) {
 
                 val isAlready = remember { mutableStateOf(false) }
-                if (isAlready.value) Row(Modifier.width(64.dp)
-                    .fillMaxHeight()) {
+                if (isAlready.value) Row(
+                    Modifier
+                        .width(64.dp)
+                        .fillMaxHeight()) {
 
                     Button(colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.White, contentColor = Color(0xFF4076F6)),
                         shape = RoundedCornerShape(4.dp),
                         elevation = elevation(defaultElevation = 0.dp, pressedElevation = 0.dp),
                         border = BorderStroke(width = 1.dp, Color(0xFF4076F6)),
-                        modifier = Modifier.fillMaxWidth().height(52.dp).padding(end = 12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp)
+                            .padding(end = 12.dp),
                         onClick = {
                             DLog.e("Jackson", "save click read button")
                             coroutineScope.launch {
@@ -429,7 +466,9 @@ fun AlarmDetailBottomSheet(bottomSheetScaffoldState: BottomSheetScaffoldState, c
                 Button(colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color(0xFF4076F6), contentColor = Color.White),
                     shape = RoundedCornerShape(4.dp),
                     elevation = elevation(defaultElevation = 0.dp, pressedElevation = 0.dp),
-                    modifier = Modifier.weight(1f).height(52.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(52.dp),
                     onClick = {
                         DLog.e("Jackson", "save click read button")
                         coroutineScope.launch {
@@ -454,7 +493,8 @@ fun AlarmDetailBottomSheet(bottomSheetScaffoldState: BottomSheetScaffoldState, c
 @ExperimentalMaterialApi
 @Composable
 fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, coroutineScope: CoroutineScope) {
-    Column(modifier = Modifier.fillMaxWidth()
+    Column(modifier = Modifier
+        .fillMaxWidth()
         .height(606.dp)
         .background(Color.White)
         .noRippleClickable { }) {
@@ -464,11 +504,13 @@ fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, 
         // header, close btn
         Row(horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .height(56.dp)) {
 
             Card(elevation = 0.dp,
-                modifier = Modifier.width(68.dp)
+                modifier = Modifier
+                    .width(68.dp)
                     .height(56.dp)
                     .noRippleClickable {
                         coroutineScope.launch {
@@ -478,7 +520,8 @@ fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, 
 
                 Row(verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
                         .padding(start = 20.dp, end = 16.dp)) {
 
                     Image(painter = painterResource(id = R.drawable.ic_black_close),
@@ -489,7 +532,8 @@ fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, 
         }
 
         // guide title
-        Row(modifier = Modifier.fillMaxWidth()
+        Row(modifier = Modifier
+            .fillMaxWidth()
             .padding(start = 24.dp, bottom = 28.dp)) {
 
             Text("언제마다\n알림을 받으시겠어요?",
@@ -499,7 +543,8 @@ fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, 
 
         // timepicker
         val timeDate = remember { mutableStateOf(Calendar.getInstance()) }
-        CustomTimePicker(modifier = Modifier.fillMaxWidth()
+        CustomTimePicker(modifier = Modifier
+            .fillMaxWidth()
             .height(210.dp)
             .padding(horizontal = 24.dp, vertical = 20.dp)) { type, timeVal ->
             when (type) {
@@ -510,9 +555,11 @@ fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, 
             }
         }
 
-        Column(Modifier.fillMaxWidth()
-            .height(96.dp)
-            .padding(horizontal = 24.dp, vertical = 20.dp)) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .height(96.dp)
+                .padding(horizontal = 24.dp, vertical = 20.dp)) {
 
             Text("반복 설정",
                 color = Color(0xFF292A2B),
@@ -522,7 +569,8 @@ fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, 
             Spacer(Modifier.height(12.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .height(28.dp)) {
 
                 val toogleValues = arrayListOf("주중", "주말")
@@ -547,22 +595,26 @@ fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, 
 
         Spacer(Modifier.weight(1f))
 
-        Column(Modifier.fillMaxWidth()
-            .height(68.dp)
-            .padding(start = 24.dp, top = 0.dp, end = 16.dp, bottom = 24.dp)) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .height(68.dp)
+                .padding(start = 24.dp, top = 0.dp, end = 16.dp, bottom = 24.dp)) {
 
             Row(Modifier.fillMaxSize()) {
 
                 val isAlready = remember { mutableStateOf(false) }
                 if (isAlready.value) Row(
-                    Modifier.width(64.dp)
+                    Modifier
+                        .width(64.dp)
                         .fillMaxHeight()) {
 
                     Button(colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.White, contentColor = Color(0xFF4076F6)),
                         shape = RoundedCornerShape(4.dp),
                         elevation = elevation(defaultElevation = 0.dp, pressedElevation = 0.dp),
                         border = BorderStroke(width = 1.dp, Color(0xFF4076F6)),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .height(52.dp)
                             .padding(end = 12.dp),
                         onClick = {
@@ -584,7 +636,8 @@ fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, 
                 Button(colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color(0xFF4076F6), contentColor = Color.White),
                     shape = RoundedCornerShape(4.dp),
                     elevation = elevation(defaultElevation = 0.dp, pressedElevation = 0.dp),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
                         .height(52.dp),
                     onClick = {
                         DLog.e("Jackson", "save click read button")
