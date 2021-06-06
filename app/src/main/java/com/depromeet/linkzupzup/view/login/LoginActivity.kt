@@ -26,9 +26,6 @@ class LoginActivity : BaseActivity<LoginUI, LoginViewModel>() {
                 kakaoLogin(this@LoginActivity) { token, loginError ->
                     if (token != null) getKakaoUserInfo { user, meError ->
                         user?.run {
-//                            id
-//                            kakaoAccount?.email
-//                            kakaoAccount?.profile?.nickname
 
                             /**
                              * 일단 납득은 안가지만 아래순으로 API를 호출해야될것같음
@@ -60,5 +57,7 @@ class LoginActivity : BaseActivity<LoginUI, LoginViewModel>() {
             }
         }
     }
+
+    override fun onBackPressed() { /* super.onBackPressed() */ }
 
 }

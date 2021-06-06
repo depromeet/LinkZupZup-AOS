@@ -41,7 +41,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.*
 
-class AlarmDetailUI: BaseView<AlarmDetailViewModel>() {
+class AlarmDetailUI(var clickListener: (Int)->Unit = {}): BaseView<AlarmDetailViewModel>() {
 
     @ExperimentalFoundationApi
     @ExperimentalMaterialApi
@@ -54,7 +54,7 @@ class AlarmDetailUI: BaseView<AlarmDetailViewModel>() {
                     val alarmList by alarmList.observeAsState(arrayListOf())
 
                     // BodyContent(alarmList)
-                    AlarmDetailBodyContent(alarmList)
+                    AlarmDetailBodyContent(alarmList, backClickListener = clickListener)
                 }
             }
         }
@@ -63,13 +63,13 @@ class AlarmDetailUI: BaseView<AlarmDetailViewModel>() {
 }
 
 @Composable
-fun AlarmDetailAppBar(appBarColor: MutableState<Color> = remember { mutableStateOf(Color(0xFFF8FAFB)) }) {
+fun AlarmDetailAppBar(appBarColor: MutableState<Color> = remember { mutableStateOf(Color(0xFFF8FAFB)) }, clickListener: (Int)->Unit = {}) {
     val ctx = LocalContext.current
     TopAppBar(title = { },
         navigationIcon = {
             Card(elevation = 0.dp,
                 backgroundColor = Color(0xFFF8FAFB),
-                modifier = Modifier.noRippleClickable { toast(ctx, "뒤로가기") }) {
+                modifier = Modifier.noRippleClickable { clickListener(R.drawable.ic_detail_back) }) {
 
                 Column(verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.Start,
@@ -94,7 +94,7 @@ fun AlarmDetailAppBar(appBarColor: MutableState<Color> = remember { mutableState
 @ExperimentalPagerApi
 @ExperimentalMaterialApi
 @Composable
-fun AlarmDetailBodyContent(alarms: ArrayList<WeeklyAlarm>) {
+fun AlarmDetailBodyContent(alarms: ArrayList<WeeklyAlarm>, backClickListener: (Int)->Unit = {}) {
     val alarmList = remember { mutableStateOf(alarms) }
     val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
@@ -104,7 +104,7 @@ fun AlarmDetailBodyContent(alarms: ArrayList<WeeklyAlarm>) {
         sheetContent = { AlarmDetailModalBottomSheetContent(sheetState,coroutineScope) },
         modifier = Modifier.fillMaxSize()) {
 
-        Scaffold(topBar = { AlarmDetailAppBar() },
+        Scaffold(topBar = { AlarmDetailAppBar(clickListener = backClickListener) },
             backgroundColor = Color.Transparent,
             modifier = Modifier.fillMaxSize()) {
 
