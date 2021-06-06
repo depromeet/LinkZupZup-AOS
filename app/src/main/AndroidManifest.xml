@@ -33,6 +33,18 @@
         <activity android:name=".view.alarm.AlarmDetailActivity" />
         <activity android:name=".view.webView.WebViewActivity"/>
 
+        <activity android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- Redirect URI: "kakao{NATIVE_APP_KEY}://oauth" -->
+                <data android:host="oauth"
+                    android:scheme="kakao2f57142a7e0a3d68b9ee058d038ed2db" />
+            </intent-filter>
+        </activity>
+
         <receiver android:name=".receiver.AlarmReceiver">
             <intent-filter>
                 <action android:name="com.depromeet.linkzupzup.PERSONAL_ALARM_START" />

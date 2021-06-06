@@ -1,5 +1,6 @@
 package com.depromeet.linkzupzup.utils
 
+import android.content.ClipboardManager
 import android.content.Context
 import androidx.compose.ui.graphics.Color
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.TagColor
@@ -7,6 +8,10 @@ import com.depromeet.linkzupzup.ui.theme.*
 import java.util.*
 import kotlin.collections.ArrayList
 import java.io.InputStream
+import android.content.ClipData
+
+
+
 
 
 
@@ -51,5 +56,11 @@ object CommonUtil {
         } finally {
             inputStream.close()
         }
+    }
+
+    fun saveClipboard(ctx: Context, label: String, text: String) {
+        val clipboardManager = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipData = ClipData.newPlainText(label, text)
+        clipboardManager.setPrimaryClip(clipData)
     }
 }

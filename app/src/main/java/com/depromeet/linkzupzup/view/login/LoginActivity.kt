@@ -41,7 +41,7 @@ class LoginActivity : BaseActivity<LoginUI, LoginViewModel>() {
 
                             val userEmail = kakaoAccount?.email ?: ""
                             val nickName = kakaoAccount?.profile?.nickname ?: ""
-                            signInUp(SignInUpEntity(email = userEmail, name = nickName)) { status, responnse ->
+                            signInUp(SignInUpEntity(email = userEmail, name = nickName)) { status, response ->
 
                                 when (status) {
                                     StatusConst.SELECT_SUSSCESS_STATUS -> {
