@@ -127,3 +127,18 @@ inline fun <T> LazyListScope.itemsWithHeaderIndexed(
     if (useHeader && it == 0) headerContent()
     else itemContent(idx, items[idx])
 }
+
+
+inline fun <T> LazyListScope.itemsWithHeaderAndGuideIndexed(
+    items: List<T>,
+    useHeader: Boolean = false,
+    useEmptyGuide: Boolean = false,
+    crossinline headerContent: @Composable LazyItemScope.() -> Unit = {},
+    crossinline emptyContent: @Composable LazyItemScope.() -> Unit = {},
+    crossinline itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
+) = items(items.size + if (useHeader) 1 else 0 + if (useEmptyGuide) 1 else 0, null) {
+    val idx = it - if (useHeader) 1 else 0
+    if (useHeader && it == 0) headerContent()
+    else if (items.isNotEmpty()) itemContent(idx, items[idx])
+    else emptyContent()
+}
