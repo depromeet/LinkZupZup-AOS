@@ -51,9 +51,7 @@ import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData.Compa
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkHashData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.TagColor
 import com.depromeet.linkzupzup.base.BaseView
-import com.depromeet.linkzupzup.extensions.itemsWithHeaderIndexed
-import com.depromeet.linkzupzup.extensions.noRippleClickable
-import com.depromeet.linkzupzup.extensions.toast
+import com.depromeet.linkzupzup.extensions.*
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.CommonUtil
 import com.depromeet.linkzupzup.utils.DLog
@@ -74,8 +72,8 @@ class MainUI(var clickListener: (id: Int) -> Unit = {}): BaseView<MainViewModel>
                 Column(modifier = Modifier.fillMaxWidth()) {
 
                     vm?.run {
-                        val list by linkList.observeAsState(arrayListOf())
-                        MainBodyUI(links = list, vm = this, clickListener = clickListener)
+
+                        MainBodyUI(linkList = linkList, vm = this, clickListener = clickListener)
                     }
 
                 }
@@ -84,13 +82,13 @@ class MainUI(var clickListener: (id: Int) -> Unit = {}): BaseView<MainViewModel>
     }
 }
 
-@ExperimentalFoundationApi
-@ExperimentalMaterialApi
-@Preview
-@Composable
-fun MainPreview() {
-    MainBodyUI(links = LinkData.mockLinkList())
-}
+//@ExperimentalFoundationApi
+//@ExperimentalMaterialApi
+//@Preview
+//@Composable
+//fun MainPreview() {
+//    MainBodyUI(linkList = LinkData.mockLinkList())
+//}
 
 @ExperimentalMaterialApi
 @Preview
@@ -105,8 +103,8 @@ fun BottomSheetPreview() {
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun MainBodyUI(links: ArrayList<LinkData> = arrayListOf(), vm : MainViewModel? = null, clickListener: (id: Int) -> Unit = {}){
-    val linkList = remember { mutableStateOf(links) }
+fun MainBodyUI(linkList: LiveData<ArrayList<LinkData>>, vm : MainViewModel? = null, clickListener: (id: Int) -> Unit = {}){
+    val list by linkList.observeAsState(arrayListOf())
 
     // 로그인 성공
     val coroutineScope = rememberCoroutineScope()
@@ -126,7 +124,7 @@ fun MainBodyUI(links: ArrayList<LinkData> = arrayListOf(), vm : MainViewModel? =
                 .background(color = Color.Transparent)
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
 
-                val columnModifier = if (linkList.value.size > 0) Modifier
+                val columnModifier = if (list.size > 0) Modifier
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(bottom = 16.dp)
@@ -146,18 +144,41 @@ fun MainBodyUI(links: ArrayList<LinkData> = arrayListOf(), vm : MainViewModel? =
 
                 // 메인 리스트
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(24.dp),
-                    modifier = columnModifier) {
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(bottom = 16.dp)
+                        .drawWithCache {
+                            val gradient = Brush.linearGradient(
+                                colors = listOf(Color.Transparent, Gray10),
+                                start = Offset(0f, size.height - 100.dp.toPx()),
+                                end = Offset(0f, size.height)
+                            )
+                            onDrawWithContent {
+                                drawContent()
+                                drawRect(gradient)
+                            }
+                        }) {
 
-                    itemsWithHeaderIndexed (
-                        items = linkList.value,
+//                    itemsWithHeaderIndexed (
+//                        items = linkList.value,
+//                        useHeader = true,
+//                        headerContent = { MainHeaderCard(name = "김나경") }) { idx, linkItem ->
+//
+//                        MainLinkCard(index = idx, linkData = linkItem, vm)
+//                    }
+
+                    itemsWithHeaderAndGuideIndexed (
+                        items = list,
                         useHeader = true,
-                        headerContent = { MainHeaderCard(name = "김나경") }) { idx, linkItem ->
-
+                        useEmptyGuide = true,
+                        headerContent = { MainHeaderCard(name = "김나경") },
+                        emptyContent = { EmptyLinkGuideCard (Modifier.fillMaxWidth().weight(1f)) }) { idx, linkItem ->
                         MainLinkCard(index = idx, linkData = linkItem, vm)
                     }
                 }
 
-                if(linkList.value.size==0){ EmptyLinkGuideCard(
+                if(list.size==0){ EmptyLinkGuideCard(
                     Modifier
                         .fillMaxWidth()
                         .weight(1f)) }
@@ -421,7 +442,7 @@ fun BottomSheet(sheetState : ModalBottomSheetState, coroutineScope : CoroutineSc
     val saveBtnColor = remember { mutableStateOf(Gray50t) }
     val saveTxtColor = remember { mutableStateOf(Gray70) }
     val linkUrl = remember { mutableStateOf("") }
-    val liveCnt = vm?.selectTagList?.value
+    val liveCnt = (vm?.selectTagList?.value ?: arrayListOf()).mutableStateValue()
 
     // in Column Scope
     Column(modifier = Modifier
@@ -472,7 +493,7 @@ fun BottomSheet(sheetState : ModalBottomSheetState, coroutineScope : CoroutineSc
             Spacer(Modifier.height(20.dp))
 
             /* 해시태그 선택 */
-            BottomSheetSelect(liveCnt?.size){
+            BottomSheetSelect(liveCnt.value.size){
                 vm?.insertSelectedTag(it)
             }
 
