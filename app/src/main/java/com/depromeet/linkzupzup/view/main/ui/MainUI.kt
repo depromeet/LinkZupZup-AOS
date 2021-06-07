@@ -355,17 +355,17 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
     }
 
     val painter = rememberGlidePainter(request = metaImgUrl.value, fadeIn = true, previewPlaceholder = R.drawable.img_linklogo_placeholder)
-    when(painter.loadState) {
-        is ImageLoadState.Error -> {
-            DLog.e("TEST Glide", "Error")
-            //painter.request = Image(painter = painterResource(id = R.drawable.img_linklogo_placeholder), contentDescription = null)
-        }
-        is ImageLoadState.Empty -> {
-            DLog.e("TEST Glide", "Empty")
-            //painter.request = Image(painter = painterResource(id = R.drawable.img_linklogo_placeholder), contentDescription = null)
-        }
-        else -> {}
-    }
+//    when(painter.loadState) {
+//        is ImageLoadState.Error -> {
+//            DLog.e("TEST Glide", "Error")
+//            //painter.request = Image(painter = painterResource(id = R.drawable.img_linklogo_placeholder), contentDescription = null)
+//        }
+//        is ImageLoadState.Empty -> {
+//            DLog.e("TEST Glide", "Empty")
+//            //painter.request = Image(painter = painterResource(id = R.drawable.img_linklogo_placeholder), contentDescription = null)
+//        }
+//        else -> {}
+//    }
 
     Card(elevation = 0.dp,
         shape = RoundedCornerShape(0),
@@ -382,7 +382,7 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
                 modifier = Modifier.size(96.dp),
                 contentScale = ContentScale.Crop,
                 alignment = Alignment.Center,
-                painter =  rememberGlidePainter(painter))
+                painter =  rememberGlidePainter(request = metaImgUrl.value, fadeIn = true, previewPlaceholder = R.drawable.img_linklogo_placeholder))
 
             Spacer(modifier = Modifier.width(10.dp))
 
