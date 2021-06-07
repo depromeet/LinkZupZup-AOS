@@ -358,11 +358,11 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
     when(painter.loadState) {
         is ImageLoadState.Error -> {
             DLog.e("TEST Glide", "Error")
-            painter.request = Image(painter = painterResource(id = R.drawable.img_linklogo_placeholder), contentDescription = null)
+            //painter.request = Image(painter = painterResource(id = R.drawable.img_linklogo_placeholder), contentDescription = null)
         }
         is ImageLoadState.Empty -> {
             DLog.e("TEST Glide", "Empty")
-            painter.request = Image(painter = painterResource(id = R.drawable.img_linklogo_placeholder), contentDescription = null)
+            //painter.request = Image(painter = painterResource(id = R.drawable.img_linklogo_placeholder), contentDescription = null)
         }
         else -> {}
     }
