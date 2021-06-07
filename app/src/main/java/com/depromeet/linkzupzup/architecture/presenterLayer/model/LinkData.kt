@@ -5,6 +5,7 @@ import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmE
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
 import com.depromeet.linkzupzup.ui.theme.TagBgColor01
 import com.depromeet.linkzupzup.ui.theme.TagTextColor01
+import com.depromeet.linkzupzup.utils.CommonUtil
 import java.util.*
 
 data class LinkData(
@@ -64,12 +65,13 @@ data class LinkData(
 
         this.hashtags.addAll(
             linkEntity.hashtags.map {
+                val randomTag = CommonUtil.getRandomeTagColor()
                 LinkHashData(
                     it.hashtagId,
                     it.hashtagName,
                     it.createdAt,
-                    TagColor(TagBgColor01,
-                    TagTextColor01))
+                    TagColor(randomTag.bgColor,
+                    randomTag.textColor))
             }
         )
 

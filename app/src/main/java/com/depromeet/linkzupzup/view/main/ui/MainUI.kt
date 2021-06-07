@@ -57,6 +57,7 @@ import com.depromeet.linkzupzup.utils.CommonUtil
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
 import com.google.accompanist.glide.rememberGlidePainter
+import com.google.accompanist.imageloading.ImageLoadState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -124,22 +125,22 @@ fun MainBodyUI(linkList: LiveData<ArrayList<LinkData>>, vm : MainViewModel? = nu
                 .background(color = Color.Transparent)
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
 
-                val columnModifier = if (list.size > 0) Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(bottom = 16.dp)
-                    .drawWithCache {
-                        val gradient = Brush.linearGradient(
-                            colors = listOf(Color.Transparent, Gray10),
-                            start = Offset(0f, size.height - 100.dp.toPx()),
-                            end = Offset(0f, size.height)
-                        )
-                        onDrawWithContent {
-                            drawContent()
-                            drawRect(gradient)
-                        }
-                    }
-                else Modifier.fillMaxWidth()
+//                val columnModifier = if (list.size > 0) Modifier
+//                    .fillMaxWidth()
+//                    .weight(1f)
+//                    .padding(bottom = 16.dp)
+//                    .drawWithCache {
+//                        val gradient = Brush.linearGradient(
+//                            colors = listOf(Color.Transparent, Gray10),
+//                            start = Offset(0f, size.height - 100.dp.toPx()),
+//                            end = Offset(0f, size.height)
+//                        )
+//                        onDrawWithContent {
+//                            drawContent()
+//                            drawRect(gradient)
+//                        }
+//                    }
+//                else Modifier.fillMaxWidth()
 
 
                 // 메인 리스트
@@ -173,7 +174,10 @@ fun MainBodyUI(linkList: LiveData<ArrayList<LinkData>>, vm : MainViewModel? = nu
                         useHeader = true,
                         useEmptyGuide = true,
                         headerContent = { MainHeaderCard(name = "김나경") },
-                        emptyContent = { EmptyLinkGuideCard (Modifier.fillMaxWidth().weight(1f)) }) { idx, linkItem ->
+                        emptyContent = { EmptyLinkGuideCard (
+                            Modifier
+                                .fillMaxWidth()
+                                .weight(1f)) }) { idx, linkItem ->
                         MainLinkCard(index = idx, linkData = linkItem, vm)
                     }
                 }
@@ -193,6 +197,7 @@ fun MainBodyUI(linkList: LiveData<ArrayList<LinkData>>, vm : MainViewModel? = nu
                             DLog.e("TEST","링크 줍기 클릭")
                             sheetState.show()
                         }
+
                     }) {
 
                     Text("링크 줍기",
@@ -349,6 +354,19 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
         metaImgUrl.value = it.imgUrl
     }
 
+    val painter = rememberGlidePainter(request = metaImgUrl.value, fadeIn = true, previewPlaceholder = R.drawable.img_linklogo_placeholder)
+    when(painter.loadState) {
+        is ImageLoadState.Error -> {
+            DLog.e("TEST Glide", "Error")
+            painter.request = Image(painter = painterResource(id = R.drawable.img_linklogo_placeholder), contentDescription = null)
+        }
+        is ImageLoadState.Empty -> {
+            DLog.e("TEST Glide", "Empty")
+            painter.request = Image(painter = painterResource(id = R.drawable.img_linklogo_placeholder), contentDescription = null)
+        }
+        else -> {}
+    }
+
     Card(elevation = 0.dp,
         shape = RoundedCornerShape(0),
         backgroundColor = Color.Transparent,
@@ -360,11 +378,11 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
             .height(96.dp)) {
 
             // 링크 썸네일 이미지
-            Image(painter =  rememberGlidePainter (request = metaImgUrl.value, fadeIn = true),
-                contentDescription = null,
+            Image(contentDescription = null,
                 modifier = Modifier.size(96.dp),
                 contentScale = ContentScale.Crop,
-                alignment = Alignment.Center)
+                alignment = Alignment.Center,
+                painter =  rememberGlidePainter(painter))
 
             Spacer(modifier = Modifier.width(10.dp))
 
