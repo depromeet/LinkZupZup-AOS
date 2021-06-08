@@ -64,11 +64,11 @@ abstract class BaseActivity<VIEW: BaseView<VIEWMODEL>, VIEWMODEL: BaseViewModel>
 
     fun isLogin(): Boolean = pref.isLogin()
 
-    fun movePageDelay(cls: Class<*>, time: Long = 500L, isFinish: Boolean = false) {
+    fun movePageDelay(cls: Class<*>, time: Long = 300L, isFinish: Boolean = false) {
         Observable.timer(time, TimeUnit.MILLISECONDS)
             .subscribe { movePage(cls, isFinish) }
     }
-    fun movePage(cls: Class<*>, isFinish: Boolean = false) {
+    private fun movePage(cls: Class<*>, isFinish: Boolean = false) {
         Intent(this@BaseActivity, cls).let(this::startActivity)
         if (isFinish) finish()
     }
@@ -86,6 +86,11 @@ abstract class BaseActivity<VIEW: BaseView<VIEWMODEL>, VIEWMODEL: BaseViewModel>
                 it.dismiss()
             }, DEFAULT_PROGRESS_TIME)
         }
+    }
+
+    override fun onBackPressed() {
+        overridePendingTransition(R.anim.stay, R.anim.slide_down_out)
+        super.onBackPressed()
     }
 
 }

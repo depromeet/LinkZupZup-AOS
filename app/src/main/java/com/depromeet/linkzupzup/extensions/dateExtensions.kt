@@ -5,6 +5,34 @@ import java.text.DecimalFormat
 import java.util.*
 
 /**
+ * 서버에서 내려오는 datatime의 경우 hh:mm 만 내려오는경우가 있습니다. 이럴경우를 대비하여 아래와 같이 확장메서드를 추가합니다.
+ */
+fun calendarInstance(): Calendar = Calendar.getInstance()
+fun String.getCalendar(): Calendar {
+    return if (isNotEmpty() && contains("^\\d{2}:\\d{2}")) {
+        val times = split(":")
+        val hour = times[0].toInt()
+        val minute = times[1].toInt()
+        Calendar.getInstance().clearMillis().apply {
+           set(Calendar.HOUR, hour)
+           set(Calendar.MINUTE, minute)
+        }
+    } else calendarInstance()
+}
+fun Calendar.hour(): Int = get(Calendar.HOUR)
+fun Calendar.minute(): Int = get(Calendar.MINUTE)
+fun Calendar.hourStr(): String = hour().toString()
+fun Calendar.minuteStr(): String = minute().toString()
+fun Calendar.isAm(): Boolean = get(Calendar.AM_PM) == Calendar.AM
+fun Calendar.timeBaseStr(): String = if (isAm()) "오전" else "오후"
+fun Calendar.timeStr(digitFormat: String = "%02d"): String
+    = arrayOf(
+    hour().digitFormat(digitFormat),
+    minute().digitFormat(digitFormat)
+).joinToString(":")
+
+
+/**
  * 0 : 오전, 1: 오후
  */
 fun String.isAm(): Boolean
@@ -15,7 +43,7 @@ fun String.timeStr(digitFormat: String = "%02d"): String
     = DateUtil.dateStrToCalendar(this).let { cal ->
         arrayOf(
             cal.get(Calendar.HOUR).digitFormat(),
-            cal.get(Calendar.HOUR).digitFormat()
+            cal.get(Calendar.MINUTE).digitFormat()
         ).joinToString(":")
     }
 fun String.hour(): Int

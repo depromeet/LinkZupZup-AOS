@@ -26,9 +26,6 @@ class LoginActivity : BaseActivity<LoginUI, LoginViewModel>() {
                 kakaoLogin(this@LoginActivity) { token, loginError ->
                     if (token != null) getKakaoUserInfo { user, meError ->
                         user?.run {
-//                            id
-//                            kakaoAccount?.email
-//                            kakaoAccount?.profile?.nickname
 
                             /**
                              * 일단 납득은 안가지만 아래순으로 API를 호출해야될것같음
@@ -38,14 +35,18 @@ class LoginActivity : BaseActivity<LoginUI, LoginViewModel>() {
                              *
                              * 아직 가입 유무 API를 개발 진행중이라 향후 로직 개발
                              */
-
-                            val userEmail = kakaoAccount?.email ?: ""
+                            val identifier = id
                             val nickName = kakaoAccount?.profile?.nickname ?: ""
-                            signInUp(SignInUpEntity(email = userEmail, name = nickName)) { status, response ->
+                            val firebaseFCMToken = preference?.getFCMToken() ?: ""
+                            val authorization =  pref.getAuthorization()
+                            val userId = pref.getUserId()
+
+                            signInUp(SignInUpEntity(loginId = identifier, name = nickName, token = authorization, userId = userId, pushToken = firebaseFCMToken)) { status, response ->
 
                                 when (status) {
                                     StatusConst.SELECT_SUSSCESS_STATUS -> {
                                         toast(this@LoginActivity, "$nickName 님, 안녕하세요.")
+                                        pref.setUserName(nickName)
                                         movePageDelay(MainActivity::class.java, 500L, true)
                                     }
                                     else -> {}
@@ -59,5 +60,7 @@ class LoginActivity : BaseActivity<LoginUI, LoginViewModel>() {
             }
         }
     }
+
+    override fun onBackPressed() { /* super.onBackPressed() */ }
 
 }

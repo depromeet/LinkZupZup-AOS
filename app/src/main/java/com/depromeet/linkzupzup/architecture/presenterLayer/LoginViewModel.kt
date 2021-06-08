@@ -52,9 +52,16 @@ class LoginViewModel(private var userUseCase: UserUseCases) : BaseViewModel() {
                 when(status) {
                     StatusConst.REGIST_SUCCESS_STATUS -> {
                         // 회원가입, 재호출 하여 로그인 처리
+
+                        val _authorization = response.data?.token ?: ""
+                        val _userId = response.data?.userId ?: 0
+                        preference?.run {
+                            setAuthorization(_authorization)
+                            setUserId(_userId)
+                        }
                         signInUp(signInUpEntity.apply {
-                            token = response.data?.token ?: ""
-                            userId = response.data?.userId ?: 0
+                            token = _authorization
+                            userId = _userId
                         }, callback)
                     }
                     StatusConst.SELECT_SUSSCESS_STATUS -> {

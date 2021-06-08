@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import com.depromeet.linkzupzup.AppConst.AUTHORIZATION_KEY
 import com.depromeet.linkzupzup.AppConst.USER_FCM_TOKEN
 import com.depromeet.linkzupzup.AppConst.USER_ID_KEY
+import com.depromeet.linkzupzup.AppConst.USER_NAME_KEY
 
 class PreferencesManager(ctx: Context, name: String = "pref") {
 
@@ -21,6 +22,12 @@ class PreferencesManager(ctx: Context, name: String = "pref") {
     fun getUserId(): Int = pref.getInt(USER_ID_KEY, 0)
     fun setUserId(userId: Int) {
         saver.putInt(USER_ID_KEY, userId)
+        saver.commit()
+    }
+
+    fun getUserName(): String = pref.getString(USER_NAME_KEY, "") ?: ""
+    fun setUserName(userName: String) {
+        saver.putString(USER_NAME_KEY, userName)
         saver.commit()
     }
 
