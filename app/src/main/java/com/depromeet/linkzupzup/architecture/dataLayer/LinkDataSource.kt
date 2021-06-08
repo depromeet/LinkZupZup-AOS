@@ -18,4 +18,7 @@ class LinkDataSource(private val api: LinkAPIService) {
     fun getTodayReadCount(): Observable<ResponseEntity<Int>>
         = api.getTodayReadCount()
 
+    fun setLinkRead(linkId: Int): Observable<ResponseEntity<*>>
+        = api.setLinkRead(linkId)
+
 }

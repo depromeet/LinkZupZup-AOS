@@ -24,6 +24,10 @@ class LinkRepositoryImpl(private val roomDB: RoomDB, private val linkDataSource:
         return linkDataSource.getTodayReadCount()
     }
 
+    override fun setLinkRead(linkId: Int): Observable<ResponseEntity<*>> {
+        return linkDataSource.setLinkRead(linkId)
+    }
+
     override suspend fun getMetaList(urls: ArrayList<String>): List<LinkMetaInfoEntity> {
         var logStr = ""
         urls.forEach { logStr += "$it," }

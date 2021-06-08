@@ -32,6 +32,12 @@ class LinkUseCases(private val linkRepositoryImpl: LinkRepositoryImpl) {
         return linkRepositoryImpl.getTodayReadCount()
     }
 
+    /**
+     * 링크 읽기 상태로 변경
+     */
+    fun setLinkRead(linkId: Int): Observable<ResponseEntity<*>>{
+        return linkRepositoryImpl.setLinkRead(linkId)
+    }
 
     suspend fun getMetaList(urls: ArrayList<String>): List<LinkMetaInfoEntity> {
         return linkRepositoryImpl.getMetaList(urls)

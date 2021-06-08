@@ -7,10 +7,7 @@ import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmE
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmResponseEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import io.reactivex.Observable
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.QueryMap
+import retrofit2.http.*
 
 interface LinkAPIService {
 
@@ -33,5 +30,8 @@ interface LinkAPIService {
 
     @GET(ApiUrl.LINK_COUNT)
     fun getTodayReadCount(): Observable<ResponseEntity<Int>>
+
+    @PATCH
+    fun setLinkRead(linkId: Int): Observable<ResponseEntity<*>>
 
 }

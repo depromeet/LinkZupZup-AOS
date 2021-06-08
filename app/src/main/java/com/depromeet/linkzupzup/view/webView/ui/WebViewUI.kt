@@ -45,7 +45,7 @@ class WebViewUI : BaseView<WebViewViewModel>() {
                 Column(modifier = Modifier.fillMaxSize()) {
                     val openDialog = remember { mutableStateOf(false)  }
 
-                    WebPageScreen(urlToRender = "https://www.google.com", openDialog = openDialog)
+                    WebPageScreen(urlToRender = "https://www.naver.com", openDialog = openDialog, vm = vm)
                     WebViewCustomDialog(openDialog = openDialog)
                 }
             }
@@ -54,9 +54,9 @@ class WebViewUI : BaseView<WebViewViewModel>() {
 }
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebPageScreen(urlToRender: String, openDialog: MutableState<Boolean>) {
+fun WebPageScreen(urlToRender: String, openDialog: MutableState<Boolean>, vm: WebViewViewModel? = null) {
     Scaffold(
-        topBar = { WebViewTopBar(openDialog = openDialog) },
+        topBar = { WebViewTopBar(openDialog = openDialog, vm = vm) },
         backgroundColor = Color.Transparent,
         modifier = Modifier.fillMaxSize()) {
 
@@ -78,7 +78,7 @@ fun WebPageScreen(urlToRender: String, openDialog: MutableState<Boolean>) {
 
 
 @Composable
-fun WebViewTopBar(openDialog: MutableState<Boolean>){
+fun WebViewTopBar(openDialog: MutableState<Boolean>, vm: WebViewViewModel? = null){
     val ctx = LocalContext.current
     Box(modifier = Modifier
         .fillMaxWidth()
@@ -115,7 +115,12 @@ fun WebViewTopBar(openDialog: MutableState<Boolean>){
                 modifier = Modifier
                     .width(60.dp)
                     .height(36.dp),
-                onClick = { openDialog.value = true }) {
+                onClick = {
+                    vm?.run {
+                        openDialog.value = setLinkRead()
+                    }
+
+                }) {
 
                 Text("완료!",
                     textAlign = TextAlign.Center,
