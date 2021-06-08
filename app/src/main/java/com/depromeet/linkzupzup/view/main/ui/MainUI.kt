@@ -56,6 +56,7 @@ import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.CommonUtil
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
+import com.depromeet.linkzupzup.view.custom.CustomLinearProgressIndicator
 import com.google.accompanist.glide.rememberGlidePainter
 import com.google.accompanist.imageloading.ImageLoadState
 import kotlinx.coroutines.CoroutineScope
@@ -83,13 +84,6 @@ class MainUI(var clickListener: (id: Int) -> Unit = {}): BaseView<MainViewModel>
     }
 }
 
-//@ExperimentalFoundationApi
-//@ExperimentalMaterialApi
-//@Preview
-//@Composable
-//fun MainPreview() {
-//    MainBodyUI(linkList = LinkData.mockLinkList())
-//}
 
 @ExperimentalMaterialApi
 @Preview
@@ -324,13 +318,14 @@ fun ReadProgress(readCnt: Int, padding: PaddingValues = PaddingValues(0.dp)){
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                LinearProgressIndicator(
+                CustomLinearProgressIndicator(
                     progress = 0.7f,
                     backgroundColor = Gray20,
                     color = Blue50,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(16.dp))
+                        .height(16.dp)
+                        .padding(horizontal = 10.dp))
             }
 
         }
