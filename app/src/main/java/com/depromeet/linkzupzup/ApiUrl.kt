@@ -12,11 +12,13 @@ object ApiUrl {
     const val ALARMS = "alarms"
     const val MEMBERS = "members"
     const val RANKING = "ranking"
+    const val COUNT = "count"
 
     /**
      * Link
      */
     const val LINK_LIST = "$BASE_URL/$LINKS"
+    const val LINK_COUNT = "$BASE_URL/$LINKS/$COUNT"
 
     /**
      * Alarm

@@ -39,6 +39,9 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
     private var _linkList: MutableLiveData<ArrayList<LinkData>> = MutableLiveData(arrayListOf())
     val linkList: LiveData<ArrayList<LinkData>> = _linkList
 
+    private var _todayReadCnt: MutableLiveData<Int> = MutableLiveData()
+    val todayReadCnt: LiveData<Int> = _todayReadCnt
+
     /**
      * 사용자가 저장한 링크 리스트 조회
      * completed=F
@@ -168,6 +171,16 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
 
                 callback?.invoke(it)
                 progressStatus(false)
+            }, this@MainViewModel::defaultThrowable))
+    }
+
+    fun getTodayLinkList(){
+        addDisposable(linkUseCases.getTodayReadCount()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe ({ response ->
+                response.data?.let { preference?.setTodayCount(it) }
+                _todayReadCnt.value = preference?.getTodayCount()
             }, this@MainViewModel::defaultThrowable))
     }
 

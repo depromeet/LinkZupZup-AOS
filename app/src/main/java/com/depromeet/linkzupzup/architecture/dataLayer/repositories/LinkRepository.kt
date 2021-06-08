@@ -13,6 +13,8 @@ interface LinkRepository {
 
     fun registerLink(linkRegisterEntity: LinkRegisterEntity): Observable<ResponseEntity<LinkAlarmEntity>>
 
+    fun getTodayReadCount(): Observable<ResponseEntity<Int>>
+
     suspend fun getMetaList(urls: ArrayList<String>) : List<LinkMetaInfoEntity>
 
     suspend fun insertMetaInfo(metaInfoEntity: LinkMetaInfoEntity)

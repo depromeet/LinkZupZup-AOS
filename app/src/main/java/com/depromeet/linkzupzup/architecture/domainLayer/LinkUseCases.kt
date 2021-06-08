@@ -25,6 +25,13 @@ class LinkUseCases(private val linkRepositoryImpl: LinkRepositoryImpl) {
         return linkRepositoryImpl.registerLink(linkInfo)
     }
 
+    /**
+     * 오늘 읽은 링크 수 조회
+     */
+    fun getTodayReadCount(): Observable<ResponseEntity<Int>>{
+        return linkRepositoryImpl.getTodayReadCount()
+    }
+
 
     suspend fun getMetaList(urls: ArrayList<String>): List<LinkMetaInfoEntity> {
         return linkRepositoryImpl.getMetaList(urls)

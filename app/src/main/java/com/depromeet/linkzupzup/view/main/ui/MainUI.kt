@@ -104,6 +104,7 @@ fun MainBodyUI(linkList: LiveData<ArrayList<LinkData>>, vm : MainViewModel? = nu
     // 로그인 성공
     val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val todayCnt : Int = vm?.todayReadCnt?.observeAsState()?.value ?: 0
 
     ModalBottomSheetLayout(sheetState = sheetState,
         sheetShape = BottomSheetShape,
@@ -167,7 +168,7 @@ fun MainBodyUI(linkList: LiveData<ArrayList<LinkData>>, vm : MainViewModel? = nu
                         items = list,
                         useHeader = true,
                         useEmptyGuide = true,
-                        headerContent = { MainHeaderCard(name = userName) },
+                        headerContent = { MainHeaderCard(name = userName, progress = 0.2f * todayCnt) },
                         emptyContent = { EmptyLinkGuideCard (
                             Modifier
                                 .fillMaxWidth()
@@ -266,7 +267,7 @@ fun MainAppBarBtn(painter: Painter, onClick: ()->Unit) {
 
 
 @Composable
-fun MainHeaderCard(name : String, padding: PaddingValues = PaddingValues(0.dp)){
+fun MainHeaderCard(name : String, progress: Float, padding: PaddingValues = PaddingValues(0.dp)){
     // in ColumnScope
     Column(modifier = Modifier.fillMaxWidth()) {
 
@@ -288,12 +289,12 @@ fun MainHeaderCard(name : String, padding: PaddingValues = PaddingValues(0.dp)){
         }
 
         // 유저 링크 읽은 횟수
-        ReadProgress(5)
+        ReadProgress(progress)
     }
 }
 
 @Composable
-fun ReadProgress(readCnt: Int, padding: PaddingValues = PaddingValues(0.dp)){
+fun ReadProgress(progress: Float, padding: PaddingValues = PaddingValues(0.dp)){
     Column(modifier = Modifier
         .fillMaxWidth()
         .padding(padding)) {
@@ -309,7 +310,7 @@ fun ReadProgress(readCnt: Int, padding: PaddingValues = PaddingValues(0.dp)){
                 .fillMaxWidth()
                 .padding(16.dp)) {
 
-                Text(text = "오늘 ${readCnt}개만 읽어도 뿌듯! \uD83D\uDC4D\uD83D\uDC4D",
+                Text(text = "오늘 5개만 읽어도 뿌듯! \uD83D\uDC4D\uD83D\uDC4D",
                     lineHeight = 17.5.sp,
                     style = TextStyle(fontSize = 12.sp,
                         color = Gray100t,
@@ -319,7 +320,7 @@ fun ReadProgress(readCnt: Int, padding: PaddingValues = PaddingValues(0.dp)){
                 Spacer(modifier = Modifier.height(8.dp))
 
                 CustomLinearProgressIndicator(
-                    progress = 0.7f,
+                    progress = progress,
                     backgroundColor = Gray20,
                     color = Blue50,
                     modifier = Modifier

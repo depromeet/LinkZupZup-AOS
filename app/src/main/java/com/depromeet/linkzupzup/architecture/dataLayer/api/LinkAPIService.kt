@@ -31,4 +31,7 @@ interface LinkAPIService {
     @POST(ApiUrl.LINK_LIST)
     fun registerLink(@Body linkRegisterEntity: LinkRegisterEntity): Observable<ResponseEntity<LinkAlarmEntity>>
 
+    @GET(ApiUrl.LINK_COUNT)
+    fun getTodayReadCount(): Observable<ResponseEntity<Int>>
+
 }

@@ -9,6 +9,7 @@ object AppConst {
     const val DEVICE_TYPE_KEY: String = "device_type"
     const val DEVICE_TYPE: String = "AOS"
     const val KAKAO_TOKEN_KEY: String = "kakao_token"
+    const val TODAY_READ_KEY: String = "todayReadCount"
 
     const val OAUTH_KAKAO_TYPE: String = "oauth_kakao_type"
     const val OAUTH_GOOGLE_TYPE: String = "oauth_google_type"

@@ -5,10 +5,13 @@ import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseActivity
 import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
 import com.depromeet.linkzupzup.extensions.toast
+import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.alarm.AlarmDetailActivity
 import com.depromeet.linkzupzup.view.login.LoginActivity
 import com.depromeet.linkzupzup.view.main.ui.MainUI
 import com.depromeet.linkzupzup.view.mypage.MyPageActivity
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 
 class MainActivity : BaseActivity<MainUI, MainViewModel>() {
@@ -21,6 +24,7 @@ class MainActivity : BaseActivity<MainUI, MainViewModel>() {
         with(viewModel) {
             // 링크 리스트 호출
             getLinkList()
+            getTodayLinkList()
         }
     }
 

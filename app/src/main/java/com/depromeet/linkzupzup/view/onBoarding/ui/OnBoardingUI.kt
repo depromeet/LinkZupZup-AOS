@@ -87,7 +87,7 @@ fun PushCard(title : String, content : String, time : String, painter: Painter? 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
+            .wrapContentHeight()
             .padding(start = 14.dp, top = 12.dp, end = 14.dp, bottom = 14.dp)) {
 
         Row(
