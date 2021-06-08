@@ -35,10 +35,13 @@ class LoginActivity : BaseActivity<LoginUI, LoginViewModel>() {
                              *
                              * 아직 가입 유무 API를 개발 진행중이라 향후 로직 개발
                              */
-
-                            val userEmail = kakaoAccount?.email ?: ""
+                            val identifier = id
                             val nickName = kakaoAccount?.profile?.nickname ?: ""
-                            signInUp(SignInUpEntity(email = userEmail, name = nickName)) { status, response ->
+                            val firebaseFCMToken = preference?.getFCMToken() ?: ""
+                            val authorization =  pref.getAuthorization()
+                            val userId = pref.getUserId()
+
+                            signInUp(SignInUpEntity(loginId = identifier, name = nickName, token = authorization, userId = userId, pushToken = firebaseFCMToken)) { status, response ->
 
                                 when (status) {
                                     StatusConst.SELECT_SUSSCESS_STATUS -> {

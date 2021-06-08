@@ -7,8 +7,11 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class SignInUpEntity (
 
-    @SerializedName("email")
-    var email: String = "",
+    @SerializedName("userId")
+    var userId: Int = 0,
+
+    @SerializedName("loginId")
+    var loginId: Long = 0L,
 
     @SerializedName("name")
     var name: String = "",
@@ -16,5 +19,5 @@ data class SignInUpEntity (
     @SerializedName("token")
     var token: String = "",
 
-    @SerializedName("userId")
-    var userId: Int = 0): Parcelable
+    @SerializedName("pushToken")
+    var pushToken: String = ""): Parcelable

@@ -52,6 +52,12 @@ class AlarmDetailViewModel(private val alarmUseCases: AlarmUseCases): BaseViewMo
             .subscribeOn(Schedulers.io())
             .subscribe({
 
+                when(it.getStatus()) {
+                    // 등록 성공 이후 리스트 갱신
+                    StatusConst.REGIST_SUCCESS_STATUS -> getAlarmList()
+                    else -> {}
+                }
+
                 // TODO: 로직 추가 필요
                 callback?.invoke(it)
                 progressStatus(false)

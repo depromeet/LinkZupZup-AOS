@@ -23,12 +23,14 @@ class AlarmDetailActivity : BaseActivity<AlarmDetailUI, AlarmDetailViewModel>() 
         }
     }
 
-    private fun onClick(id: Int) {
+    private fun onClick(id: Int) = with(viewModel) {
         when (id) {
-            R.drawable.ic_detail_back -> {
+            R.id.avtivity_close -> {
                 super.onBackPressed()
-                overridePendingTransition(R.anim.stay, R.anim.slide_down_out)
+                overridePendingTransition(R.anim.stay, R.anim.act_slide_right_out)
             }
+            // 바텀시트, 알람 저장 시
+            R.id.alarm_save -> {}
             else -> {}
         }
     }

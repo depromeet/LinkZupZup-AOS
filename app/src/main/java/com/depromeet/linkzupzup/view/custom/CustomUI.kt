@@ -45,16 +45,10 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.VerticalPager
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
-import io.reactivex.Observable
-import io.reactivex.Scheduler
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 import kotlin.math.absoluteValue
 
@@ -160,14 +154,12 @@ fun CustomPreView() {
 
             })
 
-            CustomToogle(modifier = Modifier.height(28.dp), datas = arrayListOf("주중", "주말"))
 
+            CustomToggle(modifier = Modifier.height(28.dp), datas = arrayListOf("주중", "주말"))
+
+            val checked = remember { mutableStateOf(false) }
             CustomTextCheckBox(modifier = Modifier.height(20.dp),
-                text = "공휴일엔 알람 끄기",
-                enableImg = R.drawable.ic_holiday_on,
-                disableImg = R.drawable.ic_holiday_off,
-                enableColor = Color(0xFF4076F6),
-                disableColor = Color(0xFF878D91),
+                checked = checked.value,
                 onChangeListener = {
                     DLog.e("TEST", if (it) "공휴일 알람 비활성" else "공휴일 알람 활성")
                 })
@@ -433,27 +425,35 @@ fun CustomTextPicker(curIdx: Int = 0,
 }
 
 @Composable
-fun CustomToogle(modifier: Modifier, spaceSize: Dp = 6.dp, datas: ArrayList<String>, onChangeListener: (Int) -> Unit = {}) {
-    val selectedState = remember { mutableStateOf(0) }
+fun CustomToggle(modifier: Modifier, spaceSize: Dp = 6.dp, datas: ArrayList<String>, checked: ArrayList<Int> = arrayListOf(), onChangeListener: (Int) -> Unit = {}) {
+    if (checked.size < datas.size) repeat(datas.size) { checked.add(0) }
+    val status: MutableState<ArrayList<Int>> = remember { mutableStateOf(arrayListOf<Int>().apply {
+        repeat(datas.size) {
+            add(checked[it])
+        }
+    }) }
+
     Row(modifier) {
         datas.forEachIndexed { index, txt ->
-            val backgroundColor = if (selectedState.value == index) Color(0xFF4D5256) else Color(0xFFFFFFFF)
-            val border = if (selectedState.value == index) null else BorderStroke(1.dp, Color(0xFFA9AFB3))
-            val textColor = if (selectedState.value == index) Color(0xFFFFFFFF) else Color(0xFF878D91)
+
+            val backgroundColor = if (status.value[index] == 1) Color(0xFF4D5256) else Color(0xFFFFFFFF)
+            val border = if (status.value[index] == 1) null else BorderStroke(1.dp, Color(0xFFA9AFB3))
+            val textColor = if (status.value[index] == 1) Color(0xFFFFFFFF) else Color(0xFF878D91)
 
             Card(shape = RoundedCornerShape(4.dp), elevation = 0.dp, backgroundColor = backgroundColor, border = border,
-                modifier = Modifier.fillMaxHeight()
+                modifier = Modifier
+                    .fillMaxHeight()
                     .clickable {
-                        if (selectedState.value != index) {
-                            selectedState.value = if (selectedState.value == 0) 1 else 0
-                            onChangeListener(index)
-                        }
+                        status.value[index] = if (status.value[index] == 0) 1 else 0
+                        status.value = status.value
+                        onChangeListener(index)
                     }) {
                 Column(verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxHeight()
+                    modifier = Modifier
+                        .fillMaxHeight()
                         .padding(horizontal = 16.dp)) {
-                    Text(txt,
+                    Text(text = txt,
                         style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = textColor),
                         textAlign = TextAlign.Center)
                 }
@@ -468,26 +468,83 @@ fun CustomToogle(modifier: Modifier, spaceSize: Dp = 6.dp, datas: ArrayList<Stri
 }
 
 @Composable
-fun CustomTextCheckBox(modifier: Modifier = Modifier.height(20.dp), enableImg: Int, disableImg: Int, text: String, enableColor: Color = Color(0xFF4076F6), disableColor: Color = Color(0xFF878D91), onChangeListener: (Boolean) -> Unit = {}) {
-    val checked = remember { mutableStateOf(false) }
+fun CustomToggle2(modifier: Modifier, spaceSize: Dp = 6.dp, toggleValue1: Boolean, toggleValue2: Boolean, onChangeListener: (Int, Int) -> Unit = { idx, status -> }) {
+
+    var toggleValue = remember { mutableListOf(toggleValue1, toggleValue2) }
+    toggleValue[0] = toggleValue1
+    toggleValue[1] = toggleValue2
+
+    Row(modifier) {
+        val backgroundColor1 = if (toggleValue[0]) Color(0xFF4D5256) else Color(0xFFFFFFFF)
+        val border1 = if (toggleValue[0]) null else BorderStroke(1.dp, Color(0xFFA9AFB3))
+        val textColor1 = if (toggleValue[0]) Color(0xFFFFFFFF) else Color(0xFF878D91)
+
+        val backgroundColor2 = if (toggleValue[1]) Color(0xFF4D5256) else Color(0xFFFFFFFF)
+        val border2 = if (toggleValue[1]) null else BorderStroke(1.dp, Color(0xFFA9AFB3))
+        val textColor2 = if (toggleValue[1]) Color(0xFFFFFFFF) else Color(0xFF878D91)
+
+        Card(shape = RoundedCornerShape(4.dp), elevation = 0.dp, backgroundColor = backgroundColor1, border = border1,
+            modifier = Modifier
+                .fillMaxHeight()
+                .clickable {
+                    // val temp = if (toggleStatus1.value == 1) 0 else 1
+//                    toggleStatus1.value = !toggleStatus1.value
+//                    onChangeListener(0, toggleStatus1.value.getInt())
+                    toggleValue[0] = !toggleValue[0]
+                    onChangeListener(0, toggleValue[0].getInt())
+                }) {
+            Column(verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxHeight().padding(horizontal = 16.dp)) {
+                Text(text = "주중",
+                    style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = textColor1),
+                    textAlign = TextAlign.Center)
+            }
+        }
+
+        Spacer(Modifier.width(spaceSize))
+
+        Card(shape = RoundedCornerShape(4.dp), elevation = 0.dp, backgroundColor = backgroundColor2, border = border2,
+            modifier = Modifier
+                .fillMaxHeight()
+                .clickable {
+//                    toggleStatus2.value = (!toggleStatus2.value)
+//                    onChangeListener(1, toggleStatus2.value.getInt())
+                    toggleValue[1] = !toggleValue[1]
+                    onChangeListener(1, toggleValue[1].getInt())
+                }) {
+            Column(verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxHeight().padding(horizontal = 16.dp)) {
+                Text(text = "주말",
+                    style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = textColor2),
+                    textAlign = TextAlign.Center)
+            }
+        }
+    }
+}
+
+@Composable
+fun CustomTextCheckBox(modifier: Modifier = Modifier.height(20.dp), checked: Boolean = false, onChangeListener: (Boolean) -> Unit = {}) {
+    val checkedState = remember { mutableStateOf(checked) }
     Card(elevation = 0.dp, backgroundColor = Color.Transparent, modifier = Modifier
         .wrapContentSize()
         .noRippleClickable {
-            checked.value = !checked.value
-            onChangeListener(!checked.value)
+            checkedState.value = !checkedState.value
+            onChangeListener(!checkedState.value)
         }) {
         Row(modifier = modifier,
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center) {
 
-            Image(painter = painterResource(id = if (checked.value) enableImg else disableImg),
+            Image(painter = painterResource(id = if (checkedState.value) R.drawable.ic_holiday_on else R.drawable.ic_holiday_off),
                 contentDescription = null,
                 modifier = Modifier.size(20.dp))
 
             Spacer(Modifier.width(4.dp))
 
-            Text(text = text,
-                style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = if (checked.value) enableColor else disableColor),
+            Text(text = "공휴일엔 알람 끄기",
+                style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = if (checkedState.value) Color(0xFF4076F6) else Color(0xFF878D91)),
                 textAlign = TextAlign.Center)
 
         }

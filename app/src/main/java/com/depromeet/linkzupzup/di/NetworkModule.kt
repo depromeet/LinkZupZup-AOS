@@ -12,6 +12,7 @@ import com.depromeet.linkzupzup.StatusConst
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.component.PreferencesManager
 import com.depromeet.linkzupzup.extensions.applySSL
+import com.depromeet.linkzupzup.extensions.toast
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.login.LoginActivity
 import com.google.gson.Gson
@@ -87,6 +88,7 @@ val networkModule = module {
                         when (it.status.toInt()) {
                             // 토큰 만료된 경우 이므로, 강제로 로그인 화면으로 이동!
                             StatusConst.ACCESS_TOKEN_EXPIRED_STATUS -> androidApplication().let { ctx ->
+                                toast(ctx, "로그인시간이 만료되었습니다.\n재로그인 부탁드립니다.")
                                 Intent(ctx, LoginActivity::class.java).apply {
                                 }.let(ctx::startActivity)
                                 // TODO: current activity를 참조하여 finish를 호출해야될것 같습니다.
