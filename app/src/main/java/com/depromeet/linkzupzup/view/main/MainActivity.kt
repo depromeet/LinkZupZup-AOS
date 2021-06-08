@@ -12,7 +12,7 @@ import org.koin.androidx.viewmodel.ext.android.getViewModel
 
 class MainActivity : BaseActivity<MainUI, MainViewModel>() {
 
-    override var view: MainUI = MainUI(this::onClickListener)
+    override var view: MainUI = MainUI(this::onClickListener, pref.getUserName())
     override fun onCreateViewModel(): MainViewModel = getViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {

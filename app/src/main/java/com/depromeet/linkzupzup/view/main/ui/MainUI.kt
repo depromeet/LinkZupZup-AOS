@@ -62,7 +62,7 @@ import com.google.accompanist.imageloading.ImageLoadState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class MainUI(var clickListener: (id: Int) -> Unit = {}): BaseView<MainViewModel>() {
+class MainUI(var clickListener: (id: Int) -> Unit = {}, var userName : String): BaseView<MainViewModel>() {
 
     @ExperimentalFoundationApi
     @ExperimentalMaterialApi
@@ -75,7 +75,7 @@ class MainUI(var clickListener: (id: Int) -> Unit = {}): BaseView<MainViewModel>
 
                     vm?.run {
 
-                        MainBodyUI(linkList = linkList, vm = this, clickListener = clickListener)
+                        MainBodyUI(linkList = linkList, vm = this, clickListener = clickListener, userName = userName)
                     }
 
                 }
@@ -98,7 +98,7 @@ fun BottomSheetPreview() {
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun MainBodyUI(linkList: LiveData<ArrayList<LinkData>>, vm : MainViewModel? = null, clickListener: (id: Int) -> Unit = {}){
+fun MainBodyUI(linkList: LiveData<ArrayList<LinkData>>, vm : MainViewModel? = null, clickListener: (id: Int) -> Unit = {}, userName: String){
     val list by linkList.observeAsState(arrayListOf())
 
     // 로그인 성공
@@ -167,7 +167,7 @@ fun MainBodyUI(linkList: LiveData<ArrayList<LinkData>>, vm : MainViewModel? = nu
                         items = list,
                         useHeader = true,
                         useEmptyGuide = true,
-                        headerContent = { MainHeaderCard(name = "김나경") },
+                        headerContent = { MainHeaderCard(name = userName) },
                         emptyContent = { EmptyLinkGuideCard (
                             Modifier
                                 .fillMaxWidth()
