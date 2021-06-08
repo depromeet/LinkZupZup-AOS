@@ -4,10 +4,7 @@ import android.util.Size
 import android.widget.CompoundButton
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.SwitchCompat
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -18,7 +15,11 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -218,7 +220,8 @@ fun CustomViewPicker(datas: ArrayList<String>,
 @ExperimentalPagerApi
 @Composable
 fun CustomTimePicker(date: Calendar = Calendar.getInstance(),
-                     modifier: Modifier = Modifier.fillMaxWidth()
+                     modifier: Modifier = Modifier
+                         .fillMaxWidth()
                          .padding(horizontal = 24.dp),
                      onChangeListener: (Int, Int) -> Unit = { type, value -> }) {
 
@@ -442,7 +445,8 @@ fun CustomToogle(modifier: Modifier, spaceSize: Dp = 6.dp, datas: ArrayList<Stri
             val textColor = if (selectedState.value == index) Color(0xFFFFFFFF) else Color(0xFF878D91)
 
             Card(shape = RoundedCornerShape(4.dp), elevation = 0.dp, backgroundColor = backgroundColor, border = border,
-                modifier = Modifier.fillMaxHeight()
+                modifier = Modifier
+                    .fillMaxHeight()
                     .clickable {
                         if (selectedState.value != index) {
                             selectedState.value = if (selectedState.value == 0) 1 else 0
@@ -451,7 +455,8 @@ fun CustomToogle(modifier: Modifier, spaceSize: Dp = 6.dp, datas: ArrayList<Stri
                     }) {
                 Column(verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxHeight()
+                    modifier = Modifier
+                        .fillMaxHeight()
                         .padding(horizontal = 16.dp)) {
                     Text(txt,
                         style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = textColor),
@@ -579,3 +584,43 @@ fun CustomDatePickerItemView(pickDate: Calendar = Calendar.getInstance(), dpSize
 
     }
 }
+
+@Preview
+@Composable
+fun CustomLinearProgressIndicator(
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    progress: Float = 0.7f,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colors.primary,
+    backgroundColor: Color = color.copy(alpha = ProgressIndicatorDefaults.IndicatorBackgroundOpacity)
+) {
+    Canvas(
+        modifier
+            .progressSemantics(progress)
+            .size(240.dp, ProgressIndicatorDefaults.StrokeWidth)
+            .focusable()
+    ) {
+        val strokeWidth = size.height
+        drawLinearIndicatorBackground(backgroundColor, strokeWidth)
+        drawLinearIndicator(0f, progress, color, strokeWidth)
+    }
+}
+
+fun DrawScope.drawLinearIndicator(startFraction: Float, endFraction: Float, color: Color, strokeWidth: Float){
+    val width = size.width
+    val height = size.height
+    // Start drawing from the vertical center of the stroke
+    val yOffset = height / 2
+
+    val isLtr = layoutDirection == LayoutDirection.Ltr
+    val barStart = (if (isLtr) startFraction else 1f - endFraction) * width
+    val barEnd = (if (isLtr) endFraction else 1f - startFraction) * width
+
+    // Progress line
+    drawLine(color, Offset(barStart, yOffset), Offset(barEnd, yOffset), strokeWidth, StrokeCap.Round) // round
+}
+
+private fun DrawScope.drawLinearIndicatorBackground(
+    color: Color,
+    strokeWidth: Float
+) = drawLinearIndicator(0f, 1f, color, strokeWidth)    // round
