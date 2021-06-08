@@ -4,6 +4,7 @@ import com.depromeet.linkzupzup.ApiUrl
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmRegistEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmUpdateEntity
 import io.reactivex.Observable
 import retrofit2.http.*
 
@@ -19,7 +20,7 @@ interface AlarmAPIService {
      * 어플 알람 등록
      */
     @POST(ApiUrl.ALARM_REGIST)
-    fun registAlarm(alarmInfo: String): Observable<ResponseEntity<AlarmRegistEntity>>
+    fun registAlarm(@Body alarmInfo: AlarmUpdateEntity): Observable<ResponseEntity<AlarmRegistEntity>>
 
     /**
      * 특정 어플 알람의 세부 내용 조회
@@ -31,7 +32,7 @@ interface AlarmAPIService {
      * 특정 어플 알람 수정
      */
     @PUT("${ApiUrl.ALARM_UPDATE}/{alarmId}")
-    fun updateAlarm(@Path("alarmId") alarmId: Int, @Body alarmInfo: String): Observable<ResponseEntity<AlarmEntity>>
+    fun updateAlarm(@Path("alarmId") alarmId: Int, @Body alarmInfo: AlarmUpdateEntity): Observable<ResponseEntity<AlarmEntity>>
 
     /**
      * 특정 어플 알람 삭제

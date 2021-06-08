@@ -7,22 +7,17 @@ import com.depromeet.linkzupzup.architecture.domainLayer.AlarmUseCases
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmRegistEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmUpdateEntity
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.WeeklyAlarm
 import com.depromeet.linkzupzup.base.BaseViewModel
+import com.depromeet.linkzupzup.extensions.mapToDataLayer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 class AlarmDetailViewModel(private val alarmUseCases: AlarmUseCases): BaseViewModel() {
 
-    companion object {
-        val TAG = AlarmDetailViewModel::class.java.simpleName
-    }
-
-    fun getWeeklyAlarmList(): ArrayList<WeeklyAlarm>
-        = alarmUseCases.getWeeklyAlarmList()
-
-    private var _alarmList: MutableLiveData<ArrayList<AlarmEntity>> = MutableLiveData(arrayListOf())
-    val alarmList: LiveData<ArrayList<AlarmEntity>> = _alarmList
+    private var _alarmList: MutableLiveData<ArrayList<WeeklyAlarm>> = MutableLiveData(arrayListOf())
+    val alarmList: LiveData<ArrayList<WeeklyAlarm>> = _alarmList
 
     /**
      * 어플 알람 리스트 조회
@@ -36,7 +31,7 @@ class AlarmDetailViewModel(private val alarmUseCases: AlarmUseCases): BaseViewMo
 
                 when (it.getStatus()) {
                     StatusConst.SELECT_SUSSCESS_STATUS -> {
-                        _alarmList.value = it.data
+                        _alarmList.value = it.data?.mapToDataLayer()
 
                         // TODO: 로직 추가 필요
                         callback?.invoke(it)
@@ -50,12 +45,18 @@ class AlarmDetailViewModel(private val alarmUseCases: AlarmUseCases): BaseViewMo
     /**
      * 어플 알람 등록
      */
-    fun registAlarm(alarmInfo: String, callback: ((ResponseEntity<AlarmRegistEntity>)->Unit)? = null) {
+    fun registAlarm(alarmInfo: AlarmUpdateEntity, callback: ((ResponseEntity<AlarmRegistEntity>)->Unit)? = null) {
         progressStatus(true)
         addDisposable(alarmUseCases.registAlarm(alarmInfo)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
+
+                when(it.getStatus()) {
+                    // 등록 성공 이후 리스트 갱신
+                    StatusConst.REGIST_SUCCESS_STATUS -> getAlarmList()
+                    else -> {}
+                }
 
                 // TODO: 로직 추가 필요
                 callback?.invoke(it)
@@ -82,7 +83,7 @@ class AlarmDetailViewModel(private val alarmUseCases: AlarmUseCases): BaseViewMo
     /**
      * 특정 어플 알람 수정
      */
-    fun updateAlarm(alarmId: Int, alarmInfo: String, callback: ((ResponseEntity<AlarmEntity>)->Unit)? = null) {
+    fun updateAlarm(alarmId: Int, alarmInfo: AlarmUpdateEntity, callback: ((ResponseEntity<AlarmEntity>)->Unit)? = null) {
         progressStatus(true)
         addDisposable(alarmUseCases.updateAlarm(alarmId, alarmInfo)
             .observeOn(AndroidSchedulers.mainThread())

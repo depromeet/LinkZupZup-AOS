@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.component.SSLHelper
 import io.reactivex.Scheduler
@@ -26,6 +27,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -52,10 +55,19 @@ fun View.px2dip(px: Int): Float = context.px2dip(px)
 fun View.px2sp(px: Int): Float = context.px2sp(px)
 fun View.dimen(@DimenRes resource: Int): Int = context.dimen(resource)
 
+inline fun Modifier.clickable(coroutineScope: CoroutineScope, crossinline onClick: CoroutineScope.()->Unit): Modifier = composed {
+    clickable { coroutineScope.launch { onClick() } }
+}
 inline fun Modifier.noRippleClickable(crossinline onClick: ()->Unit): Modifier = composed {
     clickable(indication = null,
-    interactionSource = remember { MutableInteractionSource() }) {
+        interactionSource = remember { MutableInteractionSource() }) {
         onClick()
+    }
+}
+inline fun Modifier.noRippleClickable(coroutineScope: CoroutineScope, crossinline onClick: suspend CoroutineScope.()->Unit): Modifier = composed {
+    clickable(indication = null,
+        interactionSource = remember { MutableInteractionSource() }) {
+        coroutineScope.launch { onClick() }
     }
 }
 
@@ -71,7 +83,6 @@ fun <T> Single<T>.schedulers(subscribeOnScheduler: Scheduler = Schedulers.io(),
 fun <T> Single<T>.subSimple(onSuccess: Consumer<in T>?, baseView: BaseView<*>): Disposable {
     return subscribe(onSuccess, { baseView.defaultThrowable(it) })
 }
-
 @Composable
 fun <T> T.mutableStateValue(): MutableState<T> = remember { mutableStateOf(this) }
 
@@ -102,6 +113,9 @@ fun Color.isEquals(target: Color): Boolean {
             blue == target.blue &&
             green == target.green
 }
+
+fun Boolean.getInt(): Int = if (this) 1 else 0
+fun Int.getBoolean(): Boolean = this == 1
 
 /**
  * 특이한 경우이기는 하지만, 이미지 URL의 첫 시작이 "//" 으로 시작될 경우, Url의 프로토콜이 생략된 경우이므로,
@@ -139,3 +153,5 @@ inline fun <T> LazyListScope.itemsWithHeaderAndGuideIndexed(
     else if (items.isNotEmpty()) itemContent(idx, items[idx])
     else emptyContent()
 }
+
+fun ResponseEntity<*>.status(callback: (status: Int)->Unit) = callback(getStatus())

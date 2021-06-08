@@ -6,6 +6,7 @@ import com.depromeet.linkzupzup.base.BaseActivity
 import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
 import com.depromeet.linkzupzup.extensions.toast
 import com.depromeet.linkzupzup.view.alarm.AlarmDetailActivity
+import com.depromeet.linkzupzup.view.login.LoginActivity
 import com.depromeet.linkzupzup.view.main.ui.MainUI
 import com.depromeet.linkzupzup.view.mypage.MyPageActivity
 import org.koin.androidx.viewmodel.ext.android.getViewModel
@@ -25,12 +26,10 @@ class MainActivity : BaseActivity<MainUI, MainViewModel>() {
 
     private fun onClickListener(id: Int) {
         when(id) {
-            R.drawable.ic_alram -> movePageDelay(AlarmDetailActivity::class.java, 500L, true)
+            R.drawable.ic_alram -> movePageDelay(AlarmDetailActivity::class.java, 500L)
             R.drawable.ic_ranking -> toast(this@MainActivity, "랭킹")
-            R.drawable.ic_mypage -> {
-                if(isLogin())
-                    movePageDelay(MyPageActivity::class.java, 500L, false)
-            }
+            R.drawable.ic_mypage -> if(isLogin()) movePageDelay(MyPageActivity::class.java, 500L)
+            else movePageDelay(LoginActivity::class.java, 500L, true)
         }
     }
 
