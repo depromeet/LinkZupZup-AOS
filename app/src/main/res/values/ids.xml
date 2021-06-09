@@ -4,4 +4,5 @@
     <item name="alarm_save" type="id" />
     <item name="alarm_update" type="id" />
     <item name="alarm_delete" type="id" />
+    <item name="activity_move" type="id" />
 </resources>

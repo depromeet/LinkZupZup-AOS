@@ -1,5 +1,6 @@
 package com.depromeet.linkzupzup.view.main
 
+import android.content.Intent
 import android.os.Bundle
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseActivity
@@ -10,6 +11,7 @@ import com.depromeet.linkzupzup.view.alarm.AlarmDetailActivity
 import com.depromeet.linkzupzup.view.login.LoginActivity
 import com.depromeet.linkzupzup.view.main.ui.MainUI
 import com.depromeet.linkzupzup.view.mypage.MyPageActivity
+import com.depromeet.linkzupzup.view.scrap.ScrapDetailActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.koin.androidx.viewmodel.ext.android.getViewModel
@@ -28,12 +30,21 @@ class MainActivity : BaseActivity<MainUI, MainViewModel>() {
         }
     }
 
-    private fun onClickListener(id: Int) {
+    private fun onClickListener(id: Int, linkId: Int? = null) {
         when(id) {
             R.drawable.ic_alram -> movePageDelay(AlarmDetailActivity::class.java, 500L)
             R.drawable.ic_ranking -> toast(this@MainActivity, "랭킹")
             R.drawable.ic_mypage -> if(isLogin()) movePageDelay(MyPageActivity::class.java, 500L)
-            else movePageDelay(LoginActivity::class.java, 500L, true)
+            R.id.activity_move -> {
+                linkId?.let{
+                    Intent(this, ScrapDetailActivity::class.java).apply {
+                        putExtra("LINK_ID", it) // key는 const object로 빼서 관리해도 됩니다!
+                    }.run {
+                        startActivity(this)
+                    }
+                }
+            }
+            else -> movePageDelay(LoginActivity::class.java, 500L, true)
         }
     }
 

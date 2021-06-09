@@ -61,7 +61,7 @@ import com.google.accompanist.glide.rememberGlidePainter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class MainUI(var clickListener: (id: Int) -> Unit = {}, var userName : String): BaseView<MainViewModel>() {
+class MainUI(var clickListener: (id: Int, linkId: Int?) -> Unit, var userName : String): BaseView<MainViewModel>() {
 
     @ExperimentalFoundationApi
     @ExperimentalMaterialApi
@@ -97,7 +97,7 @@ fun BottomSheetPreview() {
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun MainBodyUI(linkList: LiveData<ArrayList<LinkData>>, vm : MainViewModel? = null, clickListener: (id: Int) -> Unit = {}, userName: String){
+fun MainBodyUI(linkList: LiveData<ArrayList<LinkData>>, vm : MainViewModel? = null, clickListener: (id: Int, linkId: Int?) -> Unit, userName: String){
     val list by linkList.observeAsState(arrayListOf())
 
     // 로그인 성공
@@ -144,7 +144,9 @@ fun MainBodyUI(linkList: LiveData<ArrayList<LinkData>>, vm : MainViewModel? = nu
                         items = list,
                         useHeader = true,
                         headerContent = { MainHeaderCard(name = userName, progress = 0.2f * todayCnt) }) { idx, linkItem ->
-                        MainLinkCard(index = idx, linkData = linkItem, vm)
+                        MainLinkCard(index = idx, linkData = linkItem, vm) {
+                            clickListener(R.id.activity_move,it)
+                        }
                     }
                 }
 
@@ -183,8 +185,7 @@ fun MainBodyUI(linkList: LiveData<ArrayList<LinkData>>, vm : MainViewModel? = nu
 }
 
 @Composable
-fun MainAppBar(appBarColor : MutableState<Color> = remember { mutableStateOf(Gray10) }, clickListener: (id: Int) -> Unit = {}){
-    val ctx = LocalContext.current
+fun MainAppBar(appBarColor : MutableState<Color> = remember { mutableStateOf(Gray10) }, clickListener: (id: Int, linkId: Int?) -> Unit){
     // in ColumnScope
     
     TopAppBar(title = {},
@@ -192,17 +193,17 @@ fun MainAppBar(appBarColor : MutableState<Color> = remember { mutableStateOf(Gra
 
             // 알람
             MainAppBarBtn(painterResource(id = R.drawable.ic_alram)) {
-                clickListener(R.drawable.ic_alram)
+                clickListener(R.drawable.ic_alram,null)
             }
 
             // 랭킹
             MainAppBarBtn(painterResource(id = R.drawable.ic_ranking)) {
-                clickListener(R.drawable.ic_ranking)
+                clickListener(R.drawable.ic_ranking,null)
             }
 
             // 마이페이지
             MainAppBarBtn(painterResource(id = R.drawable.ic_mypage)) {
-                clickListener(R.drawable.ic_mypage)
+                clickListener(R.drawable.ic_mypage,null)
             }
             
         },
@@ -306,12 +307,13 @@ fun ReadProgress(progress: Float, padding: PaddingValues = PaddingValues(0.dp)){
 }
 
 @Composable
-fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = null){
+fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = null, clickListener: (Int) -> Unit){
 
     val ctx = LocalContext.current
     val tagList : ArrayList<LinkHashData> = linkData.hashtags
     val metaTitle = remember { mutableStateOf(linkData.linkTitle)}
     val metaImgUrl = remember { mutableStateOf(linkData.imgURL)}
+    val linkId = remember { mutableStateOf(linkData.linkId)}
 
     // meta data가 없으면 비동기로 호출하여 업데이트합니다.
     viewModel?.loadMetadata(index, linkData) {
@@ -338,7 +340,7 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
     Card(elevation = 0.dp,
         shape = RoundedCornerShape(0),
         backgroundColor = Color.Transparent,
-        modifier = Modifier.noRippleClickable { toast(ctx, "스크랩 링크 클릭") }) {
+        modifier = Modifier.noRippleClickable { clickListener(linkId.value) }) {
 
         Row(modifier = Modifier
             .fillMaxWidth()
