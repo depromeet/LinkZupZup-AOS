@@ -44,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
+import com.bumptech.glide.Glide
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
@@ -58,7 +59,11 @@ import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
 import com.depromeet.linkzupzup.view.custom.CustomLinearProgressIndicator
 import com.google.accompanist.glide.rememberGlidePainter
+import com.google.accompanist.imageloading.ImageLoadState
+import com.google.accompanist.imageloading.isFinalState
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 class MainUI(var clickListener: (id: Int, linkId: Int?) -> Unit, var userName : String): BaseView<MainViewModel>() {
@@ -324,18 +329,27 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
         metaImgUrl.value = it.imgUrl
     }
 
-    val painter = rememberGlidePainter(request = metaImgUrl.value, fadeIn = true, previewPlaceholder = R.drawable.img_linklogo_placeholder)
+    val painter = rememberGlidePainter(request = metaImgUrl.value, fadeIn = true, previewPlaceholder = R.drawable.ic_jubjub)
 //    when(painter.loadState) {
 //        is ImageLoadState.Error -> {
 //            DLog.e("TEST Glide", "Error")
-//            //painter.request = Image(painter = painterResource(id = R.drawable.img_linklogo_placeholder), contentDescription = null)
+//            painter.request = R.drawable.img_linklogo_placeholder
 //        }
 //        is ImageLoadState.Empty -> {
 //            DLog.e("TEST Glide", "Empty")
-//            //painter.request = Image(painter = painterResource(id = R.drawable.img_linklogo_placeholder), contentDescription = null)
+//            painter.request = R.drawable.img_linklogo_placeholder
 //        }
 //        else -> {}
 //    }
+
+
+    LaunchedEffect(painter) {
+        snapshotFlow { painter.loadState }
+            .filter { it.isFinalState() }
+            .collect {
+
+            }
+    }
 
     Card(elevation = 0.dp,
         shape = RoundedCornerShape(0),
@@ -348,12 +362,14 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
             .height(96.dp)) {
 
             // 링크 썸네일 이미지
-            Box {
+            Box(modifier = Modifier
+                .background(Blue20)
+                .size(96.dp)) {
                 Image(contentDescription = null,
                     modifier = Modifier.size(96.dp),
                     contentScale = ContentScale.Crop,
                     alignment = Alignment.Center,
-                    painter =  rememberGlidePainter(request = metaImgUrl.value, fadeIn = true, previewPlaceholder = R.drawable.img_linklogo_placeholder))
+                    painter =  painter)
 
                 MainAlarmCard() // 리마인더 유무에 따라 현재 행 추가하시면 됩니다.
             }
@@ -382,7 +398,8 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
                         fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700))), maxLines = 2, overflow = TextOverflow.Ellipsis)
 
                 // 작성자
-                Row(Modifier
+                Row(
+                    Modifier
                         .fillMaxWidth()
                         .height(16.dp)) {
 
@@ -428,7 +445,8 @@ fun MainHashtagCard(tagName : String, backColor : Color, textColor : Color){
 @Preview
 @Composable
 fun MainAlarmCard(){
-    Row(modifier = Modifier.wrapContentSize()
+    Row(modifier = Modifier
+        .wrapContentSize()
         .padding(4.dp)
         .background(Color.Transparent)){
 
@@ -437,7 +455,8 @@ fun MainAlarmCard(){
             modifier = Modifier.size(28.dp)){
 
             Row(verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
                     .background(Blue20)
                     .padding(6.dp)){
 
@@ -570,7 +589,8 @@ fun BottomSheet(sheetState : ModalBottomSheetState, coroutineScope : CoroutineSc
 @Composable
 fun BottomHeaderCard(padding: PaddingValues = PaddingValues(0.dp)){
     // in ColumnScope
-    Column(modifier = Modifier.fillMaxWidth()
+    Column(modifier = Modifier
+        .fillMaxWidth()
         .padding(horizontal = 23.dp)) {
 
         Row(
@@ -668,7 +688,8 @@ fun BottomSheetInputTag(onClick: (String) -> Unit){
     val strColor = remember { mutableStateOf(Gray70)}
     val tagName = remember { mutableStateOf("") }
 
-    Column(modifier = Modifier.fillMaxWidth()
+    Column(modifier = Modifier
+        .fillMaxWidth()
         .padding(horizontal = 23.dp)){
         Text(
             text = clickStr.value,
