@@ -329,25 +329,17 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
         metaImgUrl.value = it.imgUrl
     }
 
-    val painter = rememberGlidePainter(request = metaImgUrl.value, fadeIn = true, previewPlaceholder = R.drawable.ic_jubjub)
-//    when(painter.loadState) {
-//        is ImageLoadState.Error -> {
-//            DLog.e("TEST Glide", "Error")
-//            painter.request = R.drawable.img_linklogo_placeholder
-//        }
-//        is ImageLoadState.Empty -> {
-//            DLog.e("TEST Glide", "Empty")
-//            painter.request = R.drawable.img_linklogo_placeholder
-//        }
-//        else -> {}
-//    }
-
+    val painter = rememberGlidePainter(request = metaImgUrl.value, fadeIn = true, previewPlaceholder = R.drawable.img_linklogo_placeholder)
 
     LaunchedEffect(painter) {
         snapshotFlow { painter.loadState }
             .filter { it.isFinalState() }
             .collect {
-
+                when(it){
+                    is ImageLoadState.Empty -> { painter.request = R.drawable.img_linklogo_placeholder }
+                    is ImageLoadState.Error -> { painter.request = R.drawable.img_linklogo_placeholder }
+                    else -> {}
+                }
             }
     }
 
