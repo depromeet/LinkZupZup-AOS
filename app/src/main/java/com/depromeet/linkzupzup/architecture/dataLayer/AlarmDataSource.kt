@@ -4,7 +4,6 @@ import com.depromeet.linkzupzup.ParamsInfo
 import com.depromeet.linkzupzup.architecture.dataLayer.api.AlarmAPIService
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmEntity
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmRegistEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmUpdateEntity
 import io.reactivex.Observable
 
@@ -19,7 +18,7 @@ class AlarmDataSource(private val api: AlarmAPIService) {
     /**
      * 어플 알람 등록
      */
-    fun registAlarm(alarmInfo: AlarmUpdateEntity): Observable<ResponseEntity<AlarmRegistEntity>>
+    fun registAlarm(alarmInfo: AlarmUpdateEntity): Observable<ResponseEntity<AlarmEntity>>
         = api.registAlarm(alarmInfo)
 
     /**

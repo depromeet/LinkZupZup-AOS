@@ -47,7 +47,6 @@ import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
-import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData.Companion.converter
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkHashData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.TagColor
 import com.depromeet.linkzupzup.base.BaseView
@@ -58,7 +57,6 @@ import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
 import com.depromeet.linkzupzup.view.custom.CustomLinearProgressIndicator
 import com.google.accompanist.glide.rememberGlidePainter
-import com.google.accompanist.imageloading.ImageLoadState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -120,67 +118,37 @@ fun MainBodyUI(linkList: LiveData<ArrayList<LinkData>>, vm : MainViewModel? = nu
                 .background(color = Color.Transparent)
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
 
-//                val columnModifier = if (list.size > 0) Modifier
-//                    .fillMaxWidth()
-//                    .weight(1f)
-//                    .padding(bottom = 16.dp)
-//                    .drawWithCache {
-//                        val gradient = Brush.linearGradient(
-//                            colors = listOf(Color.Transparent, Gray10),
-//                            start = Offset(0f, size.height - 100.dp.toPx()),
-//                            end = Offset(0f, size.height)
-//                        )
-//                        onDrawWithContent {
-//                            drawContent()
-//                            drawRect(gradient)
-//                        }
-//                    }
-//                else Modifier.fillMaxWidth()
-
+                val columnModifier = if (list.size > 0) Modifier.fillMaxWidth()
+                    .weight(1f)
+                    .padding(bottom = 16.dp)
+                    .drawWithCache {
+                        val gradient = Brush.linearGradient(
+                            colors = listOf(Color.Transparent, Gray10),
+                            start = Offset(0f, size.height - 100.dp.toPx()),
+                            end = Offset(0f, size.height)
+                        )
+                        onDrawWithContent {
+                            drawContent()
+                            drawRect(gradient)
+                        }
+                    }
+                else Modifier.fillMaxWidth()
 
                 // 메인 리스트
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(24.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .padding(bottom = 16.dp)
-                        .drawWithCache {
-                            val gradient = Brush.linearGradient(
-                                colors = listOf(Color.Transparent, Gray10),
-                                start = Offset(0f, size.height - 100.dp.toPx()),
-                                end = Offset(0f, size.height)
-                            )
-                            onDrawWithContent {
-                                drawContent()
-                                drawRect(gradient)
-                            }
-                        }) {
+                    modifier = columnModifier) {
 
-//                    itemsWithHeaderIndexed (
-//                        items = linkList.value,
-//                        useHeader = true,
-//                        headerContent = { MainHeaderCard(name = "김나경") }) { idx, linkItem ->
-//
-//                        MainLinkCard(index = idx, linkData = linkItem, vm)
-//                    }
-
-                    itemsWithHeaderAndGuideIndexed (
+                    itemsWithHeaderIndexed (
                         items = list,
                         useHeader = true,
-                        useEmptyGuide = true,
-                        headerContent = { MainHeaderCard(name = userName, progress = 0.2f * todayCnt) },
-                        emptyContent = { EmptyLinkGuideCard (
-                            Modifier
-                                .fillMaxWidth()
-                                .weight(1f)) }) { idx, linkItem ->
+                        headerContent = { MainHeaderCard(name = userName, progress = 0.2f * todayCnt) }) { idx, linkItem ->
                         MainLinkCard(index = idx, linkData = linkItem, vm)
                     }
                 }
 
-                if(list.size==0){ EmptyLinkGuideCard(
-                    Modifier
-                        .fillMaxWidth()
-                        .weight(1f)) }
+                // empty guide
+                if(list.size==0){ EmptyLinkGuideCard(Modifier.fillMaxWidth()
+                    .weight(1f)) }
 
                 Button(shape = RoundedCornerShape(4.dp),
                     colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Blue50, contentColor = Color.White),

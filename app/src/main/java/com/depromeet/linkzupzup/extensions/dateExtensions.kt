@@ -9,7 +9,7 @@ import java.util.*
  */
 fun calendarInstance(): Calendar = Calendar.getInstance()
 fun String.getCalendar(): Calendar {
-    return if (isNotEmpty() && contains("^\\d{2}:\\d{2}")) {
+    return if (isNotEmpty() && indexOf(":") == 2 && length == 5) {
         val times = split(":")
         val hour = times[0].toInt()
         val minute = times[1].toInt()
@@ -19,15 +19,15 @@ fun String.getCalendar(): Calendar {
         }
     } else calendarInstance()
 }
-fun Calendar.hour(): Int = get(Calendar.HOUR)
+fun Calendar.hour(isHourOfDay: Boolean = false): Int = get(if (isHourOfDay) Calendar.HOUR_OF_DAY else Calendar.HOUR)
 fun Calendar.minute(): Int = get(Calendar.MINUTE)
 fun Calendar.hourStr(): String = hour().toString()
 fun Calendar.minuteStr(): String = minute().toString()
 fun Calendar.isAm(): Boolean = get(Calendar.AM_PM) == Calendar.AM
 fun Calendar.timeBaseStr(): String = if (isAm()) "오전" else "오후"
-fun Calendar.timeStr(digitFormat: String = "%02d"): String
+fun Calendar.timeStr(digitFormat: String = "%02d", isHourOfDay: Boolean = false): String
     = arrayOf(
-    hour().digitFormat(digitFormat),
+    hour(isHourOfDay).digitFormat(digitFormat),
     minute().digitFormat(digitFormat)
 ).joinToString(":")
 

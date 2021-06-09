@@ -1,50 +1,69 @@
 package com.depromeet.linkzupzup.architecture.presenterLayer.model
 
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.*
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmEntity
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.getRepeatedDate
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.isHoliday
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.isWeekday
-import com.depromeet.linkzupzup.extensions.getInt
 
 data class WeeklyAlarm (
     var alarmId: Int = -1,
     var dateTime: String = "",
-    var isWeekday: Int = -1, // 0: 평일, 1: 주말, 2: 매일
-    var isHolidayUse: Int = 0,
-    var enableAlarm: Int = 0) {
+    var weeklydayend: Int = 0, // 0: 평일, 1: 주말, 2: 매일
+    var disableHoliday: Int = 0,
+    var enableAlarm: Boolean = false) {
 
     companion object {
-        const val EMPTY = -1
         const val WEEKDAYS = 0
         const val WEEKENDS = 1
         const val EVERYDAY = 2
-        fun WeeklyAlarm.clone(): WeeklyAlarm = WeeklyAlarm(alarmId, dateTime, isWeekday, isHolidayUse, enableAlarm)
+        fun WeeklyAlarm.clone(): WeeklyAlarm = WeeklyAlarm(alarmId, dateTime, weeklydayend, disableHoliday, enableAlarm)
     }
 
-    fun isEnableAlarm(): Boolean = enableAlarm == 1
-    fun isHolidayUse(): Boolean = isHolidayUse == 1
-    fun weekDayStr() = when (isWeekday) {
+    fun weekDayStr() = when (weeklydayend) {
         WEEKDAYS -> "#월화수목금"
         WEEKENDS -> "토일"
         EVERYDAY -> "매일"
-        else -> ""
+        else -> "#월화수목금"
     }
-    // weekday: 평일
-    // weekend: 주말
-    fun setWeekday(weekday: Int, weekend: Int) {
-        isWeekday = when {
-            weekday == 0 && weekend == 0 -> EMPTY
-            weekday == 1 && weekend == 0 -> WEEKDAYS
-            weekday == 0 && weekend == 1 -> WEEKENDS
-            else -> EVERYDAY
-        }
-    }
+    fun getRepeatedDate(): String
+        = getReatDateStr(repeatValues = arrayListOf(getWeeklyday(), getWeeklyend()), disableHoliday = disableHoliday)
 
     constructor(alarmEntity: AlarmEntity): this() {
         this.alarmId = alarmEntity.alarmId
         this.dateTime = alarmEntity.notifyTime
-        this.isWeekday = alarmEntity.repeatedDate.getRepeatedDate()?.isWeekday() ?: 0
-        this.isHolidayUse = alarmEntity.repeatedDate.getRepeatedDate()?.isHoliday() ?: 1
-        this.enableAlarm = alarmEntity.enabled.getInt()
+        this.weeklydayend = alarmEntity.repeatedDate.getRepeatedDate().isWeekday()
+        this.disableHoliday = alarmEntity.repeatedDate.getRepeatedDate().disableHoliday()
+        this.enableAlarm = alarmEntity.enabled
     }
+}
+
+fun WeeklyAlarm.getWeeklyday(): Int {
+    return weeklydayend.let { weeklyday ->
+        when(weeklyday) {
+            WeeklyAlarm.WEEKDAYS -> 1
+            WeeklyAlarm.WEEKENDS -> 0
+            WeeklyAlarm.EVERYDAY -> 1
+            else -> 0
+        }
+    }
+}
+
+fun WeeklyAlarm.getWeeklyend(): Int {
+    return weeklydayend.let { weeklyend ->
+        when(weeklyend) {
+            WeeklyAlarm.WEEKDAYS -> 0
+            WeeklyAlarm.WEEKENDS -> 1
+            WeeklyAlarm.EVERYDAY -> 1
+            else -> 0
+        }
+    }
+}
+
+fun getWeeklydayend(weeklyday: Int, weeklyend: Int): Int = when {
+    // 매일
+    (weeklyday == 1 && weeklyend == 1) -> WeeklyAlarm.EVERYDAY
+    // 평일
+    (weeklyday == 1 && weeklyend == 0) -> WeeklyAlarm.WEEKDAYS
+    // 주말
+    (weeklyday == 0 && weeklyend == 1) -> WeeklyAlarm.WEEKENDS
+    // 평일
+    else -> WeeklyAlarm.WEEKDAYS
 }
