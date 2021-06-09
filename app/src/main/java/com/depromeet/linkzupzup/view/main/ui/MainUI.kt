@@ -44,7 +44,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
-import com.bumptech.glide.Glide
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
@@ -329,15 +328,14 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
         metaImgUrl.value = it.imgUrl
     }
 
-    val painter = rememberGlidePainter(request = metaImgUrl.value, fadeIn = true, previewPlaceholder = R.drawable.img_linklogo_placeholder)
+    val painter = rememberGlidePainter(request = metaImgUrl.value, fadeIn = true, previewPlaceholder = R.drawable.img_link_placeholder)
 
     LaunchedEffect(painter) {
         snapshotFlow { painter.loadState }
             .filter { it.isFinalState() }
             .collect {
                 when(it){
-                    is ImageLoadState.Empty -> { painter.request = R.drawable.img_linklogo_placeholder }
-                    is ImageLoadState.Error -> { painter.request = R.drawable.img_linklogo_placeholder }
+                    is ImageLoadState.Empty, is ImageLoadState.Error -> { painter.request = R.drawable.img_link_placeholder }
                     else -> {}
                 }
             }
