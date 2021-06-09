@@ -31,6 +31,8 @@ object ApiUrl {
      * Link
      */
     const val LINK_LIST = "/$VERSION/$LINKS"
+    const val LINK_REGISTER = "/$VERSION/$LINKS"
+    const val LINK_READ = "/$VERSION/$LINKS/"
     const val LINK_COUNT = "/$VERSION/$LINKS/$COUNT"
 
     /**
