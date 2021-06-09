@@ -1,6 +1,7 @@
 package com.depromeet.linkzupzup.architecture.domainLayer.entities.api
 
 import android.os.Parcelable
+import androidx.room.Ignore
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
@@ -31,6 +32,11 @@ data class LinkAlarmEntity (
     /**
      * UI용 MetaData
      */
+    @Ignore
+    var alarmEnable: Boolean = false,
+    @Ignore
     var metaTitle: String = "",
+    @Ignore
     var metaImageUrl: String = "",
+    @Ignore
     var metaDescription: String = ""): Parcelable

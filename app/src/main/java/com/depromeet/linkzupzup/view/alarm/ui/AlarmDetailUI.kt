@@ -343,8 +343,6 @@ fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, 
         .height(606.dp)
         .background(Color.White)) {
 
-        val ctx = LocalContext.current
-
         // header, close btn
         Row(horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,

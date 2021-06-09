@@ -22,4 +22,6 @@ object AppConst {
     // 클라이언트로 부터 서버로 응답을 보내는 시간이 WRITE_TIMEOUT을 초과하면 실패로 간주
     const val WRITE_TIMEOUT: Long = 15
 
+    const val HASH_TAG_MAX_LIMIT = 3
+
 }
