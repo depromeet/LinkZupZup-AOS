@@ -96,7 +96,7 @@ fun MainBodyUI(viewModel : MainViewModel, clickListener: (id: Int, linkId: Int?)
     val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     val tagReadCnt = remember { mutableStateOf(0) }
-    tagReadCnt.value = viewModel.preference?.getTodayCount() ?: 0
+    tagReadCnt.value = viewModel.preference?.getTodayCount() ?: 0   // 문제 있음
 
     DLog.e("MAIN", "LINK_SIZE: ${linkList.size}")
 
@@ -199,6 +199,8 @@ fun MainAppBar(appBarColor : MutableState<Color> = remember { mutableStateOf(Gra
             MainAppBarBtn(painterResource(id = R.drawable.ic_mypage)) {
                 clickListener(R.drawable.ic_mypage,null)
             }
+
+            Spacer(modifier = Modifier.width(16.dp))
             
         },
         backgroundColor = appBarColor.value,
@@ -378,8 +380,7 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
                         fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700))), maxLines = 2, overflow = TextOverflow.Ellipsis)
 
                 // 작성자
-                Row(
-                    Modifier
+                Row(Modifier
                         .fillMaxWidth()
                         .height(16.dp)) {
 
@@ -491,8 +492,7 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
 
         Column(modifier = Modifier
             .fillMaxWidth()
-            .weight(1f)
-            .padding(start = 23.dp, end = 23.dp)) {
+            .weight(1f)) {
 
             /**
              * Header Title
@@ -509,9 +509,9 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp)
-                    .padding(horizontal = 23.dp)) {
+                    .padding(horizontal = 24.dp)) {
 
-//                linkUrl.value = it
+                linkUrl.value = it
 //
 //                if(it.isNullOrEmpty()){
 //                    saveBtnColor.value = Gray50t
@@ -525,7 +525,7 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
                 DLog.e("hashtags", "${Gson().toJson(hashtags)}")
             }
 
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(40.dp))
 
             /**
              * 해시태그 선택
@@ -569,18 +569,20 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
                 DLog.e("hashtags", "${Gson().toJson(hashtags)}")
             }
 
-            /**
-             * 선택된 해시태그 리스트
-             */
-            val listState = rememberLazyListState(initialFirstVisibleItemIndex = 0)
+        }
 
-            LazyRow(
-                state = listState,
-                modifier = Modifier.fillMaxWidth()
-                    .height(40.dp)
-                    .border(width = 2.dp, color = Color.Black, shape = RectangleShape)) {
+        /**
+         * 선택된 해시태그 리스트
+         */
+        val listState = rememberLazyListState(initialFirstVisibleItemIndex = 0)
 
-                itemsIndexed(items = hashtags, itemContent = { idx, tag ->
+        LazyRow(
+            state = listState,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
+
+            itemsIndexed(items = hashtags, itemContent = { idx, tag ->
 //                BottomSheetHashtagCard(tag, isSelected = true) { target ->
 //                    hashtags.value = with(hashtags.value) {
 //                        apply {
@@ -590,36 +592,41 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
 //                        }
 //                    }
 //                    linkData.hashtags = hashtags.value
-                    DLog.e("HASH_TAG", "tagName: ${tag.hashtagName}, tag: ${Gson().toJson(tag)}")
-                    DLog.e("hashtags", "${Gson().toJson(hashtags)}")
+                DLog.e("HASH_TAG", "tagName: ${tag.hashtagName}, tag: ${Gson().toJson(tag)}")
+                DLog.e("hashtags", "${Gson().toJson(hashtags)}")
 //                }
 
-                    Card(modifier = Modifier.fillMaxHeight(), shape = RoundedCornerShape(2.dp), backgroundColor = Color.Yellow, elevation = 0.dp) {
-                        Row(horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.width(100.dp).fillMaxHeight()) {
+                Card(modifier = Modifier
+                    .height(32.dp)
+                    .noRippleClickable {  },
+                    shape = RoundedCornerShape(2.dp),
+                    backgroundColor = tag.tagColor.bgColor,
+                    elevation = 0.dp) {
 
-                            Text(text = tag.hashtagName,
-                                modifier = Modifier.fillMaxHeight()
-                                    .padding(start = 8.dp, top = 8.dp, bottom = 8.dp))
+                    Box(contentAlignment = Alignment.Center){
+                        Row(modifier = Modifier.padding(8.dp,0.dp),
+                            horizontalArrangement = Arrangement.spacedBy(5.dp),
+                            verticalAlignment = Alignment.CenterVertically){
 
-                            Spacer(Modifier.width(8.dp))
+                            Text(text = "#${tag.hashtagName}",
+                                style = TextStyle(
+                                    fontSize = 12.sp,
+                                    color = tag.tagColor.textColor,
+                                    fontFamily = FontFamily(Font(
+                                        resId = R.font.spoqa_hansansneo_regular,
+                                        weight = FontWeight.W500))))
 
                             Image(painter = painterResource(id = R.drawable.ic_close),
                                 contentDescription = null,
-                                modifier = Modifier.size(12.dp).padding(end = 8.dp))
+                                modifier = Modifier.size(12.dp))
 
                         }
                     }
-                })
-
-            }
-
+                }
+            })
         }
 
-
         Spacer(modifier = Modifier.height(20.dp))
-
 
         /* 하단 저장하기 버튼 */
         Button(shape = RoundedCornerShape(4.dp),
@@ -702,7 +709,7 @@ fun BottomSheetSelect(cnt: Int, tagSizeLimit: Int = 3, onClick: (LinkHashData) -
     Spacer(Modifier.height(12.dp))
 
     LazyRow(modifier = Modifier.fillMaxWidth(), contentPadding = PaddingValues(23.dp,0.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)){
+        horizontalArrangement = Arrangement.spacedBy(8.dp)){
         items(LinkHashData.tc1) { tag ->
             BottomSheetHashtagCard(tag){
                 onClick(tag)
@@ -713,7 +720,7 @@ fun BottomSheetSelect(cnt: Int, tagSizeLimit: Int = 3, onClick: (LinkHashData) -
     Spacer(Modifier.height(12.dp))
 
     LazyRow(modifier = Modifier.fillMaxWidth(), contentPadding = PaddingValues(23.dp,0.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)){
+        horizontalArrangement = Arrangement.spacedBy(8.dp)){
         items(LinkHashData.tc2) { tag ->
             BottomSheetHashtagCard(tag){
                 onClick(tag)
