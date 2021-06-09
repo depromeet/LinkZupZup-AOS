@@ -483,8 +483,7 @@ fun BottomSheet(sheetState : ModalBottomSheetState, coroutineScope : CoroutineSc
 
         Column(modifier = Modifier
             .fillMaxWidth()
-            .weight(1f)
-            .padding(start = 23.dp, end = 23.dp)){
+            .weight(1f)){
 
             /* title */
             BottomHeaderCard()
@@ -495,7 +494,8 @@ fun BottomSheet(sheetState : ModalBottomSheetState, coroutineScope : CoroutineSc
             CustomTextField(hintStr = "\uD83D\uDC49 링크주소를 여기에 붙여넣기 해주세요.",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp)){
+                    .height(40.dp)
+                    .padding(horizontal = 23.dp)){
                 linkUrl.value = it
 
                 if(it.isNullOrEmpty()){
@@ -570,7 +570,8 @@ fun BottomSheet(sheetState : ModalBottomSheetState, coroutineScope : CoroutineSc
 @Composable
 fun BottomHeaderCard(padding: PaddingValues = PaddingValues(0.dp)){
     // in ColumnScope
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = Modifier.fillMaxWidth()
+        .padding(horizontal = 23.dp)) {
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -613,7 +614,8 @@ fun BottomSheetSelect(cnt: Int? = 0, onClick: (LinkHashData) -> Unit){
     Row(verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .height(18.dp)){
+            .height(18.dp)
+            .padding(horizontal = 23.dp)){
 
         Text(text = "해시태그를 선택해주세요.",
             modifier = Modifier.weight(1f),
@@ -635,7 +637,7 @@ fun BottomSheetSelect(cnt: Int? = 0, onClick: (LinkHashData) -> Unit){
 
     Spacer(Modifier.height(12.dp))
 
-    LazyRow(modifier = Modifier.fillMaxWidth(),
+    LazyRow(modifier = Modifier.fillMaxWidth(),contentPadding = PaddingValues(23.dp,0.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp)){
         items(tc1) { tag ->
             BottomSheetHashtagCard(tag){
@@ -646,7 +648,7 @@ fun BottomSheetSelect(cnt: Int? = 0, onClick: (LinkHashData) -> Unit){
 
     Spacer(Modifier.height(12.dp))
 
-    LazyRow(modifier = Modifier.fillMaxWidth(),
+    LazyRow(modifier = Modifier.fillMaxWidth(),contentPadding = PaddingValues(23.dp,0.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp)){
         items(tc2) { tag ->
             BottomSheetHashtagCard(tag){
@@ -666,7 +668,8 @@ fun BottomSheetInputTag(onClick: (String) -> Unit){
     val strColor = remember { mutableStateOf(Gray70)}
     val tagName = remember { mutableStateOf("") }
 
-    Column(modifier = Modifier.fillMaxWidth()){
+    Column(modifier = Modifier.fillMaxWidth()
+        .padding(horizontal = 23.dp)){
         Text(
             text = clickStr.value,
             modifier = Modifier.noRippleClickable {
@@ -747,7 +750,7 @@ fun BottomSheetHashtagCard(tag: LinkHashData, isSelected : Boolean = false, onCl
                         color = tag.tagColor.textColor,
                         fontFamily = FontFamily(Font(
                             resId = R.font.spoqa_hansansneo_regular,
-                            weight = FontWeight.W300))))
+                            weight = FontWeight.W500))))
                 if(isSelected){
                     Image(
                         painter = painterResource(id = R.drawable.ic_close),
