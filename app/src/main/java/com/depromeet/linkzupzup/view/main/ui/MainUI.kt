@@ -462,7 +462,7 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
     val isNewRegister = remember { mutableStateOf(false) }
     val linkId = remember { mutableStateOf(-1) }
     val linkUrl = remember { mutableStateOf("") }
-    val hashtags = remember { mutableStateListOf(LinkHashData()) }
+    val hashtags = remember { mutableStateListOf<LinkHashData>() }
 
     val ctx = LocalContext.current
 
@@ -547,7 +547,7 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
 //                        }
 //                    }
 //                }
-//                linkData.hashtags = hashtags.value
+//               linkData.hashtags = hashtags.value
                 hashtags.add(target)
                 DLog.e("HASH_TAG", "${Gson().toJson(target)}")
                 DLog.e("hashtags", "${Gson().toJson(hashtags)}")
