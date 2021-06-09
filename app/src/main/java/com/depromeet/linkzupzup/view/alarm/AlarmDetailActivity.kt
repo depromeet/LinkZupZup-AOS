@@ -30,7 +30,10 @@ class AlarmDetailActivity : BaseActivity<AlarmDetailUI, AlarmDetailViewModel>() 
                 overridePendingTransition(R.anim.stay, R.anim.act_slide_right_out)
             }
             // 바텀시트, 알람 저장 시
-            R.id.alarm_save -> {}
+            R.id.alarm_save -> getAlarmList()
+            R.id.alarm_update -> getAlarmList()
+            R.id.alarm_delete -> getAlarmList()
+
             else -> {}
         }
     }

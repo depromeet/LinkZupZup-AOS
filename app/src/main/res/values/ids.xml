@@ -2,4 +2,6 @@
 <resources>
     <item name="avtivity_close" type="id" />
     <item name="alarm_save" type="id" />
+    <item name="alarm_update" type="id" />
+    <item name="alarm_delete" type="id" />
 </resources>

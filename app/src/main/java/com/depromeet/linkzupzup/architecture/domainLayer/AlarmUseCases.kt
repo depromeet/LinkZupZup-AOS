@@ -3,7 +3,6 @@ package com.depromeet.linkzupzup.architecture.domainLayer
 import com.depromeet.linkzupzup.architecture.dataLayer.repositories.AlarmRepositoryImpl
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmEntity
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmRegistEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmUpdateEntity
 import io.reactivex.Observable
 
@@ -18,7 +17,7 @@ class AlarmUseCases(private val alarmRepositoryImpl: AlarmRepositoryImpl) {
     /**
      * 어플 알람 등록
      */
-    fun registAlarm(alarmInfo: AlarmUpdateEntity): Observable<ResponseEntity<AlarmRegistEntity>>
+    fun registAlarm(alarmInfo: AlarmUpdateEntity): Observable<ResponseEntity<AlarmEntity>>
         = alarmRepositoryImpl.registAlarm(alarmInfo)
 
     /**

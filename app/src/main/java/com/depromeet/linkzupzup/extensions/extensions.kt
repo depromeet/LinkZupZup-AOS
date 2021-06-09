@@ -10,10 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
@@ -147,7 +144,7 @@ inline fun <T> LazyListScope.itemsWithHeaderAndGuideIndexed(
     crossinline headerContent: @Composable LazyItemScope.() -> Unit = {},
     crossinline emptyContent: @Composable LazyItemScope.() -> Unit = {},
     crossinline itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
-) = items(items.size + if (useHeader) 1 else 0 + if (useEmptyGuide) 1 else 0, null) {
+) = items(items.size + (if (useHeader) 1 else 0) + (if (useEmptyGuide) 1 else 0), null) {
     val idx = it - if (useHeader) 1 else 0
     if (useHeader && it == 0) headerContent()
     else if (items.isNotEmpty()) itemContent(idx, items[idx])

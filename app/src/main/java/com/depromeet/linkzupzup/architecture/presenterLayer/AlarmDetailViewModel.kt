@@ -6,7 +6,6 @@ import com.depromeet.linkzupzup.StatusConst
 import com.depromeet.linkzupzup.architecture.domainLayer.AlarmUseCases
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmEntity
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmRegistEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.AlarmUpdateEntity
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.WeeklyAlarm
 import com.depromeet.linkzupzup.base.BaseViewModel
@@ -45,7 +44,7 @@ class AlarmDetailViewModel(private val alarmUseCases: AlarmUseCases): BaseViewMo
     /**
      * 어플 알람 등록
      */
-    fun registAlarm(alarmInfo: AlarmUpdateEntity, callback: ((ResponseEntity<AlarmRegistEntity>)->Unit)? = null) {
+    fun registAlarm(alarmInfo: AlarmUpdateEntity, callback: ((ResponseEntity<AlarmEntity>)->Unit)? = null) {
         progressStatus(true)
         addDisposable(alarmUseCases.registAlarm(alarmInfo)
             .observeOn(AndroidSchedulers.mainThread())

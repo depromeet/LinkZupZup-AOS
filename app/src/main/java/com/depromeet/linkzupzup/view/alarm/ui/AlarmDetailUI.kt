@@ -27,6 +27,9 @@ import com.depromeet.linkzupzup.architecture.domainLayer.entities.getReatDateStr
 import com.depromeet.linkzupzup.architecture.presenterLayer.AlarmDetailViewModel
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.WeeklyAlarm
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.WeeklyAlarm.Companion.clone
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.getWeeklyday
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.getWeeklydayend
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.getWeeklyend
 import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.extensions.*
 import com.depromeet.linkzupzup.ui.theme.BottomSheetShape
@@ -36,8 +39,9 @@ import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.CustomSwitchCompat
 import com.depromeet.linkzupzup.view.custom.CustomTextCheckBox
 import com.depromeet.linkzupzup.view.custom.CustomTimePicker
-import com.depromeet.linkzupzup.view.custom.CustomToggle2
+import com.depromeet.linkzupzup.view.custom.WeeklyRepeatToggle
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.*
@@ -81,8 +85,7 @@ fun AlarmDetailAppBar(appBarColor: MutableState<Color> = remember { mutableState
         },
         backgroundColor = appBarColor.value,
         elevation = 0.dp,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
             .height(52.dp)
             .padding(start = 12.dp))
 }
@@ -93,13 +96,22 @@ fun AlarmDetailAppBar(appBarColor: MutableState<Color> = remember { mutableState
 @Composable
 fun AlarmDetailBodyContent(viewModel: AlarmDetailViewModel, clickListener: (Int) -> Unit = {}) {
     val alarmList by viewModel.alarmList.observeAsState(arrayListOf())
+    val targetAlarm: MutableState<WeeklyAlarm> = remember { mutableStateOf(WeeklyAlarm()) }
+    val (selected, setSelected) = remember(calculation = { mutableStateOf(0) })
+
     val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
-    val alarmInfo: MutableState<WeeklyAlarm?> = remember { mutableStateOf(null) }
+    val userName = remember { mutableStateOf("") }
+    viewModel.preference?.getUserName()?.let { name -> userName.value = name }
 
     ModalBottomSheetLayout(sheetState = sheetState,
         sheetShape = BottomSheetShape,
-        sheetContent = { AlarmDetailModalBottomSheetContent(sheetState,coroutineScope, viewModel, clickListener, alarmInfo.value) },
+        sheetContent = {
+            when (selected) {
+                0 -> AlarmDetailModalBottomSheetContent(sheetState,coroutineScope, viewModel, clickListener, WeeklyAlarm())
+                1 -> AlarmDetailModalBottomSheetContent(sheetState,coroutineScope, viewModel, clickListener, targetAlarm.value)
+            }
+        },
         modifier = Modifier.fillMaxSize()) {
 
         Scaffold(topBar = { AlarmDetailAppBar(clickListener = clickListener) },
@@ -109,27 +121,39 @@ fun AlarmDetailBodyContent(viewModel: AlarmDetailViewModel, clickListener: (Int)
             Column(modifier = Modifier.fillMaxWidth()
                 .fillMaxHeight()) {
 
+                val columnModifier = if (alarmList.size > 0) Modifier
+                    .fillMaxWidth()
+                    .weight(1f) else Modifier.fillMaxWidth()
+
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    modifier = Modifier.fillMaxWidth()
-                        .weight(1f)) {
+                    modifier = columnModifier) {
 
-                    itemsWithHeaderAndGuideIndexed (
+                    itemsWithHeaderIndexed (
                         items = alarmList,
                         useHeader = true,
-                        useEmptyGuide = true,
-                        headerContent = { TopHeaderCard() },
-                        emptyContent = { AlarmEmptyGuideCard(Modifier.fillMaxWidth()
-                            .weight(1f)) }) { idx, alarm ->
+                        headerContent = { TopHeaderCard(userName.value) }) { idx, alarm ->
 
-                        WeeklyAlarmCard(idx, alarm) { item ->
+                        WeeklyAlarmCard(index = idx, alarm = alarm, onClick = { item ->
                             coroutineScope.launch {
-                                alarmInfo.value = item.clone()
+                                targetAlarm.value = item.clone()
+                                setSelected(1)
                                 sheetState.show()
                             }
-                        }
+                        }, switchCallback = { checked ->
+                            alarm.enableAlarm = checked
+                            viewModel.updateAlarm(alarm.alarmId, AlarmUpdateEntity(
+                                enabled = alarm.enableAlarm,
+                                notifyTime = alarm.dateTime,
+                                repeatedDate = alarm.getRepeatedDate()
+                            ))
+                        })
                     }
                 }
+
+                // empty guide
+                if (alarmList.size == 0) AlarmEmptyGuideCard(Modifier.fillMaxWidth()
+                    .weight(1f))
 
                 Box(modifier = Modifier.fillMaxWidth()
                     .height(68.dp)
@@ -138,22 +162,21 @@ fun AlarmDetailBodyContent(viewModel: AlarmDetailViewModel, clickListener: (Int)
                     Button(colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color(0xFF4076F6), contentColor = Color.White),
                         shape = RoundedCornerShape(4.dp),
                         elevation = elevation(defaultElevation = 0.dp, pressedElevation = 0.dp),
-                        modifier = Modifier.fillMaxWidth()
-                            .height(52.dp),
+                        modifier = Modifier.fillMaxWidth().height(52.dp),
                         onClick = {
-                            alarmInfo.value = null
-                            coroutineScope.launch { sheetState.show() }
+                            coroutineScope.launch {
+                                setSelected(0)
+                                sheetState.show()
+                            }
                         }) {
 
                         Text("알림 추가하기",
                             style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700)), fontSize = 14.sp, lineHeight = 17.5.sp),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth())
-
                     }
                 }
             }
-
         }
     }
 }
@@ -162,16 +185,14 @@ fun AlarmDetailBodyContent(viewModel: AlarmDetailViewModel, clickListener: (Int)
 fun AlarmEmptyGuideCard(modifier: Modifier = Modifier) {
     Column(horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = modifier
-            .fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
             .padding(bottom = 24.dp)
             .background(Color.Transparent)) {
 
         // 도넛 이미지
         Column(horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
                 .weight(1f)) {
 
             Image(painter = painterResource(id = R.drawable.ic_donut05),
@@ -188,15 +209,14 @@ fun AlarmEmptyGuideCard(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun TopHeaderCard() {
+fun TopHeaderCard(userName: String) {
     Row(verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
             .padding(horizontal = 16.dp)
             .background(color = Color(0xFFF8FAFB))
             .height(96.dp)) {
 
-        Text("칠성파님,\n알람을 설정하시겠어요?",
+        Text("${userName}님,\n알람을 설정하시겠어요?",
             color = Color(0xFF292A2B),
             style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700)), fontSize = 24.sp, lineHeight = 32.4.sp, color = Color(0xFF292A2B)))
 
@@ -205,28 +225,21 @@ fun TopHeaderCard() {
 
 @ExperimentalFoundationApi
 @Composable
-fun WeeklyAlarmCard(index: Int, alarm: WeeklyAlarm, onClick: (item: WeeklyAlarm) -> Unit) {
+fun WeeklyAlarmCard(index: Int, alarm: WeeklyAlarm, onClick: (item: WeeklyAlarm) -> Unit, switchCallback: (Boolean)->Unit) {
 
     // 알람 설정 유무
-    val enableAlarm: MutableState<Boolean> = alarm.isEnableAlarm().mutableStateValue()
-    alarm.enableAlarm = if (enableAlarm.value) 1 else 0
+    val enableAlarm: MutableState<Boolean> = alarm.enableAlarm.mutableStateValue()
     val switchCompat: MutableState<SwitchCompat?> = remember { mutableStateOf(null) }
 
     Card(shape = RoundedCornerShape(4.dp),
         backgroundColor = Color.White,
         elevation = 2.dp,
-        modifier = Modifier.combinedClickable(onClick = {
-            // switchCompat.let { it.value?.isChecked = it.value?.isChecked?.not() ?: false }
-            onClick(alarm)
-        })) {
+        modifier = Modifier.combinedClickable(onClick = { onClick(alarm) })) {
 
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .height(110.dp)) {
+        Box(Modifier.fillMaxWidth()
+            .height(110.dp)) {
 
-            Column(modifier = Modifier
-                .fillMaxWidth()
+            Column(modifier = Modifier.fillMaxWidth()
                 .height(110.dp)
                 .padding(horizontal = 24.dp, vertical = 19.dp)) {
 
@@ -237,8 +250,7 @@ fun WeeklyAlarmCard(index: Int, alarm: WeeklyAlarm, onClick: (item: WeeklyAlarm)
                 val holidayTagTextColor = Color(if (enableAlarm.value) 0xFFF24147 else 0xFFCED3D6)
 
                 Row(verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
                         .height(40.dp)) {
 
                     Image(painter = painterResource(id = R.drawable.ic_sun_img),
@@ -261,8 +273,7 @@ fun WeeklyAlarmCard(index: Int, alarm: WeeklyAlarm, onClick: (item: WeeklyAlarm)
                     Spacer(Modifier.weight(1f))
 
                     Column(horizontalAlignment = Alignment.End,
-                        modifier = Modifier
-                            .fillMaxHeight()
+                        modifier = Modifier.fillMaxHeight()
                             .padding(top = 10.dp)) {
 
                         CustomSwitchCompat(instanceCallback = {
@@ -270,13 +281,14 @@ fun WeeklyAlarmCard(index: Int, alarm: WeeklyAlarm, onClick: (item: WeeklyAlarm)
                             it.isChecked = enableAlarm.value
                         }, checkedOnChangeListener = { view, isChecked ->
                             enableAlarm.value = isChecked
+                            switchCallback(isChecked)
                         })
                     }
                 }
 
                 Spacer(Modifier.height(10.dp))
 
-                if (alarm.isWeekday != WeeklyAlarm.EMPTY) Row(modifier = Modifier.fillMaxWidth()
+                Row(modifier = Modifier.fillMaxWidth()
                     .height(22.dp)) {
 
                     Card(shape = RoundedCornerShape(2.dp),
@@ -290,7 +302,7 @@ fun WeeklyAlarmCard(index: Int, alarm: WeeklyAlarm, onClick: (item: WeeklyAlarm)
                         }
                     }
 
-                    if (alarm.isHolidayUse == 1) {
+                    if (alarm.disableHoliday == 0) {
 
                         Spacer(Modifier.width(8.dp))
 
@@ -300,8 +312,7 @@ fun WeeklyAlarmCard(index: Int, alarm: WeeklyAlarm, onClick: (item: WeeklyAlarm)
                                 Text("#공휴일에 울려요",
                                     style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 10.sp, lineHeight = 14.sp, color = holidayTagTextColor),
                                     textAlign = TextAlign.Center,
-                                    modifier = Modifier
-                                        .height(22.dp)
+                                    modifier = Modifier.height(22.dp)
                                         .padding(horizontal = 8.dp, vertical = 4.dp))
                             }
                         }
@@ -315,40 +326,18 @@ fun WeeklyAlarmCard(index: Int, alarm: WeeklyAlarm, onClick: (item: WeeklyAlarm)
 @ExperimentalPagerApi
 @ExperimentalMaterialApi
 @Composable
-fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, coroutineScope: CoroutineScope, viewModel: AlarmDetailViewModel, clickListener: (Int) -> Unit = {}, alarmInfo: WeeklyAlarm? = null) {
-    val checkData = remember { mutableStateOf(false)}
-    var alarmData: WeeklyAlarm? = null
-
+fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, coroutineScope: CoroutineScope, viewModel: AlarmDetailViewModel, clickListener: (Int) -> Unit = {}, alarmData: WeeklyAlarm) {
+    val alarmId = remember { mutableStateOf(-1) }
+    val isNewRegist = remember { mutableStateOf(false) }
     val timeDate = remember { mutableStateOf(Calendar.getInstance()) }
-    val repeatValues = arrayListOf<MutableState<Int>>().apply {
-        add(remember { mutableStateOf(-1) })
-        add(remember { mutableStateOf(-1) })
-    }
-    val holidayChecked = remember { mutableStateOf(false) }
+    val weekdayend = remember { mutableStateOf(WeeklyAlarm.WEEKDAYS) }
+    val holidayDisable = remember { mutableStateOf(false) }
 
-    /**
-     * 알람 상세화면이 그려질때,
-     */
-    if (!checkData.value && alarmInfo != null) {
-        alarmData = alarmInfo
-        timeDate.value = alarmData.dateTime.getCalendar()
-        repeatValues[0].value = when(alarmData.isWeekday) {
-            WeeklyAlarm.WEEKDAYS -> 1
-            WeeklyAlarm.WEEKENDS -> 0
-            WeeklyAlarm.EVERYDAY -> 1
-            else -> 0
-        }
-        repeatValues[1].value = when(alarmData.isWeekday) {
-            WeeklyAlarm.WEEKDAYS -> 0
-            WeeklyAlarm.WEEKENDS -> 1
-            WeeklyAlarm.EVERYDAY -> 1
-            else -> 0
-        }
-        holidayChecked.value = alarmData.isHolidayUse()
-        checkData.value = true
-    }
-
-    DLog.e("ALARM_INFO", "[UI 갱신] repeat: ${repeatValues[0].value}, ${repeatValues[1].value}, holiday: ${holidayChecked.value}")
+    alarmId.value = alarmData.alarmId
+    isNewRegist.value = alarmData.alarmId < 0
+    timeDate.value = alarmData.dateTime.getCalendar()
+    weekdayend.value = alarmData.weeklydayend
+    holidayDisable.value = alarmData.disableHoliday.getBoolean()
 
     Column(modifier = Modifier.fillMaxWidth()
         .height(606.dp)
@@ -365,11 +354,7 @@ fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, 
             Card(elevation = 0.dp,
                 modifier = Modifier.width(68.dp)
                     .height(56.dp)
-                    .noRippleClickable(coroutineScope) {
-                        alarmData = null
-                        checkData.value = false
-                        bottomSheetState.hide()
-                    }) {
+                    .noRippleClickable(coroutineScope) { bottomSheetState.hide() }) {
 
                 Row(verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
@@ -404,12 +389,12 @@ fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, 
                 Calendar.MINUTE -> timeDate.value.apply { set(Calendar.MINUTE, timeVal) }
                 else -> timeDate.value
             }
+            alarmData.dateTime = timeDate.value.timeStr(isHourOfDay = true)
         }
 
-        Column(
-            Modifier.fillMaxWidth()
-                .height(96.dp)
-                .padding(horizontal = 24.dp, vertical = 20.dp)) {
+        Column(Modifier.fillMaxWidth()
+            .height(96.dp)
+            .padding(horizontal = 24.dp, vertical = 20.dp)) {
 
             Text("반복 설정",
                 color = Color(0xFF292A2B),
@@ -419,32 +404,21 @@ fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, 
             Spacer(Modifier.height(12.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
                     .height(28.dp)) {
 
-                val toggleStrs = arrayListOf("주중", "주말")
-                CustomToggle2(modifier = Modifier.height(28.dp), toggleValue1 = repeatValues[0].value == 1, toggleValue2 = repeatValues[1].value == 1, onChangeListener = { idx, status ->
-                    if (idx == 0) {
-                        // -1: Empty, 0: 평일, 1: 주말, 2: 매일
-                        repeatValues[0].value = status
-                        alarmData?.setWeekday(status, repeatValues[1].value)
-                    } else {
-                        // -1: Empty, 0: 평일, 1: 주말, 2: 매일
-                        repeatValues[1].value = status
-                        alarmData?.setWeekday(repeatValues[0].value, status)
-                    }
-                    DLog.e("TEST", "${ toggleStrs[idx] }, idx: $idx, status: $status, toggleValue1: ${repeatValues[0].value}, toggleValue2: ${repeatValues[1].value}")
-                })
+                WeeklyRepeatToggle(modifier = Modifier.height(28.dp), weekdayend = weekdayend.value) { weekday, weekend ->
+                    weekdayend.value = getWeeklydayend(weekday, weekend)
+                    alarmData.weeklydayend = weekdayend.value
+                }
 
                 Spacer(Modifier.weight(1f))
 
-
                 CustomTextCheckBox(modifier = Modifier.height(20.dp),
-                    checked = holidayChecked.value,
+                    holidayDisable = holidayDisable.value,
                     onChangeListener = {
-                        holidayChecked.value = it
-                        DLog.e("TEST", if (it) "공휴일 알람 비활성" else "공휴일 알람 활성")
+                        alarmData.disableHoliday = it.getInt()
+                        holidayDisable.value = it
                     })
 
             }
@@ -452,60 +426,62 @@ fun AlarmDetailModalBottomSheetContent(bottomSheetState: ModalBottomSheetState, 
 
         Spacer(Modifier.weight(1f))
 
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .height(68.dp)
-                .padding(start = 24.dp, top = 0.dp, end = 16.dp, bottom = 24.dp)) {
+        Column(Modifier.fillMaxWidth()
+            .height(68.dp)
+            .padding(start = 24.dp, top = 0.dp, end = 16.dp, bottom = 24.dp)) {
 
             Row(Modifier.fillMaxSize()) {
 
-                val isAlready = remember { mutableStateOf(false) }
-                if (isAlready.value) Row(
-                    Modifier
-                        .width(64.dp)
-                        .fillMaxHeight()) {
+                if (alarmId.value >= 0) Row(Modifier.width(64.dp)
+                    .fillMaxHeight()) {
 
                     Button(colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.White, contentColor = Color(0xFF4076F6)),
                         shape = RoundedCornerShape(4.dp),
                         elevation = elevation(defaultElevation = 0.dp, pressedElevation = 0.dp),
                         border = BorderStroke(width = 1.dp, Color(0xFF4076F6)),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp)
-                            .padding(end = 12.dp),
+                        modifier = Modifier.fillMaxWidth().height(52.dp).padding(end = 12.dp),
                         onClick = {
-                            DLog.e("Jackson", "save click read button")
-                            coroutineScope.launch {
-                                toast(ctx, "삭제")
-                                alarmData = null
-                                checkData.value = false
-                                bottomSheetState.hide()
+                            viewModel.deleteAlarm(alarmId = alarmId.value) {
+                                coroutineScope.launch {
+                                    bottomSheetState.hide()
+                                }
+                                clickListener(R.id.alarm_delete)
                             }
                         }) {
 
                         Image(painter = painterResource(id = R.drawable.ic_blue_trash),
                             contentDescription = null,
                             modifier = Modifier.size(20.dp))
-
                     }
-
                 }
 
                 Button(colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color(0xFF4076F6), contentColor = Color.White),
                     shape = RoundedCornerShape(4.dp),
                     elevation = elevation(defaultElevation = 0.dp, pressedElevation = 0.dp),
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(52.dp),
+                    modifier = Modifier.weight(1f).height(52.dp),
                     onClick = {
-                        DLog.e("Jackson", "save click read button")
                         coroutineScope.launch {
-                            viewModel.registAlarm(alarmInfo= AlarmUpdateEntity (
-                                enabled = true,
-                                notifyTime = timeDate.value.timeStr(),
-                                repeatedDate = getReatDateStr(repeatValues = ArrayList(repeatValues.map { it.value }), isHoliday = holidayChecked.value.getInt())
-                            )) { clickListener(R.id.alarm_save) }
+                            if (alarmData.alarmId < 0) {
+                               /**
+                                * 알람등록
+                                */
+                               viewModel.registAlarm(alarmInfo= AlarmUpdateEntity (
+                                   enabled = true,
+                                   notifyTime = timeDate.value.timeStr(isHourOfDay = true),
+                                   repeatedDate = getReatDateStr(repeatValues = arrayListOf(alarmData.getWeeklyday(), alarmData.getWeeklyend()), disableHoliday = holidayDisable.value.getInt()))) {
+                                   clickListener(R.id.alarm_save)
+                               }
+                            } else {
+                                /**
+                                 * 알람수정
+                                 */
+                                viewModel.updateAlarm(alarmId = alarmId.value, alarmInfo = AlarmUpdateEntity (
+                                    enabled = true,
+                                    notifyTime = timeDate.value.timeStr(isHourOfDay = true),
+                                    repeatedDate = alarmData.getRepeatedDate())) {
+                                    clickListener(R.id.alarm_update)
+                                }
+                            }
                             bottomSheetState.hide()
                         }
                     }) {

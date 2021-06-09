@@ -19,7 +19,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -37,6 +36,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.depromeet.linkzupzup.R
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.WeeklyAlarm
 import com.depromeet.linkzupzup.component.SliderAdapter
 import com.depromeet.linkzupzup.extensions.*
 import com.depromeet.linkzupzup.utils.CommonUtil
@@ -88,58 +88,6 @@ fun CustomSwitchCompat(modifier: Modifier = Modifier.height(24.dp),
 
 }
 
-
-
-
-//@Composable
-//fun CustomTimePicker(modifier: Modifier = Modifier,
-//                     instanceCallback: (NumberPicker)->Unit = {},
-//                     updateCallback: (NumberPicker)->Unit = {},
-//                     onTimeChangedListener: TimePicker.OnTimeChangedListener) {
-//    AndroidView(
-//        modifier = modifier,
-//        factory = { ctx ->
-//            NumberPicker(ctx).apply {
-//                instanceCallback(this)
-//            }
-//        },
-//        update = { view ->
-//            updateCallback(view)
-//        }
-//    )
-//}
-//
-//@Composable
-//fun CustomTextPicker(datas: Array<String>,
-//                     modifier: Modifier = Modifier,
-//                     instanceCallback: (NumberPicker)->Unit = {},
-//                     updateCallback: (NumberPicker)->Unit = {},
-//                     minLimit: Int = 0,
-//                     maxLimit: Int = datas.size - 1,
-//                     enableWrapSelectorWheel: Boolean = true,
-//                     onValueChangeListener: NumberPicker.OnValueChangeListener? = null) {
-//
-//    AndroidView(
-//        modifier = modifier,
-//        factory = { ctx ->
-//            NumberPicker(ctx).apply {
-//                minValue = minLimit
-//                maxValue = maxLimit
-//                wrapSelectorWheel = enableWrapSelectorWheel
-//                displayedValues = datas
-//                onValueChangeListener?.let { listenr -> setOnValueChangedListener(listenr) }
-//                instanceCallback(this)
-//                setOnScrollListener { numberPicker, i ->
-//                    DLog.e("TEST", "scroll: $i")
-//                }
-//            }
-//        },
-//        update = { view ->
-//            updateCallback(view)
-//        }
-//    )
-//}
-
 @ExperimentalPagerApi
 @Preview
 @Composable
@@ -161,7 +109,7 @@ fun CustomPreView() {
 
             val checked = remember { mutableStateOf(false) }
             CustomTextCheckBox(modifier = Modifier.height(20.dp),
-                checked = checked.value,
+                holidayDisable = checked.value,
                 onChangeListener = {
                     DLog.e("TEST", if (it) "공휴일 알람 비활성" else "공휴일 알람 활성")
                 })
@@ -233,13 +181,6 @@ fun CustomTimePicker(date: Calendar = Calendar.getInstance(),
 
             // 오전, 오후
             arrayListOf("\uD83C\uDF19 오후", "\u2600\uFE0F 오전").let { amPms ->
-//                CustomImgTextPicker(imgs = arrayListOf(R.drawable.ic_sun_img, R.drawable.ic_sun_img),
-//                    txts = amPms,
-//                    spaceSize = 4.dp,
-//                    modifier = Modifier.fillMaxHeight()) { str, idx ->
-//                    amPmVal.value = idx
-//                    onChangeListener(amPmVal.value, hourVal.value, minuteVal.value)
-//                }
                 val curIdx = if (date.get(Calendar.AM_PM) == Calendar.PM) 0 else 1
                 CustomTextPicker(curIdx = curIdx, datas = amPms, modifier = Modifier.fillMaxHeight()) { str, idx ->
                     DLog.e("CustomTimePicker", "오전,오후, str: $str, idx: $idx")
@@ -471,54 +412,72 @@ fun CustomToggle(modifier: Modifier, spaceSize: Dp = 6.dp, datas: ArrayList<Stri
 }
 
 @Composable
-fun CustomToggle2(modifier: Modifier, spaceSize: Dp = 6.dp, toggleValue1: Boolean, toggleValue2: Boolean, onChangeListener: (Int, Int) -> Unit = { idx, status -> }) {
+fun WeeklyRepeatToggle(modifier: Modifier, weekdayend: Int = 0, onChangeListener: (Int, Int) -> Unit = {_,_ -> }) {
+    val weekday = remember { mutableStateOf(true) }
+    val weekend = remember { mutableStateOf(false) }
 
-    var toggleValue = remember { mutableListOf(toggleValue1, toggleValue2) }
-    toggleValue[0] = toggleValue1
-    toggleValue[1] = toggleValue2
+    when(weekdayend) {
+        WeeklyAlarm.WEEKDAYS -> {
+            weekday.value = true
+            weekend.value = false
+        }
+        WeeklyAlarm.WEEKENDS -> {
+            weekday.value = false
+            weekend.value = true
+        }
+        WeeklyAlarm.EVERYDAY -> {
+            weekday.value = true
+            weekend.value = true
+        }
+        else -> { }
+    }
+    DLog.e("repeatToggle", "weekdayend: $weekdayend, weekday: ${weekday.value}, weekend: ${weekend.value}")
+
+    val backgroundColor1 = if (weekday.value) Color(0xFF4D5256) else Color(0xFFFFFFFF)
+    val border1 = if (weekday.value) null else BorderStroke(1.dp, Color(0xFFA9AFB3))
+    val textColor1 = if (weekday.value) Color(0xFFFFFFFF) else Color(0xFF878D91)
+
+    val backgroundColor2 = if (weekend.value) Color(0xFF4D5256) else Color(0xFFFFFFFF)
+    val border2 = if (weekend.value) null else BorderStroke(1.dp, Color(0xFFA9AFB3))
+    val textColor2 = if (weekend.value) Color(0xFFFFFFFF) else Color(0xFF878D91)
 
     Row(modifier) {
-        val backgroundColor1 = if (toggleValue[0]) Color(0xFF4D5256) else Color(0xFFFFFFFF)
-        val border1 = if (toggleValue[0]) null else BorderStroke(1.dp, Color(0xFFA9AFB3))
-        val textColor1 = if (toggleValue[0]) Color(0xFFFFFFFF) else Color(0xFF878D91)
-
-        val backgroundColor2 = if (toggleValue[1]) Color(0xFF4D5256) else Color(0xFFFFFFFF)
-        val border2 = if (toggleValue[1]) null else BorderStroke(1.dp, Color(0xFFA9AFB3))
-        val textColor2 = if (toggleValue[1]) Color(0xFFFFFFFF) else Color(0xFF878D91)
-
         Card(shape = RoundedCornerShape(4.dp), elevation = 0.dp, backgroundColor = backgroundColor1, border = border1,
             modifier = Modifier
                 .fillMaxHeight()
                 .clickable {
-                    // val temp = if (toggleStatus1.value == 1) 0 else 1
-//                    toggleStatus1.value = !toggleStatus1.value
-//                    onChangeListener(0, toggleStatus1.value.getInt())
-                    toggleValue[0] = !toggleValue[0]
-                    onChangeListener(0, toggleValue[0].getInt())
+                    if (weekend.value || !weekday.value) {
+                        weekday.value = !weekday.value
+                    }
+                    onChangeListener(weekday.value.getInt(), weekend.value.getInt())
                 }) {
             Column(verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxHeight().padding(horizontal = 16.dp)) {
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(horizontal = 16.dp)) {
                 Text(text = "주중",
                     style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = textColor1),
                     textAlign = TextAlign.Center)
             }
         }
 
-        Spacer(Modifier.width(spaceSize))
+        Spacer(Modifier.width(6.dp))
 
         Card(shape = RoundedCornerShape(4.dp), elevation = 0.dp, backgroundColor = backgroundColor2, border = border2,
             modifier = Modifier
                 .fillMaxHeight()
                 .clickable {
-//                    toggleStatus2.value = (!toggleStatus2.value)
-//                    onChangeListener(1, toggleStatus2.value.getInt())
-                    toggleValue[1] = !toggleValue[1]
-                    onChangeListener(1, toggleValue[1].getInt())
+                    if (weekday.value || !weekend.value) {
+                        weekend.value = !weekend.value
+                    }
+                    onChangeListener(weekday.value.getInt(), weekend.value.getInt())
                 }) {
             Column(verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxHeight().padding(horizontal = 16.dp)) {
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(horizontal = 16.dp)) {
                 Text(text = "주말",
                     style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = textColor2),
                     textAlign = TextAlign.Center)
@@ -528,26 +487,26 @@ fun CustomToggle2(modifier: Modifier, spaceSize: Dp = 6.dp, toggleValue1: Boolea
 }
 
 @Composable
-fun CustomTextCheckBox(modifier: Modifier = Modifier.height(20.dp), checked: Boolean = false, onChangeListener: (Boolean) -> Unit = {}) {
-    val checkedState = remember { mutableStateOf(checked) }
+fun CustomTextCheckBox(modifier: Modifier = Modifier.height(20.dp), holidayDisable: Boolean = false, onChangeListener: (Boolean) -> Unit = {}) {
+    val holidayDisableState = remember { mutableStateOf(holidayDisable) }
     Card(elevation = 0.dp, backgroundColor = Color.Transparent, modifier = Modifier
         .wrapContentSize()
         .noRippleClickable {
-            checkedState.value = !checkedState.value
-            onChangeListener(!checkedState.value)
+            holidayDisableState.value = !holidayDisableState.value
+            onChangeListener(holidayDisableState.value)
         }) {
         Row(modifier = modifier,
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center) {
 
-            Image(painter = painterResource(id = if (checkedState.value) R.drawable.ic_holiday_on else R.drawable.ic_holiday_off),
+            Image(painter = painterResource(id = if (holidayDisableState.value) R.drawable.ic_holiday_on else R.drawable.ic_holiday_off),
                 contentDescription = null,
                 modifier = Modifier.size(20.dp))
 
             Spacer(Modifier.width(4.dp))
 
             Text(text = "공휴일엔 알람 끄기",
-                style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = if (checkedState.value) Color(0xFF4076F6) else Color(0xFF878D91)),
+                style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = if (holidayDisableState.value) Color(0xFF4076F6) else Color(0xFF878D91)),
                 textAlign = TextAlign.Center)
 
         }

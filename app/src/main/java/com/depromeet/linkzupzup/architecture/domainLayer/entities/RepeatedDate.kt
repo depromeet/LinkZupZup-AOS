@@ -24,14 +24,14 @@ enum class RepeatedDate(var str: String) {
 
 }
 
-fun String.getRepeatedDate(): RepeatedDate? = when(this) {
+fun String.getRepeatedDate(): RepeatedDate = when(this) {
     RepeatedDate.EVERYDAY.str -> RepeatedDate.EVERYDAY
     RepeatedDate.EVERYDAY_EXCEPT_HOLIDAYS.str -> RepeatedDate.EVERYDAY_EXCEPT_HOLIDAYS
     RepeatedDate.WEEKDAYS.str -> RepeatedDate.WEEKDAYS
     RepeatedDate.WEEKDAYS_EXCEPT_HOLIDAYS.str -> RepeatedDate.WEEKDAYS_EXCEPT_HOLIDAYS
     RepeatedDate.WEEKENDS.str -> RepeatedDate.WEEKENDS
     RepeatedDate.WEEKENDS_EXCEPT_HOLIDAYS.str -> RepeatedDate.WEEKENDS_EXCEPT_HOLIDAYS
-    else -> null
+    else -> RepeatedDate.WEEKDAYS
 }
 
 fun RepeatedDate.isWeekday(): Int = when {
@@ -42,24 +42,24 @@ fun RepeatedDate.isWeekday(): Int = when {
     // 주말
     equals(RepeatedDate.WEEKENDS) || equals(RepeatedDate.WEEKENDS_EXCEPT_HOLIDAYS) -> WeeklyAlarm.WEEKENDS
     // 평일
-    else -> WeeklyAlarm.EMPTY
+    else -> WeeklyAlarm.WEEKDAYS
 }
 
-fun RepeatedDate.isHoliday(): Int = when {
+fun RepeatedDate.disableHoliday(): Int = when {
     // 매일
-    equals(RepeatedDate.EVERYDAY) -> 1
+    equals(RepeatedDate.EVERYDAY) -> 0
     // 매일 & 공휴일 제외
-    equals(RepeatedDate.EVERYDAY_EXCEPT_HOLIDAYS) -> 0
+    equals(RepeatedDate.EVERYDAY_EXCEPT_HOLIDAYS) -> 1
     // 평일
-    equals(RepeatedDate.WEEKDAYS) -> 1
+    equals(RepeatedDate.WEEKDAYS) -> 0
     // 평일 & 공휴일 제외
-    equals(RepeatedDate.WEEKDAYS_EXCEPT_HOLIDAYS) -> 0
+    equals(RepeatedDate.WEEKDAYS_EXCEPT_HOLIDAYS) -> 1
     // 주말
-    equals(RepeatedDate.WEEKENDS) -> 1
+    equals(RepeatedDate.WEEKENDS) -> 0
     // 주말 & 공휴일 제외
-    equals(RepeatedDate.WEEKENDS_EXCEPT_HOLIDAYS) -> 0
+    equals(RepeatedDate.WEEKENDS_EXCEPT_HOLIDAYS) -> 1
     // 평일
-    else -> 1
+    else -> 0
 }
 
 /**
@@ -67,27 +67,26 @@ fun RepeatedDate.isHoliday(): Int = when {
  * 주말, repeatValues[1]
  * 공휴일 알람 여부
  */
-fun getReatDateStr(repeatValues: ArrayList<Int>, isHoliday: Int): String = when {
+fun getReatDateStr(repeatValues: ArrayList<Int>, disableHoliday: Int): String = when {
 
     // 매일
-    (repeatValues[0] == 1 && repeatValues[1] == 1 && isHoliday == 1) -> RepeatedDate.EVERYDAY.str
+    (repeatValues[0] == 1 && repeatValues[1] == 1 && disableHoliday == 0) -> RepeatedDate.EVERYDAY.str
 
     // 매일 & 공휴일 제외
-    (repeatValues[0] == 1 && repeatValues[1] == 1 && isHoliday == 0) -> RepeatedDate.EVERYDAY_EXCEPT_HOLIDAYS.str
+    (repeatValues[0] == 1 && repeatValues[1] == 1 && disableHoliday == 1) -> RepeatedDate.EVERYDAY_EXCEPT_HOLIDAYS.str
 
     // 평일
-    (repeatValues[0] == 1 && repeatValues[1] == 0 && isHoliday == 1) -> RepeatedDate.WEEKDAYS.str
+    (repeatValues[0] == 1 && repeatValues[1] == 0 && disableHoliday == 0) -> RepeatedDate.WEEKDAYS.str
 
     // 평일 & 공휴일 제외
-    (repeatValues[0] == 1 && repeatValues[1] == 0 && isHoliday == 0) -> RepeatedDate.WEEKDAYS_EXCEPT_HOLIDAYS.str
+    (repeatValues[0] == 1 && repeatValues[1] == 0 && disableHoliday == 1) -> RepeatedDate.WEEKDAYS_EXCEPT_HOLIDAYS.str
 
     // 주말
-    (repeatValues[0] == 0 && repeatValues[1] == 1 && isHoliday == 1) -> RepeatedDate.WEEKENDS.str
+    (repeatValues[0] == 0 && repeatValues[1] == 1 && disableHoliday == 0) -> RepeatedDate.WEEKENDS.str
 
     // 주말 & 공휴일 제외
-    (repeatValues[0] == 0 && repeatValues[1] == 1 && isHoliday == 0) -> RepeatedDate.WEEKENDS_EXCEPT_HOLIDAYS.str
+    (repeatValues[0] == 0 && repeatValues[1] == 1 && disableHoliday == 1) -> RepeatedDate.WEEKENDS_EXCEPT_HOLIDAYS.str
 
     // 평일
     else -> RepeatedDate.WEEKDAYS.str
-
 }
