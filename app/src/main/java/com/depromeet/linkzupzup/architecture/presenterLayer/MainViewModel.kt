@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.depromeet.linkzupzup.ParamsInfo
+import com.depromeet.linkzupzup.StatusConst
 import com.depromeet.linkzupzup.architecture.domainLayer.LinkUseCases
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmDataEntity
@@ -17,6 +18,7 @@ import com.depromeet.linkzupzup.architecture.presenterLayer.model.User
 import com.depromeet.linkzupzup.base.BaseViewModel
 import com.depromeet.linkzupzup.component.MetaDataManager.extractUrlFormText
 import com.depromeet.linkzupzup.component.MetaDataManager.getMetaDataFromUrl
+import com.depromeet.linkzupzup.utils.DLog
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -163,12 +165,24 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
      */
     fun registerLink(linkInfo: LinkRegisterEntity, callback: ((ResponseEntity<LinkAlarmEntity>)->Unit)? = null) {
         progressStatus(true)
+        DLog.e("RegisterLink",preference?.getAuthorization().toString())
+        DLog.e("RegisterLink",preference?.getUserId().toString())
         addDisposable(linkUseCases.registerLink(linkInfo)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({
+            .subscribe({ response ->
 
-                callback?.invoke(it)
+                when(response.getStatus()) {
+                    StatusConst.REGIST_SUCCESS_STATUS -> {
+                        callback?.invoke(response)
+                    }
+                    StatusConst.REGIST_FAIL_STATUS -> {
+                        DLog.e("registerLink", response.comment)
+                    }
+                    else -> {
+                        DLog.e("registerLink", response.comment)
+                    }
+                }
                 progressStatus(false)
             }, this@MainViewModel::defaultThrowable))
     }

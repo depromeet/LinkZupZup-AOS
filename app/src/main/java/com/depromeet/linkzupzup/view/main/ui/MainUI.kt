@@ -1,5 +1,6 @@
 package com.depromeet.linkzupzup.view.main.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -118,7 +119,8 @@ fun MainBodyUI(linkList: LiveData<ArrayList<LinkData>>, vm : MainViewModel? = nu
                 .background(color = Color.Transparent)
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
 
-                val columnModifier = if (list.size > 0) Modifier.fillMaxWidth()
+                val columnModifier = if (list.size > 0) Modifier
+                    .fillMaxWidth()
                     .weight(1f)
                     .padding(bottom = 16.dp)
                     .drawWithCache {
@@ -147,8 +149,10 @@ fun MainBodyUI(linkList: LiveData<ArrayList<LinkData>>, vm : MainViewModel? = nu
                 }
 
                 // empty guide
-                if(list.size==0){ EmptyLinkGuideCard(Modifier.fillMaxWidth()
-                    .weight(1f)) }
+                if(list.size==0){ EmptyLinkGuideCard(
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f)) }
 
                 Button(shape = RoundedCornerShape(4.dp),
                     colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Blue50, contentColor = Color.White),
@@ -342,11 +346,15 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
             .height(96.dp)) {
 
             // 링크 썸네일 이미지
-            Image(contentDescription = null,
-                modifier = Modifier.size(96.dp),
-                contentScale = ContentScale.Crop,
-                alignment = Alignment.Center,
-                painter =  rememberGlidePainter(request = metaImgUrl.value, fadeIn = true, previewPlaceholder = R.drawable.img_linklogo_placeholder))
+            Box {
+                Image(contentDescription = null,
+                    modifier = Modifier.size(96.dp),
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center,
+                    painter =  rememberGlidePainter(request = metaImgUrl.value, fadeIn = true, previewPlaceholder = R.drawable.img_linklogo_placeholder))
+
+                MainAlarmCard() // 리마인더 유무에 따라 현재 행 추가하시면 됩니다.
+            }
 
             Spacer(modifier = Modifier.width(10.dp))
 
@@ -372,8 +380,7 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
                         fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700))), maxLines = 2, overflow = TextOverflow.Ellipsis)
 
                 // 작성자
-                Row(
-                    Modifier
+                Row(Modifier
                         .fillMaxWidth()
                         .height(16.dp)) {
 
@@ -416,11 +423,37 @@ fun MainHashtagCard(tagName : String, backColor : Color, textColor : Color){
     }
 }
 
+@Preview
+@Composable
+fun MainAlarmCard(){
+    Row(modifier = Modifier.wrapContentSize()
+        .padding(4.dp)
+        .background(Color.Transparent)){
+
+        Card(elevation = 0.dp,
+            shape = Shapes.small,
+            modifier = Modifier.size(28.dp)){
+
+            Row(verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxSize()
+                    .background(Blue20)
+                    .padding(6.dp)){
+
+                Image(painter = painterResource(id = R.drawable.ic_blue_alarm),
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                    alignment = Alignment.Center)
+            }
+        }
+    }
+
+}
+
 /* BottomSheet */
 @ExperimentalMaterialApi
 @Composable
 fun BottomSheet(sheetState : ModalBottomSheetState, coroutineScope : CoroutineScope, vm : MainViewModel? = null){
-
+    val ctx = LocalContext.current
     val saveBtnColor = remember { mutableStateOf(Gray50t) }
     val saveTxtColor = remember { mutableStateOf(Gray70) }
     val linkUrl = remember { mutableStateOf("") }
@@ -514,6 +547,7 @@ fun BottomSheet(sheetState : ModalBottomSheetState, coroutineScope : CoroutineSc
                         coroutineScope.launch {
                             viewModel.getLinkList()
                             sheetState.hide()
+                            Toast.makeText(ctx,"링크가 저장되었습니다!",Toast.LENGTH_SHORT).show()    // 2초
                         }
                     }
                 }
