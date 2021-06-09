@@ -3,6 +3,7 @@ package com.depromeet.linkzupzup.architecture.dataLayer.repositories
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmDataEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkReadEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
 import io.reactivex.Observable
@@ -15,7 +16,7 @@ interface LinkRepository {
 
     fun getTodayReadCount(): Observable<ResponseEntity<Int>>
 
-    fun setLinkRead(linkId: Int): Observable<ResponseEntity<*>>
+    fun setLinkRead(linkId: Int): Observable<ResponseEntity<LinkReadEntity>>
 
     suspend fun getMetaList(urls: ArrayList<String>) : List<LinkMetaInfoEntity>
 

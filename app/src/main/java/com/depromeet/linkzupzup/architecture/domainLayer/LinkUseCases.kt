@@ -4,6 +4,7 @@ import com.depromeet.linkzupzup.architecture.dataLayer.repositories.LinkReposito
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmDataEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkReadEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
@@ -35,7 +36,7 @@ class LinkUseCases(private val linkRepositoryImpl: LinkRepositoryImpl) {
     /**
      * 링크 읽기 상태로 변경
      */
-    fun setLinkRead(linkId: Int): Observable<ResponseEntity<*>>{
+    fun setLinkRead(linkId: Int): Observable<ResponseEntity<LinkReadEntity>>{
         return linkRepositoryImpl.setLinkRead(linkId)
     }
 

@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -37,16 +38,17 @@ import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.architecture.presenterLayer.WebViewViewModel
 import com.depromeet.linkzupzup.ui.theme.*
 
-class WebViewUI : BaseView<WebViewViewModel>() {
+class WebViewUI(var clickListener: (Int)->Unit = {}) : BaseView<WebViewViewModel>() {
     @Composable
     override fun onCreateViewContent() {
         LinkZupZupTheme {
             Surface(color = Color.White) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     val openDialog = remember { mutableStateOf(false)  }
+                    val readCount = remember { mutableStateOf(0) }
 
-                    WebPageScreen(urlToRender = "https://www.naver.com", openDialog = openDialog, vm = vm)
-                    WebViewCustomDialog(openDialog = openDialog)
+                    WebPageScreen(urlToRender = "https://www.naver.com", openDialog = openDialog, vm = vm, clickListener = clickListener)
+                    WebViewCustomDialog(readCount = readCount, openDialog = openDialog)
                 }
             }
         }
@@ -54,9 +56,9 @@ class WebViewUI : BaseView<WebViewViewModel>() {
 }
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebPageScreen(urlToRender: String, openDialog: MutableState<Boolean>, vm: WebViewViewModel? = null) {
+fun WebPageScreen(urlToRender: String, openDialog: MutableState<Boolean>, vm: WebViewViewModel? = null, clickListener: (Int) -> Unit) {
     Scaffold(
-        topBar = { WebViewTopBar(openDialog = openDialog, vm = vm) },
+        topBar = { WebViewTopBar(openDialog = openDialog, vm = vm, clickListener = clickListener) },
         backgroundColor = Color.Transparent,
         modifier = Modifier.fillMaxSize()) {
 
@@ -78,8 +80,10 @@ fun WebPageScreen(urlToRender: String, openDialog: MutableState<Boolean>, vm: We
 
 
 @Composable
-fun WebViewTopBar(openDialog: MutableState<Boolean>, vm: WebViewViewModel? = null){
-    val ctx = LocalContext.current
+fun WebViewTopBar(openDialog: MutableState<Boolean>,vm: WebViewViewModel? = null,clickListener: (Int) -> Unit){
+
+    val todayCnt = vm?.todayReadCnt?.observeAsState()
+
     Box(modifier = Modifier
         .fillMaxWidth()
         .height(52.dp)
@@ -91,7 +95,7 @@ fun WebViewTopBar(openDialog: MutableState<Boolean>, vm: WebViewViewModel? = nul
                 .fillMaxHeight()){
 
             WebViewBackButton(painterResource(id = R.drawable.ic_detail_back)){
-                // finish activity
+                clickListener(R.id.avtivity_close)
             }
         }
 
@@ -117,9 +121,13 @@ fun WebViewTopBar(openDialog: MutableState<Boolean>, vm: WebViewViewModel? = nul
                     .height(36.dp),
                 onClick = {
                     vm?.run {
-                        openDialog.value = setLinkRead()
+                        setLinkRead(2)  // 링크 아이디
+                        todayCnt?.value?.let {
+                            if(it.completed){
+                                openDialog.value = true
+                            }
+                        }
                     }
-
                 }) {
 
                 Text("완료!",
@@ -160,15 +168,15 @@ fun WebViewBackButton(painter: Painter, onClick : () -> Unit){
 }
 
 @Composable
-fun WebViewCustomDialog(openDialog : MutableState<Boolean>){
+fun WebViewCustomDialog(readCount: MutableState<Int>, openDialog : MutableState<Boolean>){
     if(openDialog.value)
-        WebViewCustomDialog(onDismissRequest = { openDialog.value = false })
+        WebViewCustomDialog(readCount = readCount){ openDialog.value = false }
 }
 
 @Composable
-fun WebViewCustomDialog(onDismissRequest: () -> Unit){
+fun WebViewCustomDialog( readCount: MutableState<Int>, onDismissRequest: () -> Unit){
     Dialog(onDismissRequest = onDismissRequest) {
-        DialogBody(234, onDismissRequest)
+        DialogBody(readCount.value, onDismissRequest)
     }
 }
 
@@ -176,7 +184,7 @@ fun WebViewCustomDialog(onDismissRequest: () -> Unit){
 @Composable
 fun DialogBody(readCount : Int, onClick: () -> Unit){
 
-    val thisWeekCount : String = "이번 달 읽은 링크 ${readCount}개"
+    val thisWeekCount = "이번 달 읽은 링크 ${readCount}개"
 
     Card(shape = Shapes.small,
         modifier = Modifier
