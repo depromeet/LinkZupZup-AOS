@@ -65,7 +65,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
-class MainUI(var clickListener: (id: Int, linkId: Int?) -> Unit, var userName : String): BaseView<MainViewModel>() {
+class MainUI(var clickListener: (id: Int, linkData: LinkData?) -> Unit, var userName : String): BaseView<MainViewModel>() {
 
     @ExperimentalFoundationApi
     @ExperimentalMaterialApi
@@ -101,7 +101,7 @@ fun BottomSheetPreview() {
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun MainBodyUI(linkList: LiveData<ArrayList<LinkData>>, vm : MainViewModel? = null, clickListener: (id: Int, linkId: Int?) -> Unit, userName: String){
+fun MainBodyUI(linkList: LiveData<ArrayList<LinkData>>, vm : MainViewModel? = null, clickListener: (id: Int, linkData: LinkData?) -> Unit, userName: String){
     val list by linkList.observeAsState(arrayListOf())
 
     // 로그인 성공
@@ -149,7 +149,7 @@ fun MainBodyUI(linkList: LiveData<ArrayList<LinkData>>, vm : MainViewModel? = nu
                         useHeader = true,
                         headerContent = { MainHeaderCard(name = userName, progress = 0.2f * todayCnt) }) { idx, linkItem ->
                         MainLinkCard(index = idx, linkData = linkItem, vm) {
-                            clickListener(R.id.activity_move,it)
+                            clickListener(R.id.activity_move,linkItem)
                         }
                     }
                 }
@@ -189,7 +189,7 @@ fun MainBodyUI(linkList: LiveData<ArrayList<LinkData>>, vm : MainViewModel? = nu
 }
 
 @Composable
-fun MainAppBar(appBarColor : MutableState<Color> = remember { mutableStateOf(Gray10) }, clickListener: (id: Int, linkId: Int?) -> Unit){
+fun MainAppBar(appBarColor : MutableState<Color> = remember { mutableStateOf(Gray10) }, clickListener: (id: Int, linkData: LinkData?) -> Unit){
     // in ColumnScope
     
     TopAppBar(title = {},

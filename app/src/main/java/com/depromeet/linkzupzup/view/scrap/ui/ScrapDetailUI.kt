@@ -46,7 +46,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-class ScrapDetailUI: BaseView<ScrapDetailViewModel>() {
+class ScrapDetailUI(val clickListener: () -> Unit): BaseView<ScrapDetailViewModel>() {
 
     companion object {
         // menu
@@ -64,7 +64,7 @@ class ScrapDetailUI: BaseView<ScrapDetailViewModel>() {
     override fun onCreateViewContent() {
         LinkZupZupTheme {
             Surface(color = MaterialTheme.colors.background) {
-                bottomSheetTest(vm)
+                bottomSheetTest(vm, clickListener)
             }
         }
     }
@@ -78,7 +78,7 @@ class ScrapDetailUI: BaseView<ScrapDetailViewModel>() {
 fun previewSample() {
     LinkZupZupTheme {
         Surface(color = MaterialTheme.colors.background) {
-            bottomSheetTest()
+            bottomSheetTest(){}
         }
     }
 }
@@ -86,7 +86,7 @@ fun previewSample() {
 @ExperimentalPagerApi
 @ExperimentalMaterialApi
 @Composable
-fun bottomSheetTest(viewModel: ScrapDetailViewModel? = null) {
+fun bottomSheetTest(viewModel: ScrapDetailViewModel? = null, clickListener: () -> Unit) {
 
     val ctx = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -235,7 +235,7 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel? = null) {
 
                                 Spacer(Modifier.height(20.dp))
 
-                                Button(onClick = { DLog.e("Jackson", "click read button") },
+                                Button(onClick = { clickListener() },
                                     colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color(0xFF4076F6), contentColor = Color.White),
                                     shape = RoundedCornerShape(4.dp),
                                     modifier = Modifier
