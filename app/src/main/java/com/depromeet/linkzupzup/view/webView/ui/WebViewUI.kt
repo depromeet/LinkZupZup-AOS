@@ -46,8 +46,10 @@ class WebViewUI(var clickListener: (Int)->Unit = {}) : BaseView<WebViewViewModel
                 Column(modifier = Modifier.fillMaxSize()) {
                     val openDialog = remember { mutableStateOf(false)  }
                     val readCount = remember { mutableStateOf(0) }
+                    val linkId = vm?.linkId?.value ?: -1
+                    val linkUrl = vm?.linkUrl?.value ?: ""
 
-                    WebPageScreen(urlToRender = "https://www.naver.com", openDialog = openDialog, vm = vm, clickListener = clickListener)
+                    WebPageScreen(urlToRender = linkUrl, openDialog = openDialog, vm = vm, clickListener = clickListener)
                     WebViewCustomDialog(readCount = readCount, openDialog = openDialog)
                 }
             }

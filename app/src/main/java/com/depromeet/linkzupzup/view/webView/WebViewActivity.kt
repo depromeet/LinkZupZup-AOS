@@ -1,6 +1,7 @@
 package com.depromeet.linkzupzup.view.webView
 
 import android.os.Bundle
+import com.depromeet.linkzupzup.AppConst
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseActivity
 import com.depromeet.linkzupzup.architecture.presenterLayer.WebViewViewModel
@@ -13,6 +14,10 @@ class WebViewActivity : BaseActivity<WebViewUI,WebViewViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        intent?.run {
+            viewModel.setLinkUrl(getStringExtra(AppConst.WEB_LINK_URL) ?: "")
+            viewModel.setLinkId(getIntExtra(AppConst.WEB_LINK_ID, -1))
+        }
     }
 
     private fun onClick(id: Int) = with(viewModel) {
