@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -152,7 +151,10 @@ fun MainBodyUI(viewModel : MainViewModel, clickListener: (id: Int, linkId: Int?)
                 }
 
                 // empty guide
-                if (linkList.size == 0) EmptyLinkGuideCard(Modifier.fillMaxWidth().weight(1f))
+                if (linkList.size == 0) EmptyLinkGuideCard(
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f))
 
                 Button(shape = RoundedCornerShape(4.dp),
                     colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Blue50, contentColor = Color.White),
@@ -380,7 +382,8 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
                         fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700))), maxLines = 2, overflow = TextOverflow.Ellipsis)
 
                 // 작성자
-                Row(Modifier
+                Row(
+                    Modifier
                         .fillMaxWidth()
                         .height(16.dp)) {
 
@@ -456,17 +459,21 @@ fun MainAlarmCard(){
 @Composable
 fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : CoroutineScope, viewModel: MainViewModel, clickListener: (id: Int, linkId: Int?) -> Unit, linkData: LinkData) {
 
-    val isNewRegist = remember { mutableStateOf(false) }
+    val isNewRegister = remember { mutableStateOf(false) }
     val linkId = remember { mutableStateOf(-1) }
     val linkUrl = remember { mutableStateOf("") }
     val hashtags = remember { mutableStateListOf(LinkHashData()) }
 
     val ctx = LocalContext.current
-    val saveBtnColor = if (!linkUrl.value.isNullOrEmpty()) Blue50 else Gray50t
-    val saveTxtColor = if (!linkUrl.value.isNullOrEmpty()) Color.White else Gray70
+
+//    값을 직접 set 해줘야 갱신되는 현상
+//    val saveBtnColor = if (!linkUrl.value.isNullOrEmpty()) Blue50 else Gray50t
+//    val saveTxtColor = if (!linkUrl.value.isNullOrEmpty()) Color.White else Gray70
+    val saveBtnColor = remember { mutableStateOf(Gray50t) }
+    val saveTxtColor = remember { mutableStateOf(Gray70) }
 
     linkId.value = linkData.linkId
-    isNewRegist.value = linkData.linkId < 0
+    isNewRegister.value = linkData.linkId < 0
     linkUrl.value = linkData.linkURL
     hashtags.addAll(linkData.hashtags)
 
@@ -512,14 +519,13 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
                     .padding(horizontal = 24.dp)) {
 
                 linkUrl.value = it
-//
-//                if(it.isNullOrEmpty()){
-//                    saveBtnColor.value = Gray50t
-//                    saveTxtColor.value = Gray70
-//                }else if(it.isNotEmpty()){
-//                    saveBtnColor.value = Blue50
-//                    saveTxtColor.value = Color.White
-//                }
+                if(it.isNullOrEmpty()){
+                    saveBtnColor.value = Gray50t
+                    saveTxtColor.value = Gray70
+                }else if(it.isNotEmpty()){
+                    saveBtnColor.value = Blue50
+                    saveTxtColor.value = Color.White
+                }
 
                 // DLog.e("MAIN_TEST", "url: $it")
                 DLog.e("hashtags", "${Gson().toJson(hashtags)}")
@@ -580,7 +586,9 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
             state = listState,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)) {
 
             itemsIndexed(items = hashtags, itemContent = { idx, tag ->
 //                BottomSheetHashtagCard(tag, isSelected = true) { target ->
@@ -598,7 +606,7 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
 
                 Card(modifier = Modifier
                     .height(32.dp)
-                    .noRippleClickable {  },
+                    .noRippleClickable { },
                     shape = RoundedCornerShape(2.dp),
                     backgroundColor = tag.tagColor.bgColor,
                     elevation = 0.dp) {
@@ -630,7 +638,7 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
 
         /* 하단 저장하기 버튼 */
         Button(shape = RoundedCornerShape(4.dp),
-            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = saveBtnColor, contentColor = saveTxtColor),
+            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = saveBtnColor.value, contentColor = saveTxtColor.value),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp)
@@ -666,7 +674,8 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
 
 @Composable
 fun BottomHeaderCard(padding: PaddingValues = PaddingValues(0.dp)){
-    Column(modifier = Modifier.fillMaxWidth()
+    Column(modifier = Modifier
+        .fillMaxWidth()
         .padding(horizontal = 23.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -739,7 +748,8 @@ fun BottomSheetInputTag(onClick: (String) -> Unit){
     val strColor = remember { mutableStateOf(Gray70)}
     val tagName = remember { mutableStateOf("") }
 
-    Column(modifier = Modifier.fillMaxWidth()
+    Column(modifier = Modifier
+        .fillMaxWidth()
         .padding(horizontal = 23.dp)){
         Text(
             text = clickStr.value,
@@ -767,7 +777,8 @@ fun BottomSheetInputTag(onClick: (String) -> Unit){
                     .padding(top = 8.dp)){
 
                 CustomTextField(hintStr = "#",
-                    modifier = Modifier.height(40.dp)
+                    modifier = Modifier
+                        .height(40.dp)
                         .weight(1f)) {
                     tagName.value = it
                 }
