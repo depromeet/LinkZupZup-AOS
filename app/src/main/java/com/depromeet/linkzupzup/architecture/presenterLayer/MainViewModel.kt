@@ -119,24 +119,6 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
         }
     }
 
-
-    fun insertSelectedTag(tag: LinkHashData){
-        _selTagList.value = selTagList.value?.apply {
-            val target = find { it.hashtagName == tag.hashtagName }
-            if (size < AppConst.HASH_TAG_MAX_LIMIT && target == null) add(tag)
-        }
-    }
-
-    fun removeSelectedTag(tag: LinkHashData){
-        _selTagList.value = selTagList.value?.apply {
-            find { it.hashtagName == tag.hashtagName }?.let { target ->
-                val targetIdx = indexOf(target)
-                if (size > 0 && targetIdx >= 0) removeAt(targetIdx)
-            }
-        }
-    }
-
-
     private fun getMetadata(url : String, callback: (LinkMetaInfoEntity) -> Unit){
         extractUrlFormText(url)?.let{ rightUrl ->
             getMetaDataFromUrl(rightUrl).let { metaData ->

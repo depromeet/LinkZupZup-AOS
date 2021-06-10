@@ -1,5 +1,6 @@
 package com.depromeet.linkzupzup.view.main.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
@@ -48,12 +49,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
+import com.depromeet.linkzupzup.AppConst
 import com.depromeet.linkzupzup.R
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkHashData
@@ -64,7 +68,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 
 
-class MainUI(var clickListener: (id: Int, linkId: Int?) -> Unit, var userName : String): BaseView<MainViewModel>() {
+class MainUI(private var clickListener: (id: Int, linkId: Int?) -> Unit, private var userName : String): BaseView<MainViewModel>() {
 
     @ExperimentalFoundationApi
     @ExperimentalMaterialApi
@@ -307,13 +311,12 @@ fun ReadProgress(progress: Float, padding: PaddingValues = PaddingValues(0.dp)){
 @Composable
 fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = null, clickListener: (Int) -> Unit) {
 
-    val ctx = LocalContext.current
     val tagList : ArrayList<LinkHashData> = linkData.hashtags
     val metaTitle = remember { mutableStateOf(linkData.linkTitle) }
     val metaImgUrl = remember { mutableStateOf(linkData.imgURL) }
     val linkId = remember { mutableStateOf(linkData.linkId)}
 
-    // meta data가 없으면 비동기로 호출하여 업데이트합니다.
+    // meta data 가 없으면 비동기로 호출하여 업데이트합니다.
     viewModel?.loadMetadata(index, linkData) {
         /**
          * UI 갱신이 되지 않아, 비동기 콜백으로 데이터를 교체하여 갱신하였습니다.
@@ -537,18 +540,7 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
              * 해시태그 선택
              */
             BottomSheetSelect(cnt = hashtags.size) { target ->
-//                hashtags.value = with(hashtags.value) {
-//                    apply {
-//                        find { it.hashtagName == target.hashtagName }?.let {
-//                            remove(it)
-//                        } ?: let {
-//                            if (size < AppConst.HASH_TAG_MAX_LIMIT) add(target)
-//                            else { /* 3개 이상 무시 */ }
-//                        }
-//                    }
-//                }
-//               linkData.hashtags = hashtags.value
-                hashtags.add(target)
+                updateHashtags(hashtags, target)
                 DLog.e("HASH_TAG", "${Gson().toJson(target)}")
                 DLog.e("hashtags", "${Gson().toJson(hashtags)}")
             }
@@ -559,18 +551,7 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
              * 커스텀 태그 입력 화면
              */
             BottomSheetInputTag { tagName ->
-//                hashtags.value = with(hashtags.value) {
-//                    apply {
-//                        find { it.hashtagName == tagName }?.let {
-//                            remove(it)
-//                        }?.let {
-//                            if (size < AppConst.HASH_TAG_MAX_LIMIT) add(LinkHashData(hashtagName = tagName))
-//                            else { /* 3개 이상 무시 */ }
-//                        }
-//                    }
-//                }
-//                linkData.hashtags = hashtags.value
-                hashtags.add(LinkHashData(hashtagName = tagName))
+                updateHashtags(hashtags, LinkHashData(hashtagName = tagName))
                 DLog.e("CUSTOM_TAG", "$tagName")
                 DLog.e("hashtags", "${Gson().toJson(hashtags)}")
             }
@@ -590,23 +571,12 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)) {
 
-            itemsIndexed(items = hashtags, itemContent = { idx, tag ->
-//                BottomSheetHashtagCard(tag, isSelected = true) { target ->
-//                    hashtags.value = with(hashtags.value) {
-//                        apply {
-//                            find { it.hashtagName == target.hashtagName }?.let {
-//                                remove(it)
-//                            }?.let {  }
-//                        }
-//                    }
-//                    linkData.hashtags = hashtags.value
+            items(items = hashtags, itemContent = { tag ->
                 DLog.e("HASH_TAG", "tagName: ${tag.hashtagName}, tag: ${Gson().toJson(tag)}")
                 DLog.e("hashtags", "${Gson().toJson(hashtags)}")
-//                }
-
                 Card(modifier = Modifier
                     .height(32.dp)
-                    .noRippleClickable { },
+                    .noRippleClickable { updateHashtags(hashtags, tag) },
                     shape = RoundedCornerShape(2.dp),
                     backgroundColor = tag.tagColor.bgColor,
                     elevation = 0.dp) {
@@ -645,20 +615,18 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
                 .padding(start = 24.dp, end = 24.dp),
             onClick = {
                 with(viewModel) {
-
                     // 링크 저장 TODO : 추후 LinkRegisterEntity 개선 필요
-//                    viewModel.registerLink(
-//                        LinkRegisterEntity(
-//                        linkURL = linkUrl.value,
-//                        hashtags = ArrayList(viewModel.selectTagList.value?.map { it.hashtagName }))
-//                    ){
-//
-//                        coroutineScope.launch {
-//                            viewModel.getLinkList()
-//                            sheetState.hide()
-//                            Toast.makeText(ctx,"링크가 저장되었습니다!", Toast.LENGTH_SHORT).show()    // 2초
-//                        }
-//                    }
+                    viewModel.registerLink(
+                        LinkRegisterEntity(
+                        linkURL = linkUrl.value,
+                        hashtags = ArrayList(hashtags.map { it.hashtagName }))
+                    ){
+                        coroutineScope.launch {
+                            viewModel.getLinkList()
+                            sheetState.hide()
+                            Toast.makeText(ctx,"링크가 저장되었습니다!", Toast.LENGTH_SHORT).show()    // 2초
+                        }
+                    }
                 }
             }) {
 
@@ -668,6 +636,19 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
                     fontSize = 14.sp,
                     lineHeight = 17.5.sp,
                     fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700))))
+        }
+    }
+}
+
+fun updateHashtags(hashtags : SnapshotStateList<LinkHashData>, target: LinkHashData) {
+    with(hashtags) {
+        apply {
+            find { it.hashtagName == target.hashtagName }?.let {
+                remove(it)
+            } ?: let {
+                if (size < AppConst.HASH_TAG_MAX_LIMIT) add(target)
+                // else { /* 3개 이상 무시 */ }
+            }
         }
     }
 }
@@ -789,7 +770,7 @@ fun BottomSheetInputTag(onClick: (String) -> Unit){
                     .align(Alignment.CenterVertically)
                     .noRippleClickable {
                         onClick(tagName.value)
-                        tagName.value = ""
+                        // tagName.value = ""
                     },
                     shape = RoundedCornerShape(4.dp),
                     backgroundColor = Gray70,
