@@ -16,7 +16,7 @@ class MyPageData <T : Any> {
         val MENU_DATA : List<Pair<String,Int>> = listOf(
             Pair("다 읽은 링크", MENU_DETAIL),
             Pair("푸시 알림", MENU_TOGGLE),
-            Pair("공지사항 / 업데이트", MENU_DETAIL),
+            Pair("개인정보 처리방침", MENU_DETAIL),
             Pair("칠성파가 누구? ⭐️",MENU_DETAIL)
         )
     }

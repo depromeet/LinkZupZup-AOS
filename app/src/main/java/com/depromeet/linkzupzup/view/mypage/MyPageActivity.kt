@@ -8,10 +8,19 @@ import org.koin.androidx.viewmodel.ext.android.getViewModel
 
 
 class MyPageActivity: BaseActivity<MyPageUI, MyPageViewModel>() {
-    override var view: MyPageUI = MyPageUI()
+    override var view: MyPageUI = MyPageUI(::onClick)
     override fun onCreateViewModel(): MyPageViewModel = getViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        with(viewModel) {
+            // 마이페이지 정보 조회
+            getMyPageInfo()
+        }
+    }
+
+    private fun onClick(id: Int){
+
     }
 }

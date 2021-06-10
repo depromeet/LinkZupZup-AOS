@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,25 +35,26 @@ import com.depromeet.linkzupzup.architecture.presenterLayer.model.MyPageData
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.view.custom.CustomSwitchCompat
 import com.depromeet.linkzupzup.view.mydonut.MyDonutActivity
+import com.google.accompanist.glide.rememberGlidePainter
 
-class MyPageUI: BaseView<MyPageViewModel>() {
+class MyPageUI(private var clickListener: (id: Int) -> Unit) : BaseView<MyPageViewModel>() {
     @Composable
     override fun onCreateViewContent() {
         LinkZupZupTheme {
             Surface(color = Gray10) {
                 Column(modifier = Modifier.fillMaxWidth()) {
+                    vm?.let {
+                        val myPageContentList : ArrayList<MyPageData<*>> = arrayListOf<MyPageData<*>>().apply{
+                            // 이번 달 내 포인트
+                            add(MyPageData<Any>(MyPageData.THIS_WEEK_POINT,9999))
+                            // 전체 읽은 수
+                            add(MyPageData<Any>(MyPageData.TOTAL_READ_COUNT,9999))
+                            // 이번 달 읽은 수
+                            add(MyPageData<Any>(MyPageData.THIS_WEEK_READ_COUNT,100))
+                        }
 
-                    val myPageContentList : ArrayList<MyPageData<*>> = arrayListOf<MyPageData<*>>().apply{
-                        // 이번 달 내 포인트
-                        add(MyPageData<Any>(MyPageData.THIS_WEEK_POINT,9999))
-                        // 전체 읽은 수
-                        add(MyPageData<Any>(MyPageData.TOTAL_READ_COUNT,9999))
-                        // 이번 달 읽은 수
-                        add(MyPageData<Any>(MyPageData.THIS_WEEK_READ_COUNT,100))
+                        MyPageBodyUI(myPageContentList = myPageContentList, vm = vm)
                     }
-
-                    MyPageBodyUI(myPageContentList = myPageContentList)
-
                 }
             }
         }
@@ -60,17 +62,20 @@ class MyPageUI: BaseView<MyPageViewModel>() {
 }
 
 @Composable
-fun MyPageBodyUI(myPageContentList: ArrayList<MyPageData<*>>){
+fun MyPageBodyUI(myPageContentList: ArrayList<MyPageData<*>>, vm: MyPageViewModel ?= null){
     Scaffold(topBar = { MyPageTopBar() },
         backgroundColor = Color.Transparent,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
         
-        Column(Modifier.fillMaxWidth()
-            .background(Color.Transparent)) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .background(Color.Transparent)) {
 
             // 상단 프로필
-            MyPageProfile(myPageContentList = myPageContentList, userName = "김나경")
+            MyPageProfile(myPageContentList = myPageContentList)
 
             Spacer(modifier = Modifier.height(30.dp))
 
@@ -83,7 +88,8 @@ fun MyPageBodyUI(myPageContentList: ArrayList<MyPageData<*>>){
 
             // logout button
             Row(horizontalArrangement = Arrangement.End,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(top = 18.dp)){
 
                 Text(text = "로그아웃",
@@ -101,7 +107,8 @@ fun MyPageBodyUI(myPageContentList: ArrayList<MyPageData<*>>){
 fun MyPageTopBar(){
     val ctx = LocalContext.current
     Row(verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .height(52.dp)){
 
         BackButton(painterResource(id = R.drawable.ic_detail_back)){
@@ -115,7 +122,8 @@ fun BackButton(painter: Painter, onClick : () -> Unit){
     Card(elevation = 0.dp,
         shape = RoundedCornerShape(0),
         backgroundColor = Color.Transparent,
-        modifier = Modifier.fillMaxHeight()
+        modifier = Modifier
+            .fillMaxHeight()
             .wrapContentWidth()
             .noRippleClickable(onClick = onClick)) {
 
@@ -133,17 +141,22 @@ fun BackButton(painter: Painter, onClick : () -> Unit){
 
 
 @Composable
-fun MyPageProfile(myPageContentList: ArrayList<MyPageData<*>>, userName : String){
+fun MyPageProfile(myPageContentList: ArrayList<MyPageData<*>>, vm: MyPageViewModel? = null){
     val ctx = LocalContext.current
+    val userName = vm?.nickName?.observeAsState("")
+    val badgeUrl = vm?.badgeUrl?.observeAsState("")
+
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(vertical = 10.dp)){
 
-        Image(
-            painter = painterResource(id = R.drawable.ic_donut04),
+        Image(painter = rememberGlidePainter(request = badgeUrl, fadeIn = true),
             contentDescription = null,
-            modifier = Modifier.size(64.dp, 48.dp)
+            modifier = Modifier
+                .size(64.dp, 48.dp)
                 .padding(end = 10.dp))
 
         Text(
@@ -197,7 +210,9 @@ fun MyPageProfile(myPageContentList: ArrayList<MyPageData<*>>, userName : String
     Button(shape = RoundedCornerShape(4.dp),
         elevation = ButtonDefaults.elevation(0.dp),
         colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Blue50, contentColor = Color.White),
-        modifier = Modifier.fillMaxWidth().height(52.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(52.dp),
         onClick = {
             ctx.startActivity(Intent(ctx,MyDonutActivity::class.java))
         }) {
@@ -219,7 +234,8 @@ fun MyPageProfileCard(title: String, num : Int, unit : String){
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(vertical = 16.dp)){
 
         Text(text = title,
@@ -254,7 +270,9 @@ fun MyPageMenuCard(menuName : String, menuType : Int){
                 .fillMaxWidth()
                 .height(56.dp)
                 .noRippleClickable {
-                    Toast.makeText(ctx, "페이지 이동", Toast.LENGTH_SHORT).show()
+                    Toast
+                        .makeText(ctx, "페이지 이동", Toast.LENGTH_SHORT)
+                        .show()
                 }){
 
             Row(
