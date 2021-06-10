@@ -1,11 +1,9 @@
 package com.depromeet.linkzupzup.architecture.presenterLayer
 
+import com.depromeet.linkzupzup.architecture.domainLayer.UserUseCases
 import com.depromeet.linkzupzup.base.BaseViewModel
 
-class MyPageViewModel : BaseViewModel() {
+class MyPageViewModel(userUseCases: UserUseCases) : BaseViewModel() {
 
-    // 수치 파악
-    fun getProfileFigure(){
 
-    }
 }

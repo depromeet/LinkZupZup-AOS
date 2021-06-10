@@ -18,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -84,7 +83,7 @@ fun WebPageScreen(urlToRender: String, openDialog: MutableState<Boolean>, vm: We
 @Composable
 fun WebViewTopBar(openDialog: MutableState<Boolean>,vm: WebViewViewModel? = null,clickListener: (Int) -> Unit){
 
-    val todayCnt = vm?.todayReadCnt?.observeAsState()
+    val todayCnt = vm?.todayReadResponseCnt?.observeAsState()
 
     Box(modifier = Modifier
         .fillMaxWidth()

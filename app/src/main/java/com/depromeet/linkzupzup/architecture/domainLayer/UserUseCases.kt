@@ -3,6 +3,7 @@ package com.depromeet.linkzupzup.architecture.domainLayer
 import android.content.Context
 import com.depromeet.linkzupzup.architecture.dataLayer.repositories.UserRepositoryImpl
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.MyPageInfoResponseEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.SignInUpEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.SignResponseEntity
 import com.kakao.sdk.auth.model.OAuthToken
@@ -29,6 +30,10 @@ class UserUseCases(private val userRepositoryImpl: UserRepositoryImpl) {
 
     fun signInUp(signInUpEntity: SignInUpEntity): Observable<ResponseEntity<SignResponseEntity>> {
         return userRepositoryImpl.signInUp(signInUpEntity)
+    }
+
+    fun getMyPageInfo(): Observable<ResponseEntity<MyPageInfoResponseEntity>> {
+        return userRepositoryImpl.getMyPageInfo()
     }
 
 }

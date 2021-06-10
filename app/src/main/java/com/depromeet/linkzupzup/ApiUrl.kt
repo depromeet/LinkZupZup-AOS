@@ -26,6 +26,8 @@ object ApiUrl {
     const val RANKING = "ranking"
     const val LOGIN = "login"
     const val COUNT = "count"
+    const val MYPAGE = "mypage"
+    const val INFO = "info"
 
     /**
      * Link
@@ -50,6 +52,7 @@ object ApiUrl {
      * 응답으로 내려오는 token과 userId를 body에 포함하여 재호출시 로그인
      */
     const val MEMBERS_SIGN_IN = "/$VERSION/$MEMBERS/$LOGIN"
+    const val MEMBERS_MYPAGE_INFO = "/$VERSION/$MEMBERS/$MYPAGE/$INFO"
 
     /**
      * Ranking
