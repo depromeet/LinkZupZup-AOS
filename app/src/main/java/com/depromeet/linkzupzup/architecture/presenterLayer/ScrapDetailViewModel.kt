@@ -4,29 +4,48 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.depromeet.linkzupzup.base.BaseViewModel
-import com.depromeet.linkzupzup.architecture.domainLayer.ScrapUseCases
+import com.depromeet.linkzupzup.architecture.domainLayer.MetaUseCases
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkHashData
 import com.depromeet.linkzupzup.extensions.clearMillis
 import com.depromeet.linkzupzup.extensions.getTotalTimeSum
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.TagColor
+import com.depromeet.linkzupzup.extensions.mapToPresenter
 import com.depromeet.linkzupzup.receiver.AlarmReceiver
 import com.depromeet.linkzupzup.utils.CommonUtil
 import com.depromeet.linkzupzup.utils.DLog
 import io.reactivex.Single
+import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.get
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ScrapDetailViewModel(private val scrapUseCases: ScrapUseCases): BaseViewModel() {
+class ScrapDetailViewModel(private val metaUseCases: MetaUseCases): BaseViewModel() {
 
     private val alarmManager: AlarmManager by lazy { get(AlarmManager::class.java) }
 
+    private var _metaInfo: MutableLiveData<LinkData> = MutableLiveData(LinkData())
+    val metaInfo: LiveData<LinkData> = _metaInfo
+
     fun getTagList(): ArrayList<String> {
-        return scrapUseCases.getTagList(-1)
+        return ArrayList(metaInfo.value?.hashtags?.map { it.hashtagName } ?: arrayListOf())
     }
 
     fun getRandomColor(): Single<TagColor> {
         return Single.just(CommonUtil.getRandomeTagColor())
+    }
+
+    fun getMetaInfo(linkUrl: String) {
+        viewModelScope.launch {
+            metaUseCases.getMetaData(linkUrl = linkUrl)?.let { meta ->
+                _metaInfo.value = meta.mapToPresenter()
+            }
+        }
     }
 
     // 개별 링크 알람 설정

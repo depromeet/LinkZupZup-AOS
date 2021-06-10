@@ -1,6 +1,9 @@
 package com.depromeet.linkzupzup.architecture.dataLayer.repositories
 
-class TagRepositoryImpl: TagRepository {
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
+import com.depromeet.linkzupzup.component.RoomDB
+
+class MetaRepositoryImpl(private val roomDB: RoomDB): MetaRepository {
 
     override fun getTagList(): ArrayList<String> {
         // dataSource (API or Database) 를 참조하여 데이터를 반환합니다.
@@ -17,6 +20,10 @@ class TagRepositoryImpl: TagRepository {
             add("#스타트업")
             add("#IOS")
         }
+    }
+
+    override suspend fun getMetaData(linkUrl: String): LinkMetaInfoEntity? {
+        return roomDB.metaDao().getMetaInfo(linkUrl)
     }
 
 }

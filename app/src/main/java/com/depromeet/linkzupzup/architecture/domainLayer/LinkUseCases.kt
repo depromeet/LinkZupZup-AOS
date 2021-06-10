@@ -7,7 +7,6 @@ import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmE
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkReadEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
-import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
 import io.reactivex.Observable
 
 class LinkUseCases(private val linkRepositoryImpl: LinkRepositoryImpl) {

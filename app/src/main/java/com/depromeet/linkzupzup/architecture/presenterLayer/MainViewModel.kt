@@ -3,6 +3,7 @@ package com.depromeet.linkzupzup.architecture.presenterLayer
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.depromeet.linkzupzup.AppConst
 import com.depromeet.linkzupzup.ParamsInfo
 import com.depromeet.linkzupzup.StatusConst
 import com.depromeet.linkzupzup.architecture.domainLayer.LinkUseCases
@@ -18,6 +19,8 @@ import com.depromeet.linkzupzup.base.BaseViewModel
 import com.depromeet.linkzupzup.component.MetaDataManager.extractUrlFormText
 import com.depromeet.linkzupzup.component.MetaDataManager.getMetaDataFromUrl
 import com.depromeet.linkzupzup.utils.DLog
+import com.depromeet.linkzupzup.view.scrap.ScrapDetailActivity
+import com.google.gson.Gson
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -76,7 +79,7 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
         // 비동기, DB 조회
         coroutineScope.launch {
             linkUseCases.getMetaList(ArrayList(urlList)).let { metaList ->
-
+                DLog.e("DB", "metaList: ${Gson().toJson(metaList)}")
                 // meta data 가 주입된 리스트로 갱신
                 data?.content = (ArrayList(data?.content?.map { item ->
                     item.apply {
@@ -171,6 +174,13 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
                 preference?.setTodayCount(response.data ?: 0)
                 callback?.invoke(response)
             }, this@MainViewModel::defaultThrowable))
+    }
+
+    fun moveScrapDetail(linkData: LinkData) {
+        getIntent(ScrapDetailActivity::class.java)?.apply {
+            putExtra(AppConst.LINK_ID, linkData.linkId)
+            putExtra(AppConst.LINK_URL, linkData.linkURL)
+        }?.let { movePageDelay(it, 300L, false) }
     }
 
 }

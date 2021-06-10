@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,6 +31,7 @@ import com.depromeet.linkzupzup.extensions.clearMillis
 import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.extensions.toast
 import com.depromeet.linkzupzup.architecture.presenterLayer.ScrapDetailViewModel
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.TagColor
 import com.depromeet.linkzupzup.ui.theme.BottomSheetShape
 import com.depromeet.linkzupzup.ui.theme.LinkZupZupTheme
@@ -40,9 +42,15 @@ import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
 import com.depromeet.linkzupzup.view.custom.CustomDatePicker
 import com.depromeet.linkzupzup.view.custom.CustomTimePicker
 import com.depromeet.linkzupzup.view.custom.MultiBottomSheet
+import com.google.accompanist.glide.rememberGlidePainter
+import com.google.accompanist.imageloading.ImageLoadState
+import com.google.accompanist.imageloading.isFinalState
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -64,29 +72,16 @@ class ScrapDetailUI: BaseView<ScrapDetailViewModel>() {
     override fun onCreateViewContent() {
         LinkZupZupTheme {
             Surface(color = MaterialTheme.colors.background) {
-                bottomSheetTest(vm)
+                vm?.let { viewModel -> bottomSheetTest(viewModel) }
             }
         }
     }
 }
 
-
-@ExperimentalMaterialApi
-@ExperimentalPagerApi
-@Preview
-@Composable
-fun previewSample() {
-    LinkZupZupTheme {
-        Surface(color = MaterialTheme.colors.background) {
-            bottomSheetTest()
-        }
-    }
-}
-
 @ExperimentalPagerApi
 @ExperimentalMaterialApi
 @Composable
-fun bottomSheetTest(viewModel: ScrapDetailViewModel? = null) {
+fun bottomSheetTest(viewModel: ScrapDetailViewModel) {
 
     val ctx = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -94,6 +89,22 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel? = null) {
         bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
     )
     val bottomSheetType = remember { mutableStateOf(ScrapDetailUI.SCRAP_ALARM_REGISTER_TYPE) }
+    val metaInfo = viewModel.metaInfo.observeAsState(LinkData())
+    val metaLink = remember { mutableStateOf("") }
+    metaLink.value = metaInfo.value.imgURL
+
+    val painter = rememberGlidePainter(request = "", fadeIn = true, previewPlaceholder = R.drawable.img_link_placeholder)
+
+    LaunchedEffect(painter) {
+        snapshotFlow { painter.loadState }
+            .filter { it.isFinalState() }
+            .collect {
+                when(it){
+                    is ImageLoadState.Empty, is ImageLoadState.Loading, is ImageLoadState.Error -> { painter.request = R.drawable.img_link_detail_placeholder }
+                    else -> {}
+                }
+            }
+    }
 
     MultiBottomSheet(bottomSheetScaffoldState, coroutineScope) { currentBottomSheet: BottomSheetScreen?, closeSheet: () -> Unit, openSheet: (BottomSheetScreen) -> Unit ->
 
@@ -122,7 +133,8 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel? = null) {
                     .scrollable(state = rememberScrollState(), orientation = Orientation.Vertical)) {
 
                     // top header
-                    Image(painter = painterResource(id = R.drawable.ic_scrap_detail_top_bg),
+                    // painterResource(id = R.drawable.img_link_detail_placeholder)
+                    Image(painter = painter,
                         contentDescription = null,
                         modifier = Modifier.fillMaxWidth())
 
@@ -180,7 +192,10 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel? = null) {
                                 .fillMaxHeight()
                                 .padding(top = 48.dp, bottom = 16.dp)) {
 
-                                Text("스타트업과 안맞는 대기업 임원 DNA는 어떻게 찾아낼까?",
+                                /**
+                                 * 타이틀
+                                 */
+                                Text("metaInfo.value.linkTitle",
                                     style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700)), fontSize = 18.sp, lineHeight = 22.5.sp, color = Color(0xFF292A2B)),
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -188,7 +203,7 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel? = null) {
 
                                 Spacer(modifier = Modifier.height(8.dp))
 
-                                Text("IT 기업을 중심으로 빠르게 사업을 실행을 하는 것이 사업의 중요한 경쟁력이 된다는 것은 이미 공감대가 만들어져 있다. 그리고 서바이벌을 고민해야 하는 스타트업에서는 그 중요성은 더욱더 크게 받...",
+                                Text("metaInfo.value.description",
                                     style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = Color(0xFF878D91)),
                                     maxLines = 3,
                                     modifier = Modifier
@@ -197,7 +212,7 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel? = null) {
 
                                 Spacer(modifier = Modifier.height(20.dp))
 
-                                MultiLineTagList(viewModel?.getTagList() ?: arrayListOf(), contentPadding = PaddingValues(24.dp, 0.dp))
+                                MultiLineTagList(viewModel.getTagList(), contentPadding = PaddingValues(24.dp, 0.dp))
 
                                 Spacer(Modifier.weight(1f))
 
@@ -405,7 +420,8 @@ fun ScrapAlarmBottomSheet(type: Int, bottomSheetScaffoldState: BottomSheetScaffo
 
         // Time Picker
         CustomTimePicker(date = alarmDate.value,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .height(210.dp)
                 .padding(horizontal = 24.dp, vertical = 20.dp)) { type, timeVal ->
 
