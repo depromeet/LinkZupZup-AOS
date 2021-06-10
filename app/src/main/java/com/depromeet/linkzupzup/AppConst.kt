@@ -14,6 +14,8 @@ object AppConst {
     const val OAUTH_KAKAO_TYPE: String = "oauth_kakao_type"
     const val OAUTH_GOOGLE_TYPE: String = "oauth_google_type"
 
+    const val WEB_LINK_URL = "web_link_url"
+    const val WEB_LINK_ID = "web_link_id"
 
     // TCP Handshake가 완료되기까지 지속되는 시간
     const val CONNECTION_TIMEOUT: Long = 15
@@ -21,5 +23,8 @@ object AppConst {
     const val READ_TIMEOUT: Long = 15
     // 클라이언트로 부터 서버로 응답을 보내는 시간이 WRITE_TIMEOUT을 초과하면 실패로 간주
     const val WRITE_TIMEOUT: Long = 15
+
+    const val HASH_TAG_MAX_LIMIT = 3
+
 
 }

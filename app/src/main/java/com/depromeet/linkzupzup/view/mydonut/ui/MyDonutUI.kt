@@ -38,7 +38,6 @@ import com.depromeet.linkzupzup.architecture.presenterLayer.model.MyDonutData
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
-import com.depromeet.linkzupzup.view.main.ui.BottomSheet
 import com.depromeet.linkzupzup.view.main.ui.MainAppBar
 import kotlinx.coroutines.launch
 

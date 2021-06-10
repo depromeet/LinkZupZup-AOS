@@ -13,6 +13,12 @@ import io.reactivex.schedulers.Schedulers
 
 class WebViewViewModel(private val linkUseCases: LinkUseCases) : BaseViewModel() {
 
+    private var _linkUrl: MutableLiveData<String> = MutableLiveData()
+    val linkUrl: LiveData<String> = _linkUrl
+
+    private var _linkId: MutableLiveData<Int> = MutableLiveData()
+    val linkId: LiveData<Int> = _linkId
+
     private var _todayReadCnt: MutableLiveData<LinkReadEntity> = MutableLiveData()
     val todayReadCnt: LiveData<LinkReadEntity> = _todayReadCnt
 
@@ -25,5 +31,12 @@ class WebViewViewModel(private val linkUseCases: LinkUseCases) : BaseViewModel()
                     _todayReadCnt.value = it
                 }
             }, this@WebViewViewModel::defaultThrowable))
+    }
+
+    fun setLinkUrl(url: String) {
+        _linkUrl.value = url
+    }
+    fun setLinkId(Id: Int) {
+        _linkId.value = Id
     }
 }

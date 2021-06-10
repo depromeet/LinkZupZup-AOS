@@ -3,8 +3,7 @@ package com.depromeet.linkzupzup.architecture.presenterLayer.model
 import androidx.compose.ui.graphics.Color
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
-import com.depromeet.linkzupzup.ui.theme.TagBgColor01
-import com.depromeet.linkzupzup.ui.theme.TagTextColor01
+import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.CommonUtil
 import java.util.*
 
@@ -19,7 +18,8 @@ data class LinkData(
     var hashtags: ArrayList<LinkHashData> = arrayListOf(),
     var createdAt: Date = Date(0),
     var completedAt: Date = Date(0),
-    var completed: Boolean = false) {
+    var completed: Boolean = false,
+    var tagColor: TagColor = CommonUtil.getRandomeTagColor()) {
 
     /* 향후 삭제 예정 */
     companion object {
@@ -86,4 +86,25 @@ data class LinkHashData(
     var hashtagId: Int = 0,
     var hashtagName: String = "",
     var createdAt: String = "",
-    var tagColor: TagColor)
+    var tagColor: TagColor = CommonUtil.getRandomeTagColor()) {
+
+    companion object {
+        val tc1: List<LinkHashData> = listOf(
+            LinkHashData(0, "디자인", "", TagColor(TagBgColor01, TagTextColor01)),
+            LinkHashData(1, "포트폴리오", "", TagColor(TagBgColor02, TagTextColor02)),
+            LinkHashData(2, "UX", "", TagColor(TagBgColor03, TagTextColor03)),
+            LinkHashData(3, "UI", "", TagColor(TagBgColor04, TagTextColor04)),
+            LinkHashData(4, "마케팅", "", TagColor(TagBgColor05, TagTextColor05)),
+            LinkHashData(5, "인공지능", "", TagColor(TagBgColor06, TagTextColor06))
+        )
+
+        val tc2: List<LinkHashData> = listOf(
+            LinkHashData(6, "프론트 개발", "", TagColor(TagBgColor07, TagTextColor07)),
+            LinkHashData(7, "그로스 해킹", "", TagColor(TagBgColor03, TagTextColor03)),
+            LinkHashData(8, "Android", "", TagColor(TagBgColor01, TagTextColor01)),
+            LinkHashData(9, "스타트업", "", TagColor(TagBgColor02, TagTextColor02)),
+            LinkHashData(10, "ios", "", TagColor(TagBgColor04, TagTextColor04))
+        )
+    }
+
+}
