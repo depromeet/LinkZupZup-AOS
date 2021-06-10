@@ -3,7 +3,6 @@ package com.depromeet.linkzupzup.architecture.presenterLayer
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.depromeet.linkzupzup.AppConst
 import com.depromeet.linkzupzup.ParamsInfo
 import com.depromeet.linkzupzup.StatusConst
 import com.depromeet.linkzupzup.architecture.domainLayer.LinkUseCases
@@ -54,7 +53,7 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
                     val coroutineScope = CoroutineScope(Dispatchers.IO)
 
                     // 리스트 링크 발췌
-                    val urlList = ArrayList(response.data?.content?.map { it.linkURL} ?: arrayListOf())
+                    val urlList = ArrayList(response.data?.content?.map { it.linkURL } ?: arrayListOf())
 
                     _linkAlarmResponse.value = updateMetaData(urlList, response, coroutineScope) { listObs ->
                         listObs.observeOn(AndroidSchedulers.mainThread())
@@ -63,18 +62,22 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
                             _linkList.postValue(list.converter())
                             callback?.invoke(response)
                         }
-                    }
+                    }.updatePersonalData(urlList)
 
                     progressStatus(false)
                 }, this@MainViewModel::defaultThrowable))
         }
+    }
+    fun ResponseEntity<LinkAlarmDataEntity>.updatePersonalData(urlList: ArrayList<String>): ResponseEntity<LinkAlarmDataEntity> {
+
+        return this
     }
     private fun updateMetaData(urlList: ArrayList<String>, response: ResponseEntity<LinkAlarmDataEntity>, coroutineScope: CoroutineScope, listCallback: (Observable<ArrayList<LinkAlarmEntity>>) -> Unit): ResponseEntity<LinkAlarmDataEntity>  = response.apply {
         // 비동기, DB 조회
         coroutineScope.launch {
             linkUseCases.getMetaList(ArrayList(urlList)).let { metaList ->
 
-                // meta data가 주입된 리스트로 갱신
+                // meta data 가 주입된 리스트로 갱신
                 data?.content = (ArrayList(data?.content?.map { item ->
                     item.apply {
 

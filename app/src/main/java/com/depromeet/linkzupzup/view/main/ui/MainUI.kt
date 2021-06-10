@@ -54,6 +54,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import com.depromeet.linkzupzup.AppConst
 import com.depromeet.linkzupzup.R
@@ -464,23 +465,24 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
 
     val isNewRegister = remember { mutableStateOf(false) }
     val linkId = remember { mutableStateOf(-1) }
-    val linkUrl = remember { mutableStateOf("") }
+    var linkUrl = rememberSaveable { mutableStateOf("") }
     val hashtags = remember { mutableStateListOf<LinkHashData>() }
 
     val ctx = LocalContext.current
+    // var linkUrl = rememberSaveable { mutableStateOf("") }
 
 //    값을 직접 set 해줘야 갱신되는 현상
-//    val saveBtnColor = if (!linkUrl.value.isNullOrEmpty()) Blue50 else Gray50t
-//    val saveTxtColor = if (!linkUrl.value.isNullOrEmpty()) Color.White else Gray70
-    val saveBtnColor = remember { mutableStateOf(Gray50t) }
-    val saveTxtColor = remember { mutableStateOf(Gray70) }
+    val saveBtnColor = if (!linkUrl.value.isNullOrEmpty()) Blue50 else Gray50t
+    val saveTxtColor = if (!linkUrl.value.isNullOrEmpty()) Color.White else Gray70
+//    val saveBtnColor = remember { mutableStateOf(Gray50t) }
+//    val saveTxtColor = remember { mutableStateOf(Gray70) }
 
     linkId.value = linkData.linkId
     isNewRegister.value = linkData.linkId < 0
     linkUrl.value = linkData.linkURL
     hashtags.addAll(linkData.hashtags)
 
-    DLog.e("BottomSheet", "liveData: ${Gson().toJson(linkData)}, linkId: ${linkId.value}, linkUrl: ${linkUrl.value}, hashtags: ${Gson().toJson(hashtags)}")
+    // DLog.e("BottomSheet", "liveData: ${Gson().toJson(linkData)}, linkId: ${linkId.value}, linkUrl: ${linkUrl.value}, hashtags: ${Gson().toJson(hashtags)}")
 
     // in Column Scope
     Column(modifier = Modifier
@@ -520,18 +522,19 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
                     .fillMaxWidth()
                     .height(40.dp)
                     .padding(horizontal = 24.dp)) {
-
                 linkUrl.value = it
-                if(it.isNullOrEmpty()){
-                    saveBtnColor.value = Gray50t
-                    saveTxtColor.value = Gray70
-                }else if(it.isNotEmpty()){
-                    saveBtnColor.value = Blue50
-                    saveTxtColor.value = Color.White
-                }
+                DLog.e("TEST MainUI 텍트스갱신","string: ${it}, url change : ${linkUrl.value}")
+
+//                if(it.isNullOrEmpty()){
+//                    saveBtnColor.value = Gray50t
+//                    saveTxtColor.value = Gray70
+//                }else if(it.isNotEmpty()){
+//                    saveBtnColor.value = Blue50
+//                    saveTxtColor.value = Color.White
+//                }
 
                 // DLog.e("MAIN_TEST", "url: $it")
-                DLog.e("hashtags", "${Gson().toJson(hashtags)}")
+                // DLog.e("hashtags", "${Gson().toJson(hashtags)}")
             }
 
             Spacer(Modifier.height(40.dp))
@@ -541,8 +544,8 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
              */
             BottomSheetSelect(cnt = hashtags.size) { target ->
                 updateHashtags(hashtags, target)
-                DLog.e("HASH_TAG", "${Gson().toJson(target)}")
-                DLog.e("hashtags", "${Gson().toJson(hashtags)}")
+                // DLog.e("HASH_TAG", "${Gson().toJson(target)}")
+                // DLog.e("hashtags", "${Gson().toJson(hashtags)}")
             }
 
             Spacer(Modifier.height(24.dp))
@@ -552,8 +555,8 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
              */
             BottomSheetInputTag { tagName ->
                 updateHashtags(hashtags, LinkHashData(hashtagName = tagName))
-                DLog.e("CUSTOM_TAG", "$tagName")
-                DLog.e("hashtags", "${Gson().toJson(hashtags)}")
+                // DLog.e("CUSTOM_TAG", "$tagName")
+                // DLog.e("hashtags", "${Gson().toJson(hashtags)}")
             }
 
         }
@@ -572,8 +575,8 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
                 .padding(horizontal = 24.dp)) {
 
             items(items = hashtags, itemContent = { tag ->
-                DLog.e("HASH_TAG", "tagName: ${tag.hashtagName}, tag: ${Gson().toJson(tag)}")
-                DLog.e("hashtags", "${Gson().toJson(hashtags)}")
+                // DLog.e("HASH_TAG", "tagName: ${tag.hashtagName}, tag: ${Gson().toJson(tag)}")
+                // DLog.e("hashtags", "${Gson().toJson(hashtags)}")
                 Card(modifier = Modifier
                     .height(32.dp)
                     .noRippleClickable { updateHashtags(hashtags, tag) },
@@ -608,23 +611,25 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
 
         /* 하단 저장하기 버튼 */
         Button(shape = RoundedCornerShape(4.dp),
-            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = saveBtnColor.value, contentColor = saveTxtColor.value),
+            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = saveBtnColor, contentColor = saveTxtColor),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp)
                 .padding(start = 24.dp, end = 24.dp),
             onClick = {
-                with(viewModel) {
-                    // 링크 저장 TODO : 추후 LinkRegisterEntity 개선 필요
-                    viewModel.registerLink(
-                        LinkRegisterEntity(
+                // 링크 저장 TODO : 추후 LinkRegisterEntity 개선 필요
+                DLog.e("TEST MainUI","url : ${linkUrl.value}")
+
+                if (linkUrl.value.isNullOrEmpty()) toast(ctx, "아이디 내놔")
+                else {
+                    viewModel.registerLink(LinkRegisterEntity(
                         linkURL = linkUrl.value,
                         hashtags = ArrayList(hashtags.map { it.hashtagName }))
                     ){
                         coroutineScope.launch {
+                            toast(ctx,"링크가 저장되었습니다!")
                             viewModel.getLinkList()
                             sheetState.hide()
-                            Toast.makeText(ctx,"링크가 저장되었습니다!", Toast.LENGTH_SHORT).show()    // 2초
                         }
                     }
                 }
@@ -883,7 +888,8 @@ fun CustomTextField(txt: String = "",
         backgroundColor = backgroundColor,
         elevation = 0.dp) {
 
-        val text = rememberSaveable { mutableStateOf(txt) }
+        val textState = remember { mutableStateOf(TextFieldValue(txt)) }
+
         val textModifier: Modifier = Modifier
             .fillMaxWidth()
             .padding(start = 12.dp, end = 44.dp)
@@ -894,7 +900,7 @@ fun CustomTextField(txt: String = "",
         Box(Modifier.fillMaxSize()) {
 
             // hint text
-            if (text.value.isNullOrEmpty()) Text(text = hintStr,
+            if (textState.value.text.isNullOrEmpty()) Text(text = hintStr,
                 style = TextStyle(
                     fontSize = 12.sp,
                     color = Color(0xFF878D91),
@@ -908,10 +914,10 @@ fun CustomTextField(txt: String = "",
 
             // edit text
             BasicTextField(
-                value = text.value,
+                value = textState.value,
                 onValueChange = {
-                    text.value = it
-                    onValueChange(it)
+                    textState.value = it
+                    onValueChange(it.text)
                 },
                 modifier = textModifier.align(Alignment.Center),
                 textStyle = TextStyle(
@@ -934,7 +940,7 @@ fun CustomTextField(txt: String = "",
 
             if(useClearBtn){
                 // clear btn
-                if (text.value.isNotEmpty()) Row(Modifier.fillMaxSize()) {
+                if (textState.value.text.isNotEmpty()) Row(Modifier.fillMaxSize()) {
 
                     Spacer(Modifier.weight(1f))
 
@@ -944,8 +950,9 @@ fun CustomTextField(txt: String = "",
                         .fillMaxHeight()
                         .padding(start = 8.dp)
                         .noRippleClickable {
-                            text.value = ""
-                            onValueChange(text.value)
+
+                            textState.value = TextFieldValue("")
+                            onValueChange(textState.value.text)
                             // 포커스 제거, 키보드 내리기!
                             focusManager.clearFocus()
                         }) {
@@ -953,6 +960,103 @@ fun CustomTextField(txt: String = "",
                     Image(painter = painterResource(id = R.drawable.ic_gray_close),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp))
+
+                    }
+                }
+            }
+
+        }
+    }
+}
+
+
+
+/**
+ * 향후 Master 브런치와 머지 이후 Custom UI는 공통으로 관리하도록 옮기겠습니다.
+ */
+@Composable
+fun CustomTextField2(text: String,
+                    hintStr: String = "",
+                    shape: Shape = RoundedCornerShape(4.dp),
+                    backgroundColor: Color = Color(0xFFF1F2F5),
+                    useClearBtn : Boolean = true,
+                    modifier: Modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp)
+                        .heightIn(min = 20.dp, max = 100.dp),
+                    onValueChange: (String) -> Unit = {}) {
+
+    Card(modifier = modifier,
+        shape = shape,
+        backgroundColor = backgroundColor,
+        elevation = 0.dp) {
+
+        val textModifier: Modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 12.dp, end = 44.dp)
+
+        // clear or 입력후 엔터 입력 시, 키보드를 내리기 위해 사용
+        val focusManager = LocalFocusManager.current
+
+        Box(Modifier.fillMaxSize()) {
+
+
+            // hint text
+            if (text.isNullOrEmpty()) Text(text = hintStr,
+                style = TextStyle(
+                    fontSize = 12.sp,
+                    color = Color(0xFF878D91),
+                    lineHeight = 16.8.sp,
+                    fontFamily = FontFamily(
+                        Font(resId = R.font.spoqa_hansansneo_regular, weight = FontWeight.W500)
+                    )
+                ),
+                maxLines = 1,
+                modifier = textModifier.align(Alignment.Center))
+
+            // edit text
+            BasicTextField(
+                value = text,
+                onValueChange = onValueChange,
+                modifier = textModifier.align(Alignment.Center),
+                textStyle = TextStyle(
+                    fontSize = 12.sp,
+                    color = Color(0xFF292A2B),
+                    fontFamily = FontFamily(
+                        Font(
+                            resId = R.font.spoqa_hansansneo_regular,
+                            weight = FontWeight.W500)
+                    ),
+                    textDecoration = TextDecoration.None,
+                    shadow = Shadow(),
+                    lineHeight = 16.8.sp
+                ),
+                singleLine = true,
+                maxLines = 1,
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done, keyboardType = KeyboardType.Text)
+            )
+
+            if(useClearBtn){
+                // clear btn
+                if (text.isNotEmpty()) Row(Modifier.fillMaxSize()) {
+
+                    Spacer(Modifier.weight(1f))
+
+                    Column(verticalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .width(44.dp)
+                            .fillMaxHeight()
+                            .padding(start = 8.dp)
+                            .noRippleClickable {
+                                onValueChange("")
+                                // 포커스 제거, 키보드 내리기!
+                                focusManager.clearFocus()
+                            }) {
+
+                        Image(painter = painterResource(id = R.drawable.ic_gray_close),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp))
 
                     }
                 }
