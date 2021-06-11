@@ -44,14 +44,46 @@ class ScrapDetailViewModel(private val linkUseCases: LinkUseCases, private val m
     private var _linkInfo: MutableLiveData<LinkData> = MutableLiveData(LinkData())
     val linkInfo: LiveData<LinkData> = _linkInfo
 
-    private var _metaInfo: MutableLiveData<LinkData> = MutableLiveData(LinkData())
+    private var _metaInfo: MutableLiveData<LinkData> = MutableLiveData()
     val metaInfo: LiveData<LinkData> = _metaInfo
 
     fun getTagList(): ArrayList<String> {
         return ArrayList(metaInfo.value?.hashtags?.map { it.hashtagName } ?: arrayListOf())
     }
 
-    fun getLinkDetail(linkId: Int, callback: ((ResponseEntity<LinkAlarmEntity>)->Unit)? = null) {
+    fun getLinkDetail(linkId: Int){
+        progressStatus(true)
+
+        addDisposable(linkUseCases.getLinkDetail(linkId = linkId)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({ response ->
+
+                when(response.getStatus()) {
+                    StatusConst.SELECT_SUSSCESS_STATUS -> {
+
+                        response.data?.apply {
+
+                            _linkInfo.value = LinkData(this).apply {
+                                viewModelScope.launch {
+                                    metaUseCases.getMetaData(linkURL)?.let { meta ->
+                                        linkTitle = meta.title
+                                        imgURL = meta.imgUrl
+                                        description = meta.content
+
+                                        DLog.e("Scrape Detail","${_linkInfo.value?.linkURL} ${_linkInfo.value?.linkTitle}")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else -> {}
+                }
+                progressStatus(false)
+            }, this@ScrapDetailViewModel::defaultThrowable))
+    }
+
+    fun getLinkDetail2(linkId: Int, callback: ((ResponseEntity<LinkAlarmEntity>)->Unit)? = null) {
         progressStatus(true)
         addDisposable(linkUseCases.getLinkDetail(linkId = linkId)
             .observeOn(AndroidSchedulers.mainThread())
@@ -90,6 +122,7 @@ class ScrapDetailViewModel(private val linkUseCases: LinkUseCases, private val m
             }, this@ScrapDetailViewModel::defaultThrowable))
 
     }
+
     private fun ResponseEntity<LinkAlarmEntity>.updateMetaData(callback: ((LinkAlarmEntity)->Unit)? = null): ResponseEntity<LinkAlarmEntity> = apply {
         viewModelScope.launch {
             data?.run {
