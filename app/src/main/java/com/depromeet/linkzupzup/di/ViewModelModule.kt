@@ -15,5 +15,6 @@ val viewModelModule = module {
     viewModel { IntroViewModel() }
     viewModel { OnBoardingViewModel() }
     viewModel { LoginViewModel(get()) }
+    viewModel { TermsAndInfoViewModel() }
 
 }

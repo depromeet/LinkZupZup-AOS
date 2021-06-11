@@ -33,6 +33,7 @@
         <activity android:name=".view.alarm.AlarmDetailActivity" />
         <activity android:name=".view.webView.WebViewActivity"/>
         <activity android:name=".view.linkHistory.LinkHistoryDetailActivity"/>
+        <activity android:name=".view.termsAndInfo.TermsAndInfoActivity" />
 
         <activity android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity">
             <intent-filter>
