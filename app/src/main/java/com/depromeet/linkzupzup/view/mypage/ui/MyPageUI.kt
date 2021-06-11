@@ -11,7 +11,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,18 +46,7 @@ class MyPageUI(private var clickListener: (id: Int) -> Unit) : BaseView<MyPageVi
         LinkZupZupTheme {
             Surface(color = Gray10) {
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    vm?.let {
-                        val myPageContentList : ArrayList<MyPageData<*>> = arrayListOf<MyPageData<*>>().apply{
-                            // 이번 달 내 포인트
-                            add(MyPageData<Any>(MyPageData.THIS_WEEK_POINT,9999))
-                            // 전체 읽은 수
-                            add(MyPageData<Any>(MyPageData.TOTAL_READ_COUNT,9999))
-                            // 이번 달 읽은 수
-                            add(MyPageData<Any>(MyPageData.THIS_WEEK_READ_COUNT,100))
-                        }
-
-                        MyPageBodyUI(myPageContentList = myPageContentList, vm = vm)
-                    }
+                    vm?.let { MyPageBodyUI(vm = it) }
                 }
             }
         }
@@ -62,7 +54,7 @@ class MyPageUI(private var clickListener: (id: Int) -> Unit) : BaseView<MyPageVi
 }
 
 @Composable
-fun MyPageBodyUI(myPageContentList: ArrayList<MyPageData<*>>, vm: MyPageViewModel ?= null){
+fun MyPageBodyUI(vm: MyPageViewModel){
     Scaffold(topBar = { MyPageTopBar() },
         backgroundColor = Color.Transparent,
         modifier = Modifier
@@ -75,7 +67,7 @@ fun MyPageBodyUI(myPageContentList: ArrayList<MyPageData<*>>, vm: MyPageViewMode
                 .background(Color.Transparent)) {
 
             // 상단 프로필
-            MyPageProfile(myPageContentList = myPageContentList)
+            MyPageProfile(vm)
 
             Spacer(modifier = Modifier.height(30.dp))
 
@@ -141,11 +133,9 @@ fun BackButton(painter: Painter, onClick : () -> Unit){
 
 
 @Composable
-fun MyPageProfile(myPageContentList: ArrayList<MyPageData<*>>, vm: MyPageViewModel? = null){
+fun MyPageProfile(vm: MyPageViewModel){
     val ctx = LocalContext.current
-    val userName = vm?.nickName?.observeAsState("")
-    val badgeUrl = vm?.badgeUrl?.observeAsState("")
-
+    val myPageData: MyPageData by vm.myPageData.observeAsState(MyPageData())
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -153,14 +143,14 @@ fun MyPageProfile(myPageContentList: ArrayList<MyPageData<*>>, vm: MyPageViewMod
             .fillMaxWidth()
             .padding(vertical = 10.dp)){
 
-        Image(painter = rememberGlidePainter(request = badgeUrl, fadeIn = true),
+        Image(painter = rememberGlidePainter(request = myPageData.badgeUrl, fadeIn = true),
             contentDescription = null,
             modifier = Modifier
                 .size(64.dp, 48.dp)
                 .padding(end = 10.dp))
 
         Text(
-            text="${userName}님",
+            text="${myPageData.userName}님",
             style = TextStyle(fontSize = 24.sp,
                 lineHeight = 32.4.sp,
                 fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold,
@@ -175,32 +165,23 @@ fun MyPageProfile(myPageContentList: ArrayList<MyPageData<*>>, vm: MyPageViewMod
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly) {
-            items(myPageContentList){ contentData->
-                when(contentData.type){
-
-                    MyPageData.THIS_WEEK_POINT->{
-                        MyPageProfileCard(
-                            title = MyPageData.STR_THIS_WEEK_POINT.first,
-                            num = contentData.data,
-                            unit = MyPageData.STR_THIS_WEEK_POINT.second)
-                    }
-
-                    MyPageData.TOTAL_READ_COUNT->{
-                        MyPageProfileCard(
-                            title = MyPageData.STR_TOTAL_READ_COUNT.first,
-                            num = contentData.data,
-                            unit = MyPageData.STR_TOTAL_READ_COUNT.second)
-                    }
-
-                    MyPageData.THIS_WEEK_READ_COUNT->{
-                        MyPageProfileCard(
-                            title = MyPageData.STR_THIS_WEEK_READ_COUNT.first,
-                            num = contentData.data,
-                            unit = MyPageData.STR_THIS_WEEK_READ_COUNT.second)
-                    }
-
-                }
-
+            item {
+                MyPageProfileCard(
+                    title = MyPageData.STR_THIS_WEEK_POINT.first,
+                    num = myPageData.monthlyPoint,
+                    unit = MyPageData.STR_THIS_WEEK_POINT.second)
+            }
+            item {
+                MyPageProfileCard(
+                    title = MyPageData.STR_TOTAL_READ_COUNT.first,
+                    num = myPageData.readCnt,
+                    unit = MyPageData.STR_TOTAL_READ_COUNT.second)
+            }
+            item {
+                MyPageProfileCard(
+                    title = MyPageData.STR_THIS_WEEK_READ_COUNT.first,
+                    num = myPageData.totalReadCnt,
+                    unit = MyPageData.STR_THIS_WEEK_READ_COUNT.second)
             }
         }
     }
@@ -229,8 +210,8 @@ fun MyPageProfile(myPageContentList: ArrayList<MyPageData<*>>, vm: MyPageViewMod
 }
 
 @Composable
-fun MyPageProfileCard(title: String, num : Int, unit : String){
-    val decNum = num.digitFormat1000()
+fun MyPageProfileCard(title: String, num : Int? = 0, unit : String){
+    val decNum = num?.digitFormat1000() ?: 0
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -258,7 +239,6 @@ fun MyPageProfileCard(title: String, num : Int, unit : String){
 
 @Composable
 fun MyPageMenuCard(menuName : String, menuType : Int){
-    val ctx = LocalContext.current
 
     // elevation 으로 인한 그림자도 보이게 하고, 카드끼리 10dp 간격 생성.
     Row(modifier = Modifier.padding(5.dp)){
@@ -270,10 +250,11 @@ fun MyPageMenuCard(menuName : String, menuType : Int){
                 .fillMaxWidth()
                 .height(56.dp)
                 .noRippleClickable {
-                    Toast
-                        .makeText(ctx, "페이지 이동", Toast.LENGTH_SHORT)
-                        .show()
-                }){
+                    if (menuType == MyPageData.MENU_MOVE) {
+                        // 페이지 이동
+                    }
+                }
+        ){
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -289,7 +270,7 @@ fun MyPageMenuCard(menuName : String, menuType : Int){
                             weight = FontWeight.W300))))
 
                 when(menuType){
-                    MyPageData.MENU_DETAIL -> DetailBtn(painter = painterResource(id = R.drawable.ic_next))
+                    MyPageData.MENU_MOVE -> DetailBtn(painter = painterResource(id = R.drawable.ic_next))
                     MyPageData.MENU_TOGGLE -> ToggleBtn()
                 }
             }
@@ -329,22 +310,7 @@ fun PreviewMenu(){
         .fillMaxWidth()
         .background(Color.White)
         .padding(20.dp)){
-        MyPageMenuCard("다 읽은 링크", MyPageData.MENU_DETAIL)
+        MyPageMenuCard("다 읽은 링크", MyPageData.MENU_MOVE)
     }
 
-}
-
-@Preview
-@Composable
-fun MyPageBodyPreview() {
-    val myPageContentList : ArrayList<MyPageData<*>> = arrayListOf<MyPageData<*>>().apply{
-        // 이번 달 내 포인트
-        add(MyPageData<Any>(MyPageData.THIS_WEEK_POINT,9999))
-        // 전체 읽은 수
-        add(MyPageData<Any>(MyPageData.TOTAL_READ_COUNT,9999))
-        // 이번 달 읽은 수
-        add(MyPageData<Any>(MyPageData.THIS_WEEK_READ_COUNT,100))
-    }
-
-    MyPageBodyUI(myPageContentList = myPageContentList)
 }

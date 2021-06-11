@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.depromeet.linkzupzup.StatusConst
 import com.depromeet.linkzupzup.architecture.domainLayer.UserUseCases
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.MyPageInfoResponseEntity
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.MyPageData
 import com.depromeet.linkzupzup.base.BaseViewModel
 import com.depromeet.linkzupzup.utils.DLog
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -12,18 +14,10 @@ import io.reactivex.schedulers.Schedulers
 
 class MyPageViewModel(private val userUseCases: UserUseCases) : BaseViewModel() {
 
-    private var _myPageInfoResponse: MutableLiveData<MyPageInfoResponseEntity> = MutableLiveData()
-    private var _nickName: MutableLiveData<String> = MutableLiveData("")
-    private var _badgeUrl: MutableLiveData<String> = MutableLiveData("")
-    private var _monthlyPoint: MutableLiveData<Int> = MutableLiveData(0)
-    private var _totalReadCnt: MutableLiveData<Int> = MutableLiveData(0)
-    private var _readCnt: MutableLiveData<Int> = MutableLiveData(0)
+    private var _myPageInfoResponse: MutableLiveData<ResponseEntity<MyPageInfoResponseEntity>> = MutableLiveData()
 
-    val nickName: LiveData<String> = _nickName
-    val badgeUrl: LiveData<String> = _badgeUrl
-    val monthlyPoint: LiveData<Int> = _monthlyPoint
-    val totalReadCnt: LiveData<Int> = _totalReadCnt
-    val readCnt: LiveData<Int> = _readCnt
+    private var _myPageData: MutableLiveData<MyPageData> = MutableLiveData(MyPageData())
+    val myPageData: LiveData<MyPageData> = _myPageData
 
 
     fun getMyPageInfo() {
@@ -33,20 +27,22 @@ class MyPageViewModel(private val userUseCases: UserUseCases) : BaseViewModel() 
             .subscribeOn(Schedulers.io())
             .subscribe({ response ->
 
-                val status = response.getStatus()
-                when(status) {
+                when(response.getStatus()) {
                     StatusConst.SELECT_SUSSCESS_STATUS -> {
 
-                        _myPageInfoResponse.value = response.data
+                        _myPageInfoResponse.value = response
 
-                        _myPageInfoResponse.value?.apply {
-                            _nickName.value = this.nickName
-                            _badgeUrl.value = this.badge.badgeURL
-                            _monthlyPoint.value = this.totalPoint
-                            _totalReadCnt.value = this.totalReadCount
-                            _readCnt.value = this.seasonCount
+                        _myPageInfoResponse.value?.data?.let { entity ->
+                            _myPageData.value = _myPageData.value?.apply {
+                                this.userName = entity.nickName
+                                this.badgeUrl = entity.badge.badgeURL
+                                this.monthlyPoint = entity.totalPoint
+                                this.readCnt = entity.seasonCount
+                                this.totalReadCnt = entity.totalReadCount
+                                this.alarmEnabled = entity.alarmEnabled
+                            }
 
-                            preference?.setUserName(this.nickName)
+                            preference?.setUserName(entity.nickName)
                         }
                     }
                     else -> { DLog.e("MyPage",response.comment) }
