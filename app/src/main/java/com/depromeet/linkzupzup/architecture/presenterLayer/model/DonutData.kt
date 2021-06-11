@@ -14,10 +14,8 @@ data class DonutData(
     constructor(donutBadgeEntity: DonutBadgeEntity) : this() {
         this.badgeUrl = donutBadgeEntity.badgeURL
         this.seasonPoint = donutBadgeEntity.seasonalPoint
-        this.createdAt = donutBadgeEntity.createdAt.dateStrToFormatStr() /// YYYY-mm-dd HH:ii:ss
-
-        DLog.e("DATE",donutBadgeEntity.createdAt.dateStrToFormatStr())
-
+        // this.createdAt = donutBadgeEntity.createdAt.dateStrToFormatStr()
+        this.createdAt = donutBadgeEntity.conditions
     }
 
 
