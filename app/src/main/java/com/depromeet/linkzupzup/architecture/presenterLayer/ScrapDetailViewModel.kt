@@ -84,30 +84,30 @@ class ScrapDetailViewModel(private val linkUseCases: LinkUseCases, private val m
             }, this@ScrapDetailViewModel::defaultThrowable))
     }
 
-    private fun ResponseEntity<LinkAlarmEntity>.updateMetaData(callback: ((LinkAlarmEntity)->Unit)? = null): ResponseEntity<LinkAlarmEntity> = apply {
-        viewModelScope.launch {
-            data?.run {
-                metaUseCases.getMetaData(linkUrl = linkURL)?.let { metaData ->
-                    metaTitle = metaData.title
-                    metaDescription = metaData.content
-                    metaImageUrl = metaData.imgUrl
-                    _metaInfo.value = metaData.mapToPresenter()
-                    callback?.invoke(this@run)
-                }
-            }
-        }
-    }
-
-
-    fun getMetaInfo(linkUrl: String, callback: ((LinkData)->Unit)? = null) {
-        viewModelScope.launch {
-            metaUseCases.getMetaData(linkUrl = linkUrl)?.let { meta ->
-                _metaInfo.value = meta.mapToPresenter().also {
-                    callback?.invoke(it)
-                }
-            }
-        }
-    }
+//    private fun ResponseEntity<LinkAlarmEntity>.updateMetaData(callback: ((LinkAlarmEntity)->Unit)? = null): ResponseEntity<LinkAlarmEntity> = apply {
+//        viewModelScope.launch {
+//            data?.run {
+//                metaUseCases.getMetaData(linkUrl = linkURL)?.let { metaData ->
+//                    metaTitle = metaData.title
+//                    metaDescription = metaData.content
+//                    metaImageUrl = metaData.imgUrl
+//                    _metaInfo.value = metaData.mapToPresenter()
+//                    callback?.invoke(this@run)
+//                }
+//            }
+//        }
+//    }
+//
+//
+//    fun getMetaInfo(linkUrl: String, callback: ((LinkData)->Unit)? = null) {
+//        viewModelScope.launch {
+//            metaUseCases.getMetaData(linkUrl = linkUrl)?.let { meta ->
+//                _metaInfo.value = meta.mapToPresenter().also {
+//                    callback?.invoke(it)
+//                }
+//            }
+//        }
+//    }
 
     // 개별 링크 알람 설정
     fun addPersonalLinkAlarm(ctx: Context, date: Calendar) {
