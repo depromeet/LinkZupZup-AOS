@@ -17,4 +17,8 @@ class UserRepositoryImpl(private var memberDataSource: MemberDataSource): UserRe
         return memberDataSource.getMyPageInfo()
     }
 
+    override fun setAlarmEnabled(alarmEnabled: String): Observable<ResponseEntity<MyPageInfoResponseEntity>> {
+        return memberDataSource.setAlarmEnabled(alarmEnabled = alarmEnabled)
+    }
+
 }

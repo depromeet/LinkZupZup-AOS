@@ -1,6 +1,7 @@
 package com.depromeet.linkzupzup.view.termsAndInfo
 
 import android.os.Bundle
+import com.depromeet.linkzupzup.AppConst
 import com.depromeet.linkzupzup.architecture.presenterLayer.TermsAndInfoViewModel
 import com.depromeet.linkzupzup.base.BaseActivity
 import com.depromeet.linkzupzup.extensions.toast
@@ -15,7 +16,7 @@ class TermsAndInfoActivity : BaseActivity<TermsAndInfoUI, TermsAndInfoViewModel>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        intent.getStringExtra("URL")?.let {
+        intent.getStringExtra(AppConst.WEB_LINK_URL)?.let {
             toast(this,it)
             viewModel.setUrlToWebView(it)
         }

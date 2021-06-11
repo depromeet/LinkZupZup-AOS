@@ -2,6 +2,7 @@ package com.depromeet.linkzupzup.view.mypage.ui
 
 import android.content.Intent
 import android.widget.Toast
+import androidx.appcompat.widget.SwitchCompat
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,8 +14,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,27 +25,28 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.depromeet.linkzupzup.AppConst
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.extensions.digitFormat1000
 import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.architecture.presenterLayer.MyPageViewModel
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.MyPageData
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.MyPageMenuData
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.view.custom.CustomSwitchCompat
 import com.depromeet.linkzupzup.view.mydonut.MyDonutActivity
 import com.google.accompanist.glide.rememberGlidePainter
 
-class MyPageUI(private var clickListener: (id: Int) -> Unit) : BaseView<MyPageViewModel>() {
+class MyPageUI : BaseView<MyPageViewModel>() {
     @Composable
     override fun onCreateViewContent() {
         LinkZupZupTheme {
             Surface(color = Gray10) {
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    vm?.let { MyPageBodyUI(vm = it) }
+                    vm?.let { MyPageBodyUI(viewModel = it) }
                 }
             }
         }
@@ -54,34 +54,69 @@ class MyPageUI(private var clickListener: (id: Int) -> Unit) : BaseView<MyPageVi
 }
 
 @Composable
-fun MyPageBodyUI(vm: MyPageViewModel){
+fun MyPageBodyUI(viewModel: MyPageViewModel){
+
+    val switchCompat: MutableState<SwitchCompat?> = remember { mutableStateOf(null) }
+
     Scaffold(topBar = { MyPageTopBar() },
         backgroundColor = Color.Transparent,
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
             .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
         
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .background(Color.Transparent)) {
+        Column(Modifier.fillMaxWidth()
+            .background(Color.Transparent)) {
 
-            // 상단 프로필
-            MyPageProfile(vm)
+            /**
+             * 상단 프로필
+             */
+            MyPageProfile(viewModel)
 
             Spacer(modifier = Modifier.height(30.dp))
 
-            // menu button list
+            /**
+             * 메뉴 리스트
+             */
             LazyColumn(Modifier.fillMaxWidth()) {
                 items(MyPageData.MENU_DATA){ menu->
-                    MyPageMenuCard(menu.menuTitle, menu.menuType, menu.moveClass, menu.url)
+                    when (menu.menuType) {
+                        MyPageData.MENU_MOVE -> {
+                            MyPageMenuCard(menuData = menu, clickListener = {
+                                menu.moveClass?.let { cls ->
+                                    with(viewModel) {
+                                        getIntent(cls)?.apply {
+                                            putExtra(AppConst.WEB_LINK_URL, menu.url)
+                                        }?.let { intent ->
+                                            movePageDelay(intent, 300L, false)
+                                        }
+                                    }
+
+                                }
+                            }) {
+                                DetailBtn(painter = painterResource(id = R.drawable.ic_next))
+                            }
+                        }
+                        MyPageData.MENU_TOGGLE -> {
+                            MyPageMenuCard(menuData = menu) {
+                                var state = false
+                                CustomSwitchCompat(instanceCallback = {
+                                    switchCompat.value = it
+                                    it.isChecked = true
+                                }, checkedOnChangeListener = { view, isChecked ->
+                                    if (!state) { state = true }
+                                    else viewModel.setAlarmEnabled((if (isChecked) "T" else "F"))
+                                })
+                            }
+                        }
+                        else -> {}
+                    }
                 }
             }
 
-            // logout button
+            /**
+             * 로그아웃 버튼
+             */
             Row(horizontalArrangement = Arrangement.End,
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
                     .padding(top = 18.dp)){
 
                 Text(text = "로그아웃",
@@ -99,8 +134,7 @@ fun MyPageBodyUI(vm: MyPageViewModel){
 fun MyPageTopBar(){
     val ctx = LocalContext.current
     Row(verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
             .height(52.dp)){
 
         BackButton(painterResource(id = R.drawable.ic_detail_back)){
@@ -114,8 +148,7 @@ fun BackButton(painter: Painter, onClick : () -> Unit){
     Card(elevation = 0.dp,
         shape = RoundedCornerShape(0),
         backgroundColor = Color.Transparent,
-        modifier = Modifier
-            .fillMaxHeight()
+        modifier = Modifier.fillMaxHeight()
             .wrapContentWidth()
             .noRippleClickable(onClick = onClick)) {
 
@@ -131,22 +164,18 @@ fun BackButton(painter: Painter, onClick : () -> Unit){
     }
 }
 
-
 @Composable
 fun MyPageProfile(vm: MyPageViewModel){
     val ctx = LocalContext.current
     val myPageData: MyPageData by vm.myPageData.observeAsState(MyPageData())
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
+    Row(verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
             .padding(vertical = 10.dp)){
 
         Image(painter = rememberGlidePainter(request = myPageData.badgeUrl, fadeIn = true),
             contentDescription = null,
-            modifier = Modifier
-                .size(64.dp, 48.dp)
+            modifier = Modifier.size(64.dp, 48.dp)
                 .padding(end = 10.dp))
 
         Text(
@@ -160,7 +189,7 @@ fun MyPageProfile(vm: MyPageViewModel){
     Card(elevation = 0.dp,
         backgroundColor = Gray0t,
         shape = RoundedCornerShape(10),
-        modifier = Modifier.fillMaxWidth()){
+        modifier = Modifier.fillMaxWidth()) {
 
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
@@ -238,48 +267,34 @@ fun MyPageProfileCard(title: String, num : Int? = 0, unit : String){
 }
 
 @Composable
-fun MyPageMenuCard(menuName : String, menuType : Int, moveClass: Class<*>? = null, moveUrl: String? = ""){
+fun MyPageMenuCard(menuData: MyPageMenuData, clickListener: (() -> Unit)? = null, content: @Composable () -> Unit){
 
-    val ctx = LocalContext.current
-
-    // elevation 으로 인한 그림자도 보이게 하고, 카드끼리 10dp 간격 생성.
     Row(modifier = Modifier.padding(5.dp)){
         Card(
             elevation = 2.dp,
             backgroundColor = Gray0t,
             shape = RoundedCornerShape(10),
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
                 .height(56.dp)
                 .noRippleClickable {
-                    if (menuType == MyPageData.MENU_MOVE) {
-                        // 페이지 이동
-                        moveClass?.let {
-                            val intent = Intent(ctx,moveClass)
-                            moveUrl?.let { intent.putExtra("URL",moveUrl) }
-                            ctx.startActivity(intent)
-                        }
-                    }
+                    clickListener?.invoke()
                 }
         ){
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
                     .padding(horizontal = 17.dp)){
 
-                Text(text = menuName,
+                Text(text = menuData.menuTitle,
                     modifier = Modifier.weight(1f),
                     style = TextStyle(fontSize = 12.sp,
                         lineHeight = 16.sp,
                         fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_regular,
                             weight = FontWeight.W300))))
 
-                when(menuType){
-                    MyPageData.MENU_MOVE -> DetailBtn(painter = painterResource(id = R.drawable.ic_next))
-                    MyPageData.MENU_TOGGLE -> ToggleBtn()
-                }
+                content()
+
             }
 
         }
@@ -302,22 +317,4 @@ fun DetailBtn(painter: Painter){
                 Modifier.size(24.dp))
         }
     }
-}
-
-@Preview
-@Composable
-fun ToggleBtn() {
-    CustomSwitchCompat(instanceCallback = { it.isChecked = true })
-}
-
-@Preview
-@Composable
-fun PreviewMenu(){
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .background(Color.White)
-        .padding(20.dp)){
-        MyPageMenuCard("다 읽은 링크", MyPageData.MENU_MOVE)
-    }
-
 }

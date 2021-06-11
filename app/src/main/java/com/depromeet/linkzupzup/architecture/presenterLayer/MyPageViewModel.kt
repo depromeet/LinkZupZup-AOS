@@ -51,4 +51,22 @@ class MyPageViewModel(private val userUseCases: UserUseCases) : BaseViewModel() 
                 progressStatus(false)
             }, this@MyPageViewModel::defaultThrowable))
     }
+
+    /**
+     * 푸시 알람 활성화 여부 (활성화 : T, 비활성화 : F)
+     */
+    fun setAlarmEnabled(alarmEnabled: String) {
+        progressStatus(true)
+        addDisposable(userUseCases.setAlarmEnabled(alarmEnabled = alarmEnabled)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({ response ->
+
+                when(response.getStatus()) {
+                    StatusConst.REGIST_SUCCESS_STATUS -> toast(response.comment)
+                    else -> toast(response.comment)
+                }
+                progressStatus(false)
+            }, this@MyPageViewModel::defaultThrowable))
+    }
 }

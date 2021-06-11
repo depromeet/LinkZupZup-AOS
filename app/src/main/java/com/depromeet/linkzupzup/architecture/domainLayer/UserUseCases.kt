@@ -36,4 +36,8 @@ class UserUseCases(private val userRepositoryImpl: UserRepositoryImpl) {
         return userRepositoryImpl.getMyPageInfo()
     }
 
+    fun setAlarmEnabled(alarmEnabled: String): Observable<ResponseEntity<MyPageInfoResponseEntity>> {
+        return userRepositoryImpl.setAlarmEnabled(alarmEnabled = alarmEnabled)
+    }
+
 }

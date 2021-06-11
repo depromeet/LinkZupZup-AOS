@@ -12,4 +12,6 @@ interface UserRepository {
 
     fun getMyPageInfo(): Observable<ResponseEntity<MyPageInfoResponseEntity>>
 
+    fun setAlarmEnabled(alarmEnabled: String): Observable<ResponseEntity<MyPageInfoResponseEntity>>
+
 }

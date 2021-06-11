@@ -15,4 +15,6 @@ class MemberDataSource(private val api: MemberAPIService) {
     fun getMyPageInfo(): Observable<ResponseEntity<MyPageInfoResponseEntity>>
         = api.getMyPageInfo()
 
+    fun setAlarmEnabled(alarmEnabled: String): Observable<ResponseEntity<MyPageInfoResponseEntity>>
+        = api.setAlarmEnabled(alarmEnabled = alarmEnabled)
 }

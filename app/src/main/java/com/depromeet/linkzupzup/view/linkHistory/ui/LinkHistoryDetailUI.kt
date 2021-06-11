@@ -151,10 +151,10 @@ fun LinkHistoryAppBar(appBarColor: MutableState<Color> = remember { mutableState
 fun LinkEmptyGuide() {
     Column(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
 
-        Card(modifier = Modifier.fillMaxWidth()
-            .height(64.dp)
-            .padding(horizontal = 16.dp),
-            shape = RoundedCornerShape(8.dp)) {
+        Card(shape = RoundedCornerShape(8.dp),
+            elevation = 0.dp,
+            modifier = Modifier.fillMaxWidth()
+                .height(64.dp)) {
 
             Column(verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,

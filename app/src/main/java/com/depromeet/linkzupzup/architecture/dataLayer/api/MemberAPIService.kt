@@ -6,9 +6,7 @@ import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.MyPageInfo
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.SignInUpEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.SignResponseEntity
 import io.reactivex.Observable
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
+import retrofit2.http.*
 
 interface MemberAPIService {
 
@@ -22,7 +20,14 @@ interface MemberAPIService {
     @POST(ApiUrl.MEMBERS_SIGN_IN)
     fun signInUp(@Body signInUpEntity: SignInUpEntity): Observable<ResponseEntity<SignResponseEntity>>
 
+    @PUT(ApiUrl.MEMBERS_LOGOUT)
+    fun logout(@Body signInUpEntity: SignInUpEntity): Observable<ResponseEntity<SignResponseEntity>>
+
     @GET(ApiUrl.MEMBERS_MYPAGE_INFO)
     fun getMyPageInfo(): Observable<ResponseEntity<MyPageInfoResponseEntity>>
+
+    @FormUrlEncoded
+    @POST(ApiUrl.MEMBER_ALARM_ENABLED)
+    fun setAlarmEnabled(@Field("alarmEnabled") alarmEnabled: String): Observable<ResponseEntity<MyPageInfoResponseEntity>>
 
 }

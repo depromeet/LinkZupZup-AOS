@@ -12,7 +12,7 @@ import org.koin.androidx.viewmodel.ext.android.getViewModel
 
 
 class MyPageActivity: BaseActivity<MyPageUI, MyPageViewModel>() {
-    override var view: MyPageUI = MyPageUI(::onClick)
+    override var view: MyPageUI = MyPageUI()
     override fun onCreateViewModel(): MyPageViewModel = getViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {

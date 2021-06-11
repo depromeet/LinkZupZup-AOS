@@ -212,7 +212,6 @@ fun AlarmEmptyGuideCard(modifier: Modifier = Modifier) {
 fun TopHeaderCard(userName: String) {
     Row(verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
-            .padding(horizontal = 16.dp)
             .background(color = Color(0xFFF8FAFB))
             .height(96.dp)) {
 
