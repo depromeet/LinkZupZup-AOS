@@ -8,7 +8,7 @@ import kotlinx.parcelize.Parcelize
 data class DonutHistoryEntity(
 
     @SerializedName("content")
-    val content: ArrayList<MyPageBadgeEntity> = arrayListOf(),
+    val content: ArrayList<DonutBadgeEntity> = arrayListOf(),
 
     @SerializedName("pageable")
     val pageable: LinkAlarmPageableEntity,

@@ -1,6 +1,9 @@
 package com.depromeet.linkzupzup.extensions
 
 import com.depromeet.linkzupzup.utils.DateUtil
+import com.depromeet.linkzupzup.utils.DateUtil.DEFAULT_DATE_FORMAT_STR
+import com.depromeet.linkzupzup.utils.DateUtil.dateStrToDate
+import com.depromeet.linkzupzup.utils.DateUtil.getSimpleDateFormat
 import java.text.DecimalFormat
 import java.util.*
 
@@ -146,3 +149,6 @@ fun Calendar.getTotalTimeSum(): Int
       get(Calendar.HOUR) +
       get(Calendar.MINUTE) +
       get(Calendar.SECOND)
+
+
+fun String.dateStrToFormatStr(pattern: String = "yyyy년 MM월"): String = getSimpleDateFormat(pattern).format(dateStrToDate(this))
