@@ -95,7 +95,7 @@ fun WebPageScreen(urlToRender: String, openDialog: MutableState<Boolean>, vm: We
 @Composable
 fun WebViewTopBar(openDialog: MutableState<Boolean>,vm: WebViewViewModel? = null,clickListener: (Int) -> Unit){
 
-    val todayCnt = vm?.todayReadResponseCnt?.observeAsState()
+    val todayCnt = vm?.todayReadCnt?.observeAsState()
 
     Box(modifier = Modifier
         .fillMaxWidth()

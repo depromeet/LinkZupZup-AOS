@@ -4,7 +4,7 @@ import com.depromeet.linkzupzup.architecture.dataLayer.LinkDataSource
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmDataEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmEntity
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkReadResponseEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkReadEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
 import com.depromeet.linkzupzup.component.RoomDB
@@ -29,7 +29,7 @@ class LinkRepositoryImpl(private val roomDB: RoomDB, private val linkDataSource:
         return linkDataSource.getTodayReadCount()
     }
 
-    override fun setLinkRead(linkId: Int): Observable<ResponseEntity<LinkReadResponseEntity>> {
+    override fun setLinkRead(linkId: Int): Observable<ResponseEntity<LinkReadEntity>> {
         return linkDataSource.setLinkRead(linkId)
     }
 

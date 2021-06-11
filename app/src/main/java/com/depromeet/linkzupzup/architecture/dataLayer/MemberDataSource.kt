@@ -2,7 +2,7 @@ package com.depromeet.linkzupzup.architecture.dataLayer
 
 import com.depromeet.linkzupzup.architecture.dataLayer.api.MemberAPIService
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.MyPageInfoResponseEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.MyPageInfoEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.SignInUpEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.SignResponseEntity
 import io.reactivex.Observable
@@ -12,9 +12,9 @@ class MemberDataSource(private val api: MemberAPIService) {
     fun signInUp(signInUpEntity: SignInUpEntity): Observable<ResponseEntity<SignResponseEntity>>
         = api.signInUp(signInUpEntity = signInUpEntity)
 
-    fun getMyPageInfo(): Observable<ResponseEntity<MyPageInfoResponseEntity>>
+    fun getMyPageInfo(): Observable<ResponseEntity<MyPageInfoEntity>>
         = api.getMyPageInfo()
 
-    fun setAlarmEnabled(alarmEnabled: String): Observable<ResponseEntity<MyPageInfoResponseEntity>>
+    fun setAlarmEnabled(alarmEnabled: String): Observable<ResponseEntity<MyPageInfoEntity>>
         = api.setAlarmEnabled(alarmEnabled = alarmEnabled)
 }
