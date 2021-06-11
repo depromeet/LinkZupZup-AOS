@@ -6,7 +6,7 @@ object ApiUrl {
     private const val LIVE_PORT = "8080"
 
     @JvmStatic
-    val IS_DEV = BuildConfig.DEBUG
+    val IS_DEV = !BuildConfig.DEBUG
     private const val IS_SSL = false
     private const val DOMAIN = "54.180.27.142"
 
@@ -31,8 +31,9 @@ object ApiUrl {
      * Link
      */
     const val LINK_LIST = "/$VERSION/$LINKS"
+    const val LINK_DETAIL = "/$VERSION/$LINKS"
     const val LINK_REGISTER = "/$VERSION/$LINKS"
-    const val LINK_READ = "/$VERSION/$LINKS/"
+    const val LINK_READ = "/$VERSION/$LINKS"
     const val LINK_COUNT = "/$VERSION/$LINKS/$COUNT"
 
     /**

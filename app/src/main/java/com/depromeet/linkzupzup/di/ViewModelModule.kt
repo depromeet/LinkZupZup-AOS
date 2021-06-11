@@ -6,7 +6,7 @@ import org.koin.dsl.module
 
 val viewModelModule = module {
     viewModel { MainViewModel(get()) }
-    viewModel { ScrapDetailViewModel(get()) }
+    viewModel { ScrapDetailViewModel(get(), get()) }
     viewModel { AlarmDetailViewModel(get()) }
     viewModel { MyPageViewModel() }
     viewModel { MyDonutViewModel() }

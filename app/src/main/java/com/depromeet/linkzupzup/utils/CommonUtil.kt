@@ -9,12 +9,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import java.io.InputStream
 import android.content.ClipData
-
-
-
-
-
-
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 
 object CommonUtil {
 
@@ -62,5 +57,19 @@ object CommonUtil {
         val clipboardManager = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clipData = ClipData.newPlainText(label, text)
         clipboardManager.setPrimaryClip(clipData)
+    }
+
+    /**
+     * API subscribe 구현부에서 status, msg를 쉽고, 간결하게 참조하기 위해 아래와 같이 정의하였습니다.
+     * 해당 함수는 let 표현식을 참조하였습니다.
+     */
+    fun <T, R> ResponseEntity<T>.process(block: (Int, String) -> R): R = block(getStatus(), comment)
+
+    /**
+     * API subscribe 구현부에서 status, msg를 쉽고, 간결하게 참조하기 위해 아래와 같이 정의하였습니다.
+     * 해당 함수는 with 표현식을 참조하였습니다.
+     */
+    fun <T, R> process(receiver: ResponseEntity<T>, block: ResponseEntity<T>.(Int, String) -> R): R {
+        return receiver.block(receiver.getStatus(), receiver.comment)
     }
 }

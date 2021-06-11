@@ -13,6 +13,9 @@ class LinkDataSource(private val api: LinkAPIService) {
     fun getLinkList(query: HashMap<String, Any>): Observable<ResponseEntity<LinkAlarmDataEntity>>
         = api.getLinkList(query)
 
+    fun getLinkDetail(linkId: Int): Observable<ResponseEntity<LinkAlarmEntity>>
+        = api.getLinkDetail(linkId)
+
     fun insertLink(linkRegisterEntity: LinkRegisterEntity): Observable<ResponseEntity<LinkAlarmEntity>>
         = api.registerLink(linkRegisterEntity)
 

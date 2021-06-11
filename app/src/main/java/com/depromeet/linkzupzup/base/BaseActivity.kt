@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AlertDialog
@@ -14,6 +15,7 @@ import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.component.BackPressCloseHandler
 import com.depromeet.linkzupzup.component.NetworkProgressDialog
 import com.depromeet.linkzupzup.component.PreferencesManager
+import com.depromeet.linkzupzup.extensions.toast
 import com.depromeet.linkzupzup.utils.DLog
 import io.reactivex.Observable
 import org.koin.android.ext.android.inject
@@ -58,6 +60,7 @@ abstract class BaseActivity<VIEW: BaseView<VIEWMODEL>, VIEWMODEL: BaseViewModel>
             this.getIntent = this@BaseActivity.getIntent
             this.movePageDelay = this@BaseActivity.movePageDelay
             this.movePage = this@BaseActivity.movePage
+            this.toast = this@BaseActivity.toast
         }
         with(view) {
             lifecycleOwner = this@BaseActivity
@@ -74,6 +77,7 @@ abstract class BaseActivity<VIEW: BaseView<VIEWMODEL>, VIEWMODEL: BaseViewModel>
     var getIntent: (Class<*>)->Intent = { cls -> Intent(this@BaseActivity, cls) }
     var movePageDelay: (intent: Intent, time: Long, isFinish: Boolean)->Unit = { intent, time, isFinish -> movePageDelay(intent, time, isFinish) }
     var movePage: (intent: Intent, isFinish: Boolean)->Unit = { intent, isFinish -> movePage(intent, isFinish) }
+    var toast: (msg: String) -> Toast = { msg -> toast(this@BaseActivity, msg) }
 
     fun movePageDelay(intent: Intent, time: Long = 300L, isFinish: Boolean = false) {
         Observable.timer(time, TimeUnit.MILLISECONDS)
@@ -89,6 +93,11 @@ abstract class BaseActivity<VIEW: BaseView<VIEWMODEL>, VIEWMODEL: BaseViewModel>
     private fun movePage(intent: Intent, isFinish: Boolean = false) {
         intent.let(this::startActivity)
         if (isFinish) finish()
+
+    }
+
+    private fun toast(msg: String): Toast {
+        return toast(this@BaseActivity, msg)
     }
 
     fun onVisibleProgress() {

@@ -11,8 +11,8 @@ import java.util.*
 
 @Parcelize
 data class LinkData(
-    var linkId: Int = 0,
-    var userId: Int = 0,
+    var linkId: Int = -1,
+    var userId: Int = -1,
     var linkURL: String = "",
     var linkTitle: String = "",
     var imgURL : String = "",

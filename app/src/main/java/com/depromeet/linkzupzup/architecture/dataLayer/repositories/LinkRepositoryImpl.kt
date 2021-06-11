@@ -17,6 +17,10 @@ class LinkRepositoryImpl(private val roomDB: RoomDB, private val linkDataSource:
         return linkDataSource.getLinkList(query)
     }
 
+    override fun getLinkDetail(linkId: Int): Observable<ResponseEntity<LinkAlarmEntity>> {
+        return linkDataSource.getLinkDetail(linkId)
+    }
+
     override fun registerLink(linkRegisterEntity: LinkRegisterEntity): Observable<ResponseEntity<LinkAlarmEntity>> {
         return linkDataSource.insertLink(linkRegisterEntity)
     }

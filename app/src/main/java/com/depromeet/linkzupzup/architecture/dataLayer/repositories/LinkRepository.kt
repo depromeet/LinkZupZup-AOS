@@ -12,6 +12,8 @@ interface LinkRepository {
 
     fun getLinkList(query: HashMap<String, Any>): Observable<ResponseEntity<LinkAlarmDataEntity>>
 
+    fun getLinkDetail(linkId: Int): Observable<ResponseEntity<LinkAlarmEntity>>
+
     fun registerLink(linkRegisterEntity: LinkRegisterEntity): Observable<ResponseEntity<LinkAlarmEntity>>
 
     fun getTodayReadCount(): Observable<ResponseEntity<Int>>

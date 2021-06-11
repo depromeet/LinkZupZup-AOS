@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,7 +23,6 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.depromeet.linkzupzup.R
@@ -83,28 +83,37 @@ class ScrapDetailUI: BaseView<ScrapDetailViewModel>() {
 @Composable
 fun bottomSheetTest(viewModel: ScrapDetailViewModel) {
 
+    val linkInfo by viewModel.linkInfo.observeAsState(LinkData())
     val ctx = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
     )
     val bottomSheetType = remember { mutableStateOf(ScrapDetailUI.SCRAP_ALARM_REGISTER_TYPE) }
-    val metaInfo = viewModel.metaInfo.observeAsState(LinkData())
-    val metaLink = remember { mutableStateOf("") }
-    metaLink.value = metaInfo.value.imgURL
 
-    val painter = rememberGlidePainter(request = "", fadeIn = true, previewPlaceholder = R.drawable.img_link_placeholder)
+    val title = remember { mutableStateOf("") }
+    val description = remember { mutableStateOf("") }
+    val imgUrl = remember { mutableStateOf("") }
 
-    LaunchedEffect(painter) {
-        snapshotFlow { painter.loadState }
-            .filter { it.isFinalState() }
-            .collect {
-                when(it){
-                    is ImageLoadState.Empty, is ImageLoadState.Loading, is ImageLoadState.Error -> { painter.request = R.drawable.img_link_detail_placeholder }
-                    else -> {}
-                }
-            }
+    if (linkInfo.linkId >= 0) {
+        title.value = linkInfo.linkTitle
+        description.value = linkInfo.description
+        imgUrl.value = linkInfo.imgURL
     }
+
+
+//    val painter = rememberGlidePainter(request = metaLink.value, fadeIn = true, previewPlaceholder = R.drawable.img_link_detail_placeholder)
+//
+//    LaunchedEffect(painter) {
+//        snapshotFlow { painter.loadState }
+//            .filter { it.isFinalState() }
+//            .collect {
+//                when(it){
+//                    is ImageLoadState.Empty, is ImageLoadState.Loading, is ImageLoadState.Error -> { painter.request = R.drawable.img_link_detail_placeholder }
+//                    else -> {}
+//                }
+//            }
+//    }
 
     MultiBottomSheet(bottomSheetScaffoldState, coroutineScope) { currentBottomSheet: BottomSheetScreen?, closeSheet: () -> Unit, openSheet: (BottomSheetScreen) -> Unit ->
 
@@ -134,7 +143,7 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel) {
 
                     // top header
                     // painterResource(id = R.drawable.img_link_detail_placeholder)
-                    Image(painter = painter,
+                    Image(painter = painterResource(id = R.drawable.img_link_detail_placeholder),
                         contentDescription = null,
                         modifier = Modifier.fillMaxWidth())
 
@@ -195,7 +204,7 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel) {
                                 /**
                                  * 타이틀
                                  */
-                                Text("metaInfo.value.linkTitle",
+                                Text(linkInfo.linkTitle,
                                     style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700)), fontSize = 18.sp, lineHeight = 22.5.sp, color = Color(0xFF292A2B)),
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -203,7 +212,7 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel) {
 
                                 Spacer(modifier = Modifier.height(8.dp))
 
-                                Text("metaInfo.value.description",
+                                Text("metaDescription",
                                     style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = Color(0xFF878D91)),
                                     maxLines = 3,
                                     modifier = Modifier

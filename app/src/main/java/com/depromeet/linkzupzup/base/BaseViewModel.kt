@@ -2,6 +2,7 @@ package com.depromeet.linkzupzup.base
 
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -68,5 +69,6 @@ open abstract class BaseViewModel : ViewModel() {
     var getIntent: (Class<*>)-> Intent? = { cls -> null }
     var movePageDelay: (intent: Intent, time: Long, isFinish: Boolean)-> Unit = { intent, time, isFinish -> }
     var movePage: (intent: Intent, isFinish: Boolean)->Unit = { intent, isFinish -> }
+    var toast: (msg: String)-> Toast? = { msg -> null }
 
 }

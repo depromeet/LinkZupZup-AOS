@@ -19,6 +19,14 @@ class LinkUseCases(private val linkRepositoryImpl: LinkRepositoryImpl) {
     }
 
     /**
+     * 링크 상세 조회
+     */
+    fun getLinkDetail(linkId: Int): Observable<ResponseEntity<LinkAlarmEntity>> {
+        return linkRepositoryImpl.getLinkDetail(linkId)
+    }
+
+
+    /**
      * 링크 등록
      */
     fun registerLink(linkInfo: LinkRegisterEntity): Observable<ResponseEntity<LinkAlarmEntity>>{
