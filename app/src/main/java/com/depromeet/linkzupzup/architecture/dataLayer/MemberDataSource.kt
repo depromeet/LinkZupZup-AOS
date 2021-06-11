@@ -14,6 +14,7 @@ class MemberDataSource(private val api: MemberAPIService) {
         = api.signInUp(signInUpEntity = signInUpEntity)
 
     fun getMyPageInfo(): Observable<ResponseEntity<MyPageInfoEntity>>
+        = api.getMyPageInfo()
 
     fun logout(loginId: Long): Observable<ResponseEntity<String?>>
         = api.logout(loginId = loginId)

@@ -18,7 +18,6 @@ class UserRepositoryImpl(private var memberDataSource: MemberDataSource): UserRe
         return memberDataSource.logout(loginId = loginId)
     }
 
-    override fun getMyPageInfo(): Observable<ResponseEntity<MyPageInfoResponseEntity>> {
     override fun getMyPageInfo(): Observable<ResponseEntity<MyPageInfoEntity>> {
         return memberDataSource.getMyPageInfo()
     }
