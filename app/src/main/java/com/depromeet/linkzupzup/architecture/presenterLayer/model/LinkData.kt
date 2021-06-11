@@ -1,15 +1,18 @@
 package com.depromeet.linkzupzup.architecture.presenterLayer.model
 
+import android.os.Parcelable
 import androidx.compose.ui.graphics.Color
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.CommonUtil
+import kotlinx.parcelize.Parcelize
 import java.util.*
 
+@Parcelize
 data class LinkData(
-    var linkId: Int = 0,
-    var userId: Int = 0,
+    var linkId: Int = -1,
+    var userId: Int = -1,
     var linkURL: String = "",
     var linkTitle: String = "",
     var imgURL : String = "",
@@ -19,7 +22,7 @@ data class LinkData(
     var createdAt: Date = Date(0),
     var completedAt: Date = Date(0),
     var completed: Boolean = false,
-    var tagColor: TagColor = CommonUtil.getRandomeTagColor()) {
+    var tagColor: TagColor = CommonUtil.getRandomeTagColor()): Parcelable {
 
     /* 향후 삭제 예정 */
     companion object {
@@ -82,11 +85,12 @@ data class LinkData(
     }
 }
 
+@Parcelize
 data class LinkHashData(
     var hashtagId: Int = 0,
     var hashtagName: String = "",
     var createdAt: String = "",
-    var tagColor: TagColor = CommonUtil.getRandomeTagColor()) {
+    var tagColor: TagColor = CommonUtil.getRandomeTagColor()): Parcelable {
 
     companion object {
         val tc1: List<LinkHashData> = listOf(

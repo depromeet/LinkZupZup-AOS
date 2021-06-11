@@ -22,13 +22,17 @@ interface LinkAPIService {
     @GET(ApiUrl.LINK_LIST)
     fun getLinkList(@QueryMap query: HashMap<String, Any>): Observable<ResponseEntity<LinkAlarmDataEntity>>
 
+    @GET("${ApiUrl.LINK_DETAIL}/{linkId}")
+    fun getLinkDetail(@Path("linkId") linkId: Int): Observable<ResponseEntity<LinkAlarmEntity>>
+
     @POST(ApiUrl.LINK_REGISTER)
     fun registerLink(@Body linkRegisterEntity: LinkRegisterEntity): Observable<ResponseEntity<LinkAlarmEntity>>
 
     @GET(ApiUrl.LINK_COUNT)
     fun getTodayReadCount(): Observable<ResponseEntity<Int>>
 
-    @PATCH(ApiUrl.LINK_READ+"{id}")
+    @PATCH("${ApiUrl.LINK_READ}/{linkId}")
     fun setLinkRead(@Path("id") linkId: Int): Observable<ResponseEntity<LinkReadResponseEntity>>
+
 
 }

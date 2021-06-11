@@ -1,6 +1,5 @@
 package com.depromeet.linkzupzup.view.main.ui
 
-import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
@@ -11,7 +10,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,7 +36,6 @@ import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
 import com.depromeet.linkzupzup.view.custom.CustomLinearProgressIndicator
 import com.google.accompanist.glide.rememberGlidePainter
-import com.google.gson.Gson
 import com.google.accompanist.imageloading.isFinalState
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
@@ -69,7 +66,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 
 
-class MainUI(private var clickListener: (id: Int, linkId: Int?) -> Unit, private var userName : String): BaseView<MainViewModel>() {
+class MainUI(private var clickListener: (Int) -> Unit, private var userName : String): BaseView<MainViewModel>() {
 
     @ExperimentalFoundationApi
     @ExperimentalMaterialApi
@@ -91,7 +88,7 @@ class MainUI(private var clickListener: (id: Int, linkId: Int?) -> Unit, private
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
-fun MainBodyUI(viewModel : MainViewModel, clickListener: (id: Int, linkId: Int?) -> Unit, userName: String){
+fun MainBodyUI(viewModel : MainViewModel, clickListener: (Int) -> Unit, userName: String){
     val linkList by viewModel.linkList.observeAsState(arrayListOf())
     val (selected, setSelected) = remember(calculation = { mutableStateOf(0) })
     val (targetLink, updateLink) = LinkData().mutableStateValue()
@@ -119,13 +116,11 @@ fun MainBodyUI(viewModel : MainViewModel, clickListener: (id: Int, linkId: Int?)
             backgroundColor = Color.Transparent,
             modifier = Modifier.fillMaxSize()) {
 
-            Column(modifier = Modifier
-                .fillMaxSize()
+            Column(modifier = Modifier.fillMaxSize()
                 .background(color = Color.Transparent)
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
 
-                val columnModifier = if (linkList.size > 0) Modifier
-                    .fillMaxWidth()
+                val columnModifier = if (linkList.size > 0) Modifier.fillMaxWidth()
                     .weight(1f)
                     .padding(bottom = 16.dp)
                     .drawWithCache {
@@ -150,22 +145,19 @@ fun MainBodyUI(viewModel : MainViewModel, clickListener: (id: Int, linkId: Int?)
                         useHeader = true,
                         headerContent = { MainHeaderCard(name = userName, progress = 0.2f * tagReadCnt.value) }) { idx, linkItem ->
                         MainLinkCard(index = idx, linkData = linkItem, viewModel = viewModel) {
-                            clickListener(R.id.activity_move,it)
+                            viewModel.moveScrapDetail(linkItem)
                         }
                     }
                 }
 
                 // empty guide
                 if (linkList.size == 0) EmptyLinkGuideCard(
-                    Modifier
-                        .fillMaxWidth()
+                    Modifier.fillMaxWidth()
                         .weight(1f))
 
                 Button(shape = RoundedCornerShape(4.dp),
                     colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Blue50, contentColor = Color.White),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp),
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
                     onClick = {
                         coroutineScope.launch {
                             updateLink(LinkData())
@@ -188,23 +180,23 @@ fun MainBodyUI(viewModel : MainViewModel, clickListener: (id: Int, linkId: Int?)
 }
 
 @Composable
-fun MainAppBar(appBarColor : MutableState<Color> = remember { mutableStateOf(Gray10) }, clickListener: (id: Int, linkId: Int?) -> Unit){
+fun MainAppBar(appBarColor : MutableState<Color> = remember { mutableStateOf(Gray10) }, clickListener: (Int) -> Unit){
     TopAppBar(title = {},
         actions = {
 
             // 알람
             MainAppBarBtn(painterResource(id = R.drawable.ic_alram)) {
-                clickListener(R.drawable.ic_alram,null)
+                clickListener(R.drawable.ic_alram)
             }
 
             // 랭킹
             MainAppBarBtn(painterResource(id = R.drawable.ic_ranking)) {
-                clickListener(R.drawable.ic_ranking,null)
+                clickListener(R.drawable.ic_ranking)
             }
 
             // 마이페이지
             MainAppBarBtn(painterResource(id = R.drawable.ic_mypage)) {
-                clickListener(R.drawable.ic_mypage,null)
+                clickListener(R.drawable.ic_mypage)
             }
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -212,8 +204,7 @@ fun MainAppBar(appBarColor : MutableState<Color> = remember { mutableStateOf(Gra
         },
         backgroundColor = appBarColor.value,
         elevation = 0.dp,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
             .height(52.dp))
 }
 
@@ -223,20 +214,16 @@ fun MainAppBarBtn(painter: Painter, onClick: ()->Unit) {
     Card(elevation = 0.dp,
         shape = RoundedCornerShape(0),
         backgroundColor = Color.Transparent,
-        modifier = Modifier
-            .wrapContentSize()
+        modifier = Modifier.wrapContentSize()
             .noRippleClickable { onClick() }) {
 
         Row(verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .size(40.dp)) {
+            modifier = Modifier.size(40.dp)) {
 
-            Image(
-                painter = painter,
+            Image(painter = painter,
                 contentDescription = null,
-                Modifier.size(24.dp)
-            )
+                Modifier.size(24.dp))
         }
     }
 }
@@ -461,7 +448,7 @@ fun MainAlarmCard(){
 /* BottomSheet */
 @ExperimentalMaterialApi
 @Composable
-fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : CoroutineScope, viewModel: MainViewModel, clickListener: (id: Int, linkId: Int?) -> Unit, linkData: LinkData) {
+fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : CoroutineScope, viewModel: MainViewModel, clickListener: (Int) -> Unit, linkData: LinkData) {
 
     val isNewRegister = remember { mutableStateOf(false) }
     val linkId = remember { mutableStateOf(-1) }

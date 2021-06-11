@@ -9,8 +9,8 @@ interface LinkMetaInfoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMetaInfo(meta: LinkMetaInfoEntity): Long
 
-    @Query("SELECT * FROM LinkMetaInfo WHERE meta_url =:url")
-    suspend fun getMetaInfo(url: String) : LinkMetaInfoEntity?
+    @Query("SELECT * FROM LinkMetaInfo WHERE meta_url = :url")
+    suspend fun getMetaInfo(url: String): LinkMetaInfoEntity?
 
 //    @Query("SELECT * FROM LinkMetaInfo")
 //    suspend fun getAllMetaInfoList() : List<LinkMetaInfoEntity>

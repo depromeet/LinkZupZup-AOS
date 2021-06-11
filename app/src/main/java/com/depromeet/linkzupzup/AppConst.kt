@@ -14,6 +14,10 @@ object AppConst {
     const val OAUTH_KAKAO_TYPE: String = "oauth_kakao_type"
     const val OAUTH_GOOGLE_TYPE: String = "oauth_google_type"
 
+    const val LINK_ID = "link_id"
+    const val LINK_URL = "link_url"
+
+    const val LINK_ITEM = "link_item"
     const val WEB_LINK_URL = "web_link_url"
     const val WEB_LINK_ID = "web_link_id"
 

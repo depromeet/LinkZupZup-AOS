@@ -1,9 +1,11 @@
 package com.depromeet.linkzupzup.base
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AlertDialog
@@ -13,6 +15,7 @@ import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.component.BackPressCloseHandler
 import com.depromeet.linkzupzup.component.NetworkProgressDialog
 import com.depromeet.linkzupzup.component.PreferencesManager
+import com.depromeet.linkzupzup.extensions.toast
 import com.depromeet.linkzupzup.utils.DLog
 import io.reactivex.Observable
 import org.koin.android.ext.android.inject
@@ -51,6 +54,13 @@ abstract class BaseActivity<VIEW: BaseView<VIEWMODEL>, VIEWMODEL: BaseViewModel>
                 DLog.e("Jackson", "progressStatus : $it")
                 if (it) onVisibleProgress() else onInvisibleProgress()
             })
+
+            this.isLogin = this@BaseActivity.isLogin
+            this.getContext = this@BaseActivity.getContext
+            this.getIntent = this@BaseActivity.getIntent
+            this.movePageDelay = this@BaseActivity.movePageDelay
+            this.movePage = this@BaseActivity.movePage
+            this.toast = this@BaseActivity.toast
         }
         with(view) {
             lifecycleOwner = this@BaseActivity
@@ -62,15 +72,32 @@ abstract class BaseActivity<VIEW: BaseView<VIEWMODEL>, VIEWMODEL: BaseViewModel>
         backPressHandler = BackPressCloseHandler(this@BaseActivity)
     }
 
-    fun isLogin(): Boolean = pref.isLogin()
+    var isLogin: ()-> Boolean = { pref.isLogin() }
+    var getContext: ()-> Context? = { this@BaseActivity }
+    var getIntent: (Class<*>)->Intent = { cls -> Intent(this@BaseActivity, cls) }
+    var movePageDelay: (intent: Intent, time: Long, isFinish: Boolean)->Unit = { intent, time, isFinish -> movePageDelay(intent, time, isFinish) }
+    var movePage: (intent: Intent, isFinish: Boolean)->Unit = { intent, isFinish -> movePage(intent, isFinish) }
+    var toast: (msg: String) -> Toast = { msg -> toast(this@BaseActivity, msg) }
 
+    fun movePageDelay(intent: Intent, time: Long = 300L, isFinish: Boolean = false) {
+        Observable.timer(time, TimeUnit.MILLISECONDS)
+            .subscribe { movePage(intent, isFinish) }
+    }
     fun movePageDelay(cls: Class<*>, time: Long = 300L, isFinish: Boolean = false) {
         Observable.timer(time, TimeUnit.MILLISECONDS)
             .subscribe { movePage(cls, isFinish) }
     }
     private fun movePage(cls: Class<*>, isFinish: Boolean = false) {
-        Intent(this@BaseActivity, cls).let(this::startActivity)
+        movePage(Intent(this@BaseActivity, cls), isFinish)
+    }
+    private fun movePage(intent: Intent, isFinish: Boolean = false) {
+        intent.let(this::startActivity)
         if (isFinish) finish()
+
+    }
+
+    private fun toast(msg: String): Toast {
+        return toast(this@BaseActivity, msg)
     }
 
     fun onVisibleProgress() {

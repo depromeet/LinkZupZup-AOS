@@ -17,7 +17,7 @@ object ApiUrl {
     val BASE_DOMAIN: String = getBaseDomain()
 
     @JvmStatic
-    fun getBaseDomain(): String = "${if(IS_SSL) "https" else "http"}://$DOMAIN:${if(!IS_DEV) LIVE_PORT else DEV_PORT}"
+    fun getBaseDomain(): String = "${if(IS_SSL) "https" else "http"}://$DOMAIN:${if(IS_DEV) LIVE_PORT else DEV_PORT}"
 
     const val LINKS = "links"
     const val ALARM = "alarm"
@@ -33,8 +33,9 @@ object ApiUrl {
      * Link
      */
     const val LINK_LIST = "/$VERSION/$LINKS"
+    const val LINK_DETAIL = "/$VERSION/$LINKS"
     const val LINK_REGISTER = "/$VERSION/$LINKS"
-    const val LINK_READ = "/$VERSION/$LINKS/"
+    const val LINK_READ = "/$VERSION/$LINKS"
     const val LINK_COUNT = "/$VERSION/$LINKS/$COUNT"
 
     /**

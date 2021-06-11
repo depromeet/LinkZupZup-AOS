@@ -1,5 +1,8 @@
 package com.depromeet.linkzupzup.base
 
+import android.content.Context
+import android.content.Intent
+import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,7 +12,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import java.util.HashMap
 
-open class BaseViewModel : ViewModel() {
+open abstract class BaseViewModel : ViewModel() {
 
     companion object {
         var TAG = BaseViewModel::class.java.simpleName
@@ -59,5 +62,13 @@ open class BaseViewModel : ViewModel() {
             // 기본적으로 상시 주입되는 parameter 들을 이것에소 주입합니다.
         }
     }
+
+
+    var isLogin: ()-> Boolean = { false }
+    var getContext: ()-> Context? = { null }
+    var getIntent: (Class<*>)-> Intent? = { cls -> null }
+    var movePageDelay: (intent: Intent, time: Long, isFinish: Boolean)-> Unit = { intent, time, isFinish -> }
+    var movePage: (intent: Intent, isFinish: Boolean)->Unit = { intent, isFinish -> }
+    var toast: (msg: String)-> Toast? = { msg -> null }
 
 }
