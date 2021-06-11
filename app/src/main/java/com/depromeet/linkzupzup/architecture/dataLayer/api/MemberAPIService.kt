@@ -2,9 +2,7 @@ package com.depromeet.linkzupzup.architecture.dataLayer.api
 
 import com.depromeet.linkzupzup.ApiUrl
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.MyPageInfoEntity
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.SignInUpEntity
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.SignResponseEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.*
 import io.reactivex.Observable
 import retrofit2.http.*
 
@@ -29,5 +27,8 @@ interface MemberAPIService {
     @FormUrlEncoded
     @POST(ApiUrl.MEMBER_ALARM_ENABLED)
     fun setAlarmEnabled(@Field("alarmEnabled") alarmEnabled: String): Observable<ResponseEntity<MyPageInfoEntity>>
+
+    @GET(ApiUrl.MEMBER_DONUT_HISTORY)
+    fun getDonutHistoryList(@QueryMap query: HashMap<String, Any>): Observable<ResponseEntity<DonutHistoryEntity>>
 
 }

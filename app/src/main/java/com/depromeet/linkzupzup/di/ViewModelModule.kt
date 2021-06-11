@@ -9,7 +9,7 @@ val viewModelModule = module {
     viewModel { ScrapDetailViewModel(get(), get()) }
     viewModel { AlarmDetailViewModel(get()) }
     viewModel { MyPageViewModel(get()) }
-    viewModel { MyDonutViewModel() }
+    viewModel { MyDonutViewModel(get()) }
     viewModel { LinkHistoryDetailViewModel(get()) }
     viewModel { WebViewViewModel(get()) }
     viewModel { IntroViewModel() }

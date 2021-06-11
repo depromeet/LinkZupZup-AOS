@@ -2,6 +2,7 @@ package com.depromeet.linkzupzup.architecture.dataLayer
 
 import com.depromeet.linkzupzup.architecture.dataLayer.api.MemberAPIService
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.DonutHistoryEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.MyPageInfoEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.SignInUpEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.SignResponseEntity
@@ -17,4 +18,7 @@ class MemberDataSource(private val api: MemberAPIService) {
 
     fun setAlarmEnabled(alarmEnabled: String): Observable<ResponseEntity<MyPageInfoEntity>>
         = api.setAlarmEnabled(alarmEnabled = alarmEnabled)
+
+    fun getDonutHistoryList(query: HashMap<String, Any>): Observable<ResponseEntity<DonutHistoryEntity>>
+        = api.getDonutHistoryList(query)
 }

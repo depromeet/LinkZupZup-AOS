@@ -3,6 +3,7 @@ package com.depromeet.linkzupzup.architecture.domainLayer
 import android.content.Context
 import com.depromeet.linkzupzup.architecture.dataLayer.repositories.UserRepositoryImpl
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.DonutHistoryEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.MyPageInfoEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.SignInUpEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.SignResponseEntity
@@ -38,6 +39,10 @@ class UserUseCases(private val userRepositoryImpl: UserRepositoryImpl) {
 
     fun setAlarmEnabled(alarmEnabled: String): Observable<ResponseEntity<MyPageInfoEntity>> {
         return userRepositoryImpl.setAlarmEnabled(alarmEnabled = alarmEnabled)
+    }
+
+    fun getDonutHistoryList(query: HashMap<String, Any>): Observable<ResponseEntity<DonutHistoryEntity>> {
+        return userRepositoryImpl.getDonutHistory(query)
     }
 
 }
