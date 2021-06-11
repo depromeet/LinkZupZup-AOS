@@ -6,7 +6,7 @@ object ApiUrl {
     private const val LIVE_PORT = "8080"
 
     @JvmStatic
-    val IS_DEV = !BuildConfig.DEBUG
+    val IS_DEV = BuildConfig.DEBUG
     private const val IS_SSL = false
     private const val DOMAIN = "54.180.27.142"
 
@@ -17,7 +17,7 @@ object ApiUrl {
     val BASE_DOMAIN: String = getBaseDomain()
 
     @JvmStatic
-    fun getBaseDomain(): String = "${if(IS_SSL) "https" else "http"}://$DOMAIN:${if(IS_DEV) LIVE_PORT else DEV_PORT}"
+    fun getBaseDomain(): String = "${if(IS_SSL) "https" else "http"}://$DOMAIN:${if(IS_DEV) DEV_PORT else LIVE_PORT}"
 
     const val LINKS = "links"
     const val ALARM = "alarm"
@@ -25,7 +25,10 @@ object ApiUrl {
     const val MEMBERS = "members"
     const val RANKING = "ranking"
     const val LOGIN = "login"
+    const val LOGOUT = "logout"
     const val COUNT = "count"
+    const val MYPAGE = "mypage"
+    const val INFO = "info"
 
     /**
      * Link
@@ -51,6 +54,9 @@ object ApiUrl {
      * 응답으로 내려오는 token과 userId를 body에 포함하여 재호출시 로그인
      */
     const val MEMBERS_SIGN_IN = "/$VERSION/$MEMBERS/$LOGIN"
+    const val MEMBERS_LOGOUT = "/$VERSION/$MEMBERS/$LOGOUT"
+    const val MEMBERS_MYPAGE_INFO = "/$VERSION/$MEMBERS/$MYPAGE/$INFO"
+    const val MEMBER_ALARM_ENABLED = "/$VERSION/$MEMBERS/$MYPAGE/$ALARM"
 
     /**
      * Ranking

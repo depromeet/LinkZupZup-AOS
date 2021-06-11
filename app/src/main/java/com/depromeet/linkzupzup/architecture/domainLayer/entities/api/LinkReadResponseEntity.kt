@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class LinkReadEntity(
+data class LinkReadResponseEntity(
 
     @SerializedName("completed")
     val completed: Boolean = false,
