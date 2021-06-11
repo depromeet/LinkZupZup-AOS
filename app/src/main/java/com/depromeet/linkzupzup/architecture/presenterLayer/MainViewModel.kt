@@ -123,16 +123,22 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
                 }
                 callback(metaData)
             })
+        } else {
+            getMetadata(linkData.linkURL) {
+                callback(it)
+            }
         }
     }
 
     private fun getMetadata(url : String, callback: (LinkMetaInfoEntity) -> Unit){
-        extractUrlFormText(url)?.let{ rightUrl ->
-            getMetaDataFromUrl(rightUrl).let { metaData ->
-                // List UI를 갱신하기 위해 콜백
-                callback(metaData)
-                // 별도 db 갱신
-                viewModelScope.launch(Dispatchers.IO) { linkUseCases.insertMetaInfo(metaData) }
+        viewModelScope.launch(Dispatchers.IO) {
+            extractUrlFormText(url)?.let { rightUrl ->
+                getMetaDataFromUrl(rightUrl).let { metaData ->
+                    // List UI를 갱신하기 위해 콜백
+                    callback(metaData)
+                    // 별도 db 갱신
+                    linkUseCases.insertMetaInfo(metaData)
+                }
             }
         }
     }

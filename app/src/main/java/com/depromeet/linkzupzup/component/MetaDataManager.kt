@@ -62,10 +62,10 @@ object MetaDataManager {
         val metaData = LinkMetaInfoEntity(url = url)
         try{
             val doc : Document = Jsoup.connect(url).get()
-            metaData.title = doc.select("meta[property=og:title]").first().attr("content") ?: ""
-            metaData.content = doc.select("meta[property=og:description]")[0].attr("content") ?: ""
-            metaData.imgUrl = doc.select("meta[property=og:image]")[0].attr("content").verifyImgUrlDomain()
-            metaData.author = doc.select("meta[property=og:site_name]")[0].attr("content") ?: ""
+            metaData.title = doc.select("meta[property=og:title]")?.first()?.attr("content") ?: ""
+            metaData.content = doc.select("meta[property=og:description]")?.first()?.attr("content") ?: ""
+            metaData.imgUrl = doc.select("meta[property=og:image]")?.first()?.attr("content")?.verifyImgUrlDomain() ?: ""
+            metaData.author = doc.select("meta[property=og:site_name]")?.first()?.attr("content") ?: ""
 
             DLog.e("MetaData Manager", "글쓴이 : ${metaData.author}")
 
