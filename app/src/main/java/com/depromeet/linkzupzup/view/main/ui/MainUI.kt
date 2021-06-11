@@ -303,6 +303,7 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
     val metaTitle = remember { mutableStateOf(linkData.linkTitle) }
     val metaImgUrl = remember { mutableStateOf(linkData.imgURL) }
     val linkId = remember { mutableStateOf(linkData.linkId)}
+    val metaAuthor = remember { mutableStateOf(linkData.author) }
 
     // meta data 가 없으면 비동기로 호출하여 업데이트합니다.
     viewModel?.loadMetadata(index, linkData) {
@@ -311,7 +312,10 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
          */
         metaTitle.value = it.title
         metaImgUrl.value = it.imgUrl
+        metaAuthor.value = it.author
     }
+
+    DLog.e("Main UI", metaAuthor.value)
 
     val painter = rememberGlidePainter(request = metaImgUrl.value, fadeIn = true, previewPlaceholder = R.drawable.img_link_placeholder)
 
@@ -378,7 +382,7 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
                         .fillMaxWidth()
                         .height(16.dp)) {
 
-                    Image(painter = painterResource(id = R.drawable.ic_link_user_img),
+                    Image(painter = painterResource(id = R.drawable.ic_jubjub),
                         contentDescription = null,
                         modifier = Modifier
                             .size(16.dp)
@@ -386,7 +390,7 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
 
                     Spacer(Modifier.width(4.dp))
 
-                    Text(text="글쓴이",
+                    Text(text = metaAuthor.value,
                         modifier = Modifier.fillMaxHeight(),
                         lineHeight = 16.8.sp,
                         style = TextStyle(fontSize = 12.sp,

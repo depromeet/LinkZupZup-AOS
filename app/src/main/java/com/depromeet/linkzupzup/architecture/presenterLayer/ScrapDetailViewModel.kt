@@ -70,6 +70,7 @@ class ScrapDetailViewModel(private val linkUseCases: LinkUseCases, private val m
                                         linkTitle = meta.title
                                         imgURL = meta.imgUrl
                                         description = meta.content
+                                        author = meta.author
 
                                         DLog.e("Scrape Detail","${_linkInfo.value?.linkURL} ${_linkInfo.value?.linkTitle}")
                                     }
@@ -81,46 +82,6 @@ class ScrapDetailViewModel(private val linkUseCases: LinkUseCases, private val m
                 }
                 progressStatus(false)
             }, this@ScrapDetailViewModel::defaultThrowable))
-    }
-
-    fun getLinkDetail2(linkId: Int, callback: ((ResponseEntity<LinkAlarmEntity>)->Unit)? = null) {
-        progressStatus(true)
-        addDisposable(linkUseCases.getLinkDetail(linkId = linkId)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe({ response ->
-
-                when(response.getStatus()) {
-                    StatusConst.SELECT_SUSSCESS_STATUS -> {
-//                        response.data?.apply {
-//                            viewModelScope.launch {
-//                                metaUseCases.getMetaData(linkUrl = linkURL)?.let { metaData ->
-//                                    metaTitle = metaData.title
-//                                    metaDescription = metaData.content
-//                                    metaImageUrl = metaData.imgUrl
-//                                    _metaInfo.value = metaData.mapToPresenter()
-//                                }
-//                            }
-//                        }?.let {
-//                            _linkInfo.value = LinkData(it)
-//                        }
-                        response.data?.let {
-                            _linkInfo.postValue(LinkData(it))
-                        }
-
-
-
-
-//                        response.updateMetaData {
-//                            //_linkInfo.value = LinkData(it)
-//                            callback?.invoke(response)
-//                        }
-                    }
-                    else -> {}
-                }
-                progressStatus(false)
-            }, this@ScrapDetailViewModel::defaultThrowable))
-
     }
 
     private fun ResponseEntity<LinkAlarmEntity>.updateMetaData(callback: ((LinkAlarmEntity)->Unit)? = null): ResponseEntity<LinkAlarmEntity> = apply {

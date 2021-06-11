@@ -17,6 +17,7 @@ data class LinkData(
     var linkTitle: String = "",
     var imgURL : String = "",
     var description : String = "",
+    var author : String = "",
     var hasReminder: Boolean = false,
     var hashtags: ArrayList<LinkHashData> = arrayListOf(),
     var createdAt: Date = Date(0),

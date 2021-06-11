@@ -65,16 +65,13 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
                             _linkList.postValue(list.converter())
                             callback?.invoke(response)
                         }
-                    }.updatePersonalData(urlList)
+                    }
 
                     progressStatus(false)
                 }, this@MainViewModel::defaultThrowable))
         }
     }
-    fun ResponseEntity<LinkAlarmDataEntity>.updatePersonalData(urlList: ArrayList<String>): ResponseEntity<LinkAlarmDataEntity> {
 
-        return this
-    }
     private fun updateMetaData(urlList: ArrayList<String>, response: ResponseEntity<LinkAlarmDataEntity>, coroutineScope: CoroutineScope, listCallback: (Observable<ArrayList<LinkAlarmEntity>>) -> Unit): ResponseEntity<LinkAlarmDataEntity>  = response.apply {
         // 비동기, DB 조회
         coroutineScope.launch {
@@ -89,6 +86,9 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
                             metaTitle = target.title
                             metaDescription = target.content
                             metaImageUrl = target.imgUrl
+                            metaAuthor = target.author
+
+                            DLog.e("Main","메타 $metaAuthor 엔티티 ${target.author}")
                         }
                     }
 
@@ -118,6 +118,7 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
                         it.linkTitle = metaData.title
                         it.description = metaData.content
                         it.imgURL = metaData.imgUrl
+                        it.author = metaData.author
                     }
                 }
                 callback(metaData)

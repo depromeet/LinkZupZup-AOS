@@ -39,4 +39,6 @@ data class LinkAlarmEntity (
     @Ignore
     var metaImageUrl: String = "",
     @Ignore
-    var metaDescription: String = ""): Parcelable
+    var metaDescription: String = "",
+    @Ignore
+    var metaAuthor: String = ""): Parcelable
