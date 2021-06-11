@@ -29,6 +29,7 @@ object ApiUrl {
     const val COUNT = "count"
     const val MYPAGE = "mypage"
     const val INFO = "info"
+    const val BADGES = "badges"
 
     /**
      * Link
@@ -57,6 +58,7 @@ object ApiUrl {
     const val MEMBERS_LOGOUT = "/$VERSION/$MEMBERS/$LOGOUT"
     const val MEMBERS_MYPAGE_INFO = "/$VERSION/$MEMBERS/$MYPAGE/$INFO"
     const val MEMBER_ALARM_ENABLED = "/$VERSION/$MEMBERS/$MYPAGE/$ALARM"
+    const val MEMBER_DONUT_HISTORY = "/$VERSION/$MEMBERS/$MYPAGE/$BADGES"
 
     /**
      * Ranking

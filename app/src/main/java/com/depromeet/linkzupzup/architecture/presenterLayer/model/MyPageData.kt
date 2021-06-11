@@ -1,6 +1,6 @@
 package com.depromeet.linkzupzup.architecture.presenterLayer.model
 
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.MyPageInfoResponseEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.MyPageInfoEntity
 import com.depromeet.linkzupzup.view.linkHistory.LinkHistoryDetailActivity
 import com.depromeet.linkzupzup.view.termsAndInfo.TermsAndInfoActivity
 
@@ -37,12 +37,12 @@ data class MyPageData(
     }
 
 
-    constructor(myPageInfoResponseEntity: MyPageInfoResponseEntity): this() {
-        this.userName = myPageInfoResponseEntity.nickName
-        this.badgeUrl = myPageInfoResponseEntity.badge.badgeURL
-        this.monthlyPoint = myPageInfoResponseEntity.totalPoint
-        this.readCnt = myPageInfoResponseEntity.totalReadCount
-        this.alarmEnabled = myPageInfoResponseEntity.alarmEnabled
+    constructor(myPageInfoEntity: MyPageInfoEntity): this() {
+        this.userName = myPageInfoEntity.nickName
+        this.badgeUrl = myPageInfoEntity.badge.badgeURL
+        this.monthlyPoint = myPageInfoEntity.totalPoint
+        this.readCnt = myPageInfoEntity.totalReadCount
+        this.alarmEnabled = myPageInfoEntity.alarmEnabled
     }
 }
 

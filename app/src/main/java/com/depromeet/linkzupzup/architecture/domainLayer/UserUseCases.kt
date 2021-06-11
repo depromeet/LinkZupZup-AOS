@@ -3,7 +3,8 @@ package com.depromeet.linkzupzup.architecture.domainLayer
 import android.content.Context
 import com.depromeet.linkzupzup.architecture.dataLayer.repositories.UserRepositoryImpl
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.MyPageInfoResponseEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.DonutHistoryEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.MyPageInfoEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.SignInUpEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.SignResponseEntity
 import com.kakao.sdk.auth.model.OAuthToken
@@ -32,12 +33,16 @@ class UserUseCases(private val userRepositoryImpl: UserRepositoryImpl) {
         return userRepositoryImpl.signInUp(signInUpEntity)
     }
 
-    fun getMyPageInfo(): Observable<ResponseEntity<MyPageInfoResponseEntity>> {
+    fun getMyPageInfo(): Observable<ResponseEntity<MyPageInfoEntity>> {
         return userRepositoryImpl.getMyPageInfo()
     }
 
-    fun setAlarmEnabled(alarmEnabled: String): Observable<ResponseEntity<MyPageInfoResponseEntity>> {
+    fun setAlarmEnabled(alarmEnabled: String): Observable<ResponseEntity<MyPageInfoEntity>> {
         return userRepositoryImpl.setAlarmEnabled(alarmEnabled = alarmEnabled)
+    }
+
+    fun getDonutHistoryList(query: HashMap<String, Any>): Observable<ResponseEntity<DonutHistoryEntity>> {
+        return userRepositoryImpl.getDonutHistory(query)
     }
 
     fun logout(loginId: Long): Observable<ResponseEntity<String?>> {

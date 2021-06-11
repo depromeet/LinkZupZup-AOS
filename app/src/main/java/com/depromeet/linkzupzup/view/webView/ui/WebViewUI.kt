@@ -103,7 +103,7 @@ class WebViewUI(var clickListener: (Int)->Unit = {}) : BaseView<WebViewViewModel
 @Composable
 fun WebViewTopBar(openDialog: MutableState<Boolean>,vm: WebViewViewModel? = null,clickListener: (Int) -> Unit){
 
-    val todayCnt = vm?.todayReadResponseCnt?.observeAsState()
+    val todayCnt = vm?.todayReadCnt?.observeAsState()
 
     Box(modifier = Modifier
         .fillMaxWidth()

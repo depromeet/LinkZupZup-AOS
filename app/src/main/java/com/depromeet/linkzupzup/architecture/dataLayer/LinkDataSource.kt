@@ -4,7 +4,7 @@ import com.depromeet.linkzupzup.architecture.dataLayer.api.LinkAPIService
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmDataEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmEntity
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkReadResponseEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkReadEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import io.reactivex.Observable
 
@@ -22,7 +22,7 @@ class LinkDataSource(private val api: LinkAPIService) {
     fun getTodayReadCount(): Observable<ResponseEntity<Int>>
         = api.getTodayReadCount()
 
-    fun setLinkRead(linkId: Int): Observable<ResponseEntity<LinkReadResponseEntity>>
+    fun setLinkRead(linkId: Int): Observable<ResponseEntity<LinkReadEntity>>
         = api.setLinkRead(linkId)
 
 }

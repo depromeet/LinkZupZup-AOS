@@ -8,6 +8,8 @@ import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,11 +36,15 @@ import com.depromeet.linkzupzup.extensions.digitFormat1000
 import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.architecture.presenterLayer.MyDonutViewModel
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.DonutBadge
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.DonutData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.MyDonutData
+import com.depromeet.linkzupzup.extensions.dateStrToFormatStr
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
 import com.depromeet.linkzupzup.view.main.ui.MainAppBar
+import com.depromeet.linkzupzup.view.main.ui.MainBottomSheet
+import com.google.accompanist.glide.rememberGlidePainter
 import kotlinx.coroutines.launch
 
 class MyDonutUI : BaseView<MyDonutViewModel>() {
@@ -49,14 +55,7 @@ class MyDonutUI : BaseView<MyDonutViewModel>() {
     override fun onCreateViewContent() {
         LinkZupZupTheme {
             Surface(color = Color.White) {
-                val myDonutList : ArrayList<MyDonutData<*>> = arrayListOf<MyDonutData<*>>().apply{
-                    // 데이터가 없는 경우
-                    // add(MyDonutData<Any>(MyDonutData.NO_DONUT))
-
-                    // 데이터가 있는 경우
-                    addAll(MyDonutData.mockMyDonutContentList(24))
-                }
-                MyDonutBodyUI(myDonutList)
+                vm?.let { MyDonutBodyUI(viewModel = it) }
             }
         }
     }
@@ -66,54 +65,71 @@ class MyDonutUI : BaseView<MyDonutViewModel>() {
 @ExperimentalMaterialApi
 @ExperimentalFoundationApi
 @Composable
-fun MyDonutBodyUI(myDonutList: ArrayList<MyDonutData<*>>){
+fun MyDonutBodyUI(viewModel: MyDonutViewModel){
     val coroutineScope = rememberCoroutineScope()
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
     )
-    BottomSheetScaffold(
-        topBar = { MyDonutTopBar() },
-        scaffoldState = bottomSheetScaffoldState,
-        sheetShape = RoundedCornerShape(topStartPercent = 5,topEndPercent = 5),
-        sheetPeekHeight = 0.dp,
-        sheetBackgroundColor = Gray0t,
-        sheetGesturesEnabled = false,
-        backgroundColor = Color.Transparent,
-        modifier = Modifier.fillMaxSize(),
-        sheetContent = { InfoBottomSheet(){
-            coroutineScope.launch {
-                bottomSheetScaffoldState.bottomSheetState.collapse()
-            } }
-        }){
+    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.Transparent)) {
+//    BottomSheetScaffold(
+//        topBar = { MyDonutTopBar() },
+//        scaffoldState = bottomSheetScaffoldState,
+//        sheetShape = RoundedCornerShape(topStartPercent = 5,topEndPercent = 5),
+//        sheetPeekHeight = 0.dp,
+//        sheetBackgroundColor = Gray0t,
+//        sheetGesturesEnabled = false,
+//        backgroundColor = Color.Transparent,
+//        modifier = Modifier.fillMaxSize(),
+//        sheetContent = { InfoBottomSheet(){
+//            coroutineScope.launch {
+//                bottomSheetScaffoldState.bottomSheetState.collapse()
+//            } }
+//        }){
+//
+//        val donutList by viewModel.donutList.observeAsState(arrayListOf())
+//
+//        Column(modifier = Modifier
+//            .fillMaxWidth()
+//            .background(Color.Transparent)) {
+//
+//            Information(){
+//                coroutineScope.launch {
+//                    bottomSheetScaffoldState.bottomSheetState.expand()
+//                }
+//            }
+//            DonutBadgeGridList(donutList)
+//        }
+//    }
 
-            Information(){
-                coroutineScope.launch {
-                    bottomSheetScaffoldState.bottomSheetState.expand()
-                }
+    ModalBottomSheetLayout(sheetState = sheetState,
+        sheetShape = BottomSheetShape,
+        sheetContent = {
+            InfoBottomSheet(){
+                coroutineScope.launch { sheetState.hide() }
             }
-            DonutBadgeGridList(myDonutList)
+        },
+        modifier = Modifier.fillMaxSize()) {
+
+        Scaffold(topBar = { MyDonutTopBar() },
+            backgroundColor = Color.Transparent,
+            modifier = Modifier.fillMaxSize()) {
+
+            val donutList by viewModel.donutList.observeAsState(arrayListOf())
+
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Transparent)) {
+
+                Information(){
+                    coroutineScope.launch { sheetState.show() }
+                }
+                DonutBadgeGridList(donutList)
+            }
         }
     }
 
-    /* Scaffold(
-        topBar = { MyDonutTopBar() },
-        backgroundColor = Color.Transparent,
-        modifier = Modifier.fillMaxSize()) {
 
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.Transparent)) {
-
-            Information()
-
-            DonutBadgeGridList(myDonutList)
-
-        }
-    } */
 }
 
 @Composable
@@ -250,9 +266,8 @@ fun NoDonut(){
 
 @ExperimentalFoundationApi
 @Composable
-fun DonutBadgeGridList(myDonutList: ArrayList<MyDonutData<*>>){
-    val cellFixed = if (myDonutList.size == 1 && myDonutList[0].type == MyDonutData.NO_DONUT) MyDonutData.NO_DONUT
-    else MyDonutData.HAVE_DONUT
+fun DonutBadgeGridList(myDonutList: ArrayList<DonutData>){
+    val cellFixed = MyDonutData.HAVE_DONUT
 
     LazyVerticalGrid(
         cells = GridCells.Fixed(cellFixed),
@@ -260,22 +275,11 @@ fun DonutBadgeGridList(myDonutList: ArrayList<MyDonutData<*>>){
         modifier = Modifier.fillMaxWidth()) {
 
         items(myDonutList){ badge->
-            when(badge.type){
-
-                // 도넛이 없을 경우
-                MyDonutData.NO_DONUT -> NoDonut()
-
-                // 도넛이 있을 경우
-                MyDonutData.HAVE_DONUT -> (badge.data as? DonutBadge)?.let{ badgeData ->
-                    Box(
-                        Modifier
-                            .fillMaxSize()
-                            .padding(6.dp)) {
-                        DonutBadgeCard(painterResource(id = badgeData.badgeResource),badgeData.point, badgeData.date)
-                    }
-                }
-
-                else -> DLog.e("TEST","empty")
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .padding(6.dp)) {
+                DonutBadgeCard(rememberGlidePainter(request = badge.badgeUrl, fadeIn = true), badge.seasonPoint, badge.createdAt)
             }
         }
     }
@@ -337,25 +341,6 @@ fun DonutBadgeCard(painter : Painter, point : Int, date : String){
 
 }
 
-
-@ExperimentalMaterialApi
-@ExperimentalFoundationApi
-@Preview
-@Composable
-fun DonutPreview() {
-    LinkZupZupTheme {
-        Surface(color = Color.White) {
-            val myDonutList : ArrayList<MyDonutData<*>> = arrayListOf<MyDonutData<*>>().apply{
-                // 데이터가 없는 경우
-                // add(MyDonutData<Any>(MyDonutData.NO_DONUT))
-
-                // 데이터가 있는 경우
-                addAll(MyDonutData.mockMyDonutContentList(48))
-            }
-            MyDonutBodyUI(myDonutList)
-        }
-    }
-}
 
 
 @Composable

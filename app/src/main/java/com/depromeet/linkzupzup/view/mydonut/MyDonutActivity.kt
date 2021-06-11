@@ -13,5 +13,9 @@ class MyDonutActivity : BaseActivity<MyDonutUI, MyDonutViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        with(viewModel){
+            getDonutHistory()
+        }
     }
 }

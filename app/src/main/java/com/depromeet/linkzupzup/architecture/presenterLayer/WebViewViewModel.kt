@@ -3,7 +3,7 @@ package com.depromeet.linkzupzup.architecture.presenterLayer
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.depromeet.linkzupzup.architecture.domainLayer.LinkUseCases
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkReadResponseEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkReadEntity
 import com.depromeet.linkzupzup.base.BaseViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -16,8 +16,8 @@ class WebViewViewModel(private val linkUseCases: LinkUseCases) : BaseViewModel()
     private var _linkId: MutableLiveData<Int> = MutableLiveData()
     val linkId: LiveData<Int> = _linkId
 
-    private var _todayReadResponseCnt: MutableLiveData<LinkReadResponseEntity> = MutableLiveData()
-    val todayReadResponseCnt: LiveData<LinkReadResponseEntity> = _todayReadResponseCnt
+    private var _todayReadCnt: MutableLiveData<LinkReadEntity> = MutableLiveData()
+    val todayReadCnt: LiveData<LinkReadEntity> = _todayReadCnt
 
     fun setLinkRead(linkId: Int){
         addDisposable(linkUseCases.setLinkRead(linkId = linkId)
@@ -25,7 +25,7 @@ class WebViewViewModel(private val linkUseCases: LinkUseCases) : BaseViewModel()
             .subscribeOn(Schedulers.io())
             .subscribe({ response->
                 response.data?.let {
-                    _todayReadResponseCnt.value = it
+                    _todayReadCnt.value = it
                 }
             }, this@WebViewViewModel::defaultThrowable))
     }
