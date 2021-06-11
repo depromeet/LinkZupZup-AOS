@@ -148,7 +148,7 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel) {
                         .absoluteOffset(y = -middleTopPadding)) {
 
                         Box(Modifier.padding(horizontal = 24.dp)) {
-                            Image(painter= painterResource(id = R.drawable.ic_scrap_profile_img),
+                            Image(painter= painterResource(id = R.drawable.ic_jubjub),
                                 contentDescription = null,
                                 modifier = Modifier.size(48.dp))
                         }
@@ -163,7 +163,7 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel) {
                                 .padding(start = 72.dp, end = 24.dp)
                                 .height(44.dp)) {
 
-                                Text("글쓴이",
+                                Text(linkInfo.author,
                                     color = Color.Gray,
                                     style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_regular, weight = FontWeight.W400)), fontSize = 12.sp, lineHeight = 16.8.sp, color = Color(0x878D91)),
                                     modifier = Modifier
@@ -278,7 +278,7 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel) {
                     .size(64.dp)
                     .padding(16.dp)
                     .align(Alignment.TopEnd)
-                    .clickable { toast(ctx, "닫기") }) {
+                    .noRippleClickable {  }) {
 
                     Image(painter = painterResource(id = R.drawable.ic_gray_close),
                         contentDescription = null,

@@ -62,9 +62,20 @@ object MetaDataManager {
         val metaData = LinkMetaInfoEntity(url = url)
         try{
             val doc : Document = Jsoup.connect(url).get()
-            metaData.title = doc.select("meta[property=og:title]").first().attr("content")
-            metaData.content = doc.select("meta[property=og:description]")[0].attr("content")
+            metaData.title = doc.select("meta[property=og:title]").first().attr("content") ?: ""
+            metaData.content = doc.select("meta[property=og:description]")[0].attr("content") ?: ""
             metaData.imgUrl = doc.select("meta[property=og:image]")[0].attr("content").verifyImgUrlDomain()
+            metaData.author = doc.select("meta[property=og:site_name]")[0].attr("content") ?: ""
+
+            DLog.e("MetaData Manager", "글쓴이 : ${metaData.author}")
+
+            // brunch, Medium 두 가지 사이트에 대해서만 저자 정보를 따로 저장해주고, 나머지는 사이트명으로 대체합니다.
+            metaData.author = when(metaData.author){
+                "brunch" -> doc.select("meta[name=byl]")[0].attr("content")
+                "Medium" -> doc.select("meta[name=author]")[0].attr("content")
+                else -> metaData.author
+            }
+
         }catch (e : Exception){
             e.printStackTrace()
         }

@@ -23,4 +23,7 @@ class LinkMetaInfoEntity (
     var imgUrl : String = "",
 
     @ColumnInfo(name="meta_created_dt")
-    var createdDt : Date = Date())
+    var createdDt : Date = Date(),
+
+    @ColumnInfo(name="meta_author")
+    var author: String = "글쓴이")

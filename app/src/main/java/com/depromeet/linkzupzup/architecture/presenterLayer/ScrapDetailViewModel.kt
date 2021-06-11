@@ -70,6 +70,7 @@ class ScrapDetailViewModel(private val linkUseCases: LinkUseCases, private val m
                                         linkTitle = meta.title
                                         imgURL = meta.imgUrl
                                         description = meta.content
+                                        author = meta.author
 
                                         DLog.e("Scrape Detail","${_linkInfo.value?.linkURL} ${_linkInfo.value?.linkTitle}")
                                     }

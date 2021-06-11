@@ -21,4 +21,8 @@ class ScrapDetailActivity : BaseActivity<ScrapDetailUI, ScrapDetailViewModel>() 
         }
     }
 
+    fun onClick(){
+        this.finish()
+    }
+
 }
