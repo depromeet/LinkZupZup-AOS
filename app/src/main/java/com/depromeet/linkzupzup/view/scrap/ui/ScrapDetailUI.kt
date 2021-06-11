@@ -5,6 +5,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -33,6 +34,7 @@ import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.extensions.toast
 import com.depromeet.linkzupzup.architecture.presenterLayer.ScrapDetailViewModel
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkHashData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.TagColor
 import com.depromeet.linkzupzup.ui.theme.BottomSheetShape
 import com.depromeet.linkzupzup.ui.theme.LinkZupZupTheme
@@ -43,6 +45,7 @@ import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
 import com.depromeet.linkzupzup.view.custom.CustomDatePicker
 import com.depromeet.linkzupzup.view.custom.CustomTimePicker
 import com.depromeet.linkzupzup.view.custom.MultiBottomSheet
+import com.depromeet.linkzupzup.view.main.ui.MainHashtagCard
 import com.google.accompanist.glide.rememberGlidePainter
 import com.google.accompanist.imageloading.ImageLoadState
 import com.google.accompanist.imageloading.isFinalState
@@ -92,18 +95,6 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel) {
     )
     val bottomSheetType = remember { mutableStateOf(ScrapDetailUI.SCRAP_ALARM_REGISTER_TYPE) }
 
-    // DLog.e("Scrap Detail UI","${linkInfo.imgURL} ")
-
-//    val title = remember { mutableStateOf("") }
-//    val description = remember { mutableStateOf("") }
-//    val imgUrl = remember { mutableStateOf("") }
-
-//    if (linkInfo.linkId >= 0) {
-//        title.value = linkInfo.linkTitle
-//        description.value = linkInfo.description
-//        imgUrl.value = linkInfo.imgURL
-//    }
-
     MultiBottomSheet(bottomSheetScaffoldState, coroutineScope) { currentBottomSheet: BottomSheetScreen?, closeSheet: () -> Unit, openSheet: (BottomSheetScreen) -> Unit ->
 
         BottomSheetScaffold(
@@ -125,7 +116,6 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel) {
                 snapshotFlow { painter.loadState }
                     .filter { it.isFinalState() }
                     .collect {
-                        DLog.e("Scrap Detail UI 이미지", linkInfo.imgURL)
                         when(it){
                             is ImageLoadState.Empty, is ImageLoadState.Loading, is ImageLoadState.Error -> { painter.request = R.drawable.img_link_detail_placeholder }
                             else -> {}
@@ -145,7 +135,6 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel) {
                     .scrollable(state = rememberScrollState(), orientation = Orientation.Vertical)) {
 
                     // top header
-                    // painterResource(id = R.drawable.img_link_detail_placeholder)
                     Image(painter = painter,
                         contentDescription = null,
                         modifier = Modifier.fillMaxWidth().height(240.dp),
@@ -225,9 +214,10 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel) {
                                         .fillMaxWidth()
                                         .padding(horizontal = 24.dp))
 
-                                Spacer(modifier = Modifier.height(20.dp))
+                                Spacer(modifier = Modifier.height(10.dp))
 
-                                MultiLineTagList(viewModel.getTagList(), contentPadding = PaddingValues(24.dp, 0.dp))
+                                // MultiLineTagList(linkInfo.hashtags, contentPadding = PaddingValues(24.dp, 0.dp))
+                                SingleLineTagList(linkInfo.hashtags, contentPadding = PaddingValues(24.dp, 0.dp))
 
                                 Spacer(Modifier.weight(1f))
 
@@ -511,6 +501,19 @@ fun ScrapAlarmBottomSheet(type: Int, bottomSheetScaffoldState: BottomSheetScaffo
 
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun SingleLineTagList(tags: ArrayList<LinkHashData>, contentPadding: PaddingValues = PaddingValues(0.dp)) {
+    // 링크 해시태그
+    LazyRow(modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        contentPadding = contentPadding){
+
+        items(tags) { tag ->
+            MainHashtagCard(tagName = tag.hashtagName, backColor = tag.tagColor.bgColor, textColor = tag.tagColor.textColor)
         }
     }
 }
