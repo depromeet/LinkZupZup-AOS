@@ -4,7 +4,6 @@ import android.os.Bundle
 import com.depromeet.linkzupzup.AppConst
 import com.depromeet.linkzupzup.architecture.presenterLayer.TermsAndInfoViewModel
 import com.depromeet.linkzupzup.base.BaseActivity
-import com.depromeet.linkzupzup.extensions.toast
 import com.depromeet.linkzupzup.view.termsAndInfo.ui.TermsAndInfoUI
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 
@@ -15,12 +14,12 @@ class TermsAndInfoActivity : BaseActivity<TermsAndInfoUI, TermsAndInfoViewModel>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        intent.getStringExtra(AppConst.WEB_LINK_URL)?.let {
-            toast(this,it)
-            viewModel.setUrlToWebView(it)
-        }
-
+        val linkUrl = intent.getStringExtra(AppConst.WEB_LINK_URL) ?: ""
+        viewModel.setUrl(linkUrl)
     }
+
+    override fun onBackPressed() = view.webView?.run {
+        if (canGoBack()) goBack() else super.onBackPressed()
+    } ?: super.onBackPressed()
 
 }

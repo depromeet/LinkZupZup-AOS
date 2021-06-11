@@ -9,6 +9,7 @@ import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.MyPageInfo
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.MyPageData
 import com.depromeet.linkzupzup.base.BaseViewModel
 import com.depromeet.linkzupzup.utils.DLog
+import com.depromeet.linkzupzup.view.login.LoginActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
@@ -18,7 +19,6 @@ class MyPageViewModel(private val userUseCases: UserUseCases) : BaseViewModel() 
 
     private var _myPageData: MutableLiveData<MyPageData> = MutableLiveData(MyPageData())
     val myPageData: LiveData<MyPageData> = _myPageData
-
 
     fun getMyPageInfo() {
         progressStatus(true)
@@ -69,4 +69,34 @@ class MyPageViewModel(private val userUseCases: UserUseCases) : BaseViewModel() 
                 progressStatus(false)
             }, this@MyPageViewModel::defaultThrowable))
     }
+
+    fun logout() {
+        (preference?.getLoginId() ?: -1).let { loginId ->
+            if (loginId >= 0) {
+                addDisposable(userUseCases.logout(loginId)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe { response ->
+                        when (response.getStatus()) {
+                            StatusConst.UPDATE_SUCCESS_STATUS -> {
+                                toast(response.comment)
+                                preference?.logout()
+                                moveLoginPage()
+                            }
+                            else -> { toast(response.comment) }
+                        }
+                    })
+            } else {
+                preference?.logout()
+                moveLoginPage()
+            }
+
+        }
+    }
+
+    private fun moveLoginPage() {
+        getIntent(LoginActivity::class.java)?.apply {
+        }?.let { movePageDelay(it, 300L, true) }
+    }
+
 }

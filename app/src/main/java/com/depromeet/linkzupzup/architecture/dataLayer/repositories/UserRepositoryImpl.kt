@@ -13,6 +13,10 @@ class UserRepositoryImpl(private var memberDataSource: MemberDataSource): UserRe
         return memberDataSource.signInUp(signInEntity)
     }
 
+    override fun logout(loginId: Long): Observable<ResponseEntity<String?>> {
+        return memberDataSource.logout(loginId = loginId)
+    }
+
     override fun getMyPageInfo(): Observable<ResponseEntity<MyPageInfoResponseEntity>> {
         return memberDataSource.getMyPageInfo()
     }

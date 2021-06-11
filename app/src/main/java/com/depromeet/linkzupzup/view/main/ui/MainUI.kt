@@ -189,10 +189,10 @@ fun MainAppBar(appBarColor : MutableState<Color> = remember { mutableStateOf(Gra
                 clickListener(R.drawable.ic_alram)
             }
 
-            // 랭킹
-            MainAppBarBtn(painterResource(id = R.drawable.ic_ranking)) {
-                clickListener(R.drawable.ic_ranking)
-            }
+//            // 랭킹
+//            MainAppBarBtn(painterResource(id = R.drawable.ic_ranking)) {
+//                clickListener(R.drawable.ic_ranking)
+//            }
 
             // 마이페이지
             MainAppBarBtn(painterResource(id = R.drawable.ic_mypage)) {

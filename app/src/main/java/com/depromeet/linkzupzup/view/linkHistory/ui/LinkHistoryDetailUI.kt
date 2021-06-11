@@ -1,6 +1,5 @@
 package com.depromeet.linkzupzup.view.linkHistory.ui
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -19,7 +18,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -28,7 +26,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.depromeet.linkzupzup.R
@@ -37,7 +34,6 @@ import com.depromeet.linkzupzup.extensions.bottomSpacer
 import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.extensions.topSpacer
 import com.depromeet.linkzupzup.architecture.presenterLayer.LinkHistoryDetailViewModel
-import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkHashData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.MainContentData
@@ -46,16 +42,14 @@ import com.depromeet.linkzupzup.ui.theme.Gray100t
 import com.depromeet.linkzupzup.ui.theme.Gray70
 import com.depromeet.linkzupzup.ui.theme.LinkZupZupTheme
 import com.depromeet.linkzupzup.utils.DLog
-import com.depromeet.linkzupzup.view.main.ui.MainAlarmCard
 import com.depromeet.linkzupzup.view.main.ui.MainHashtagCard
-import com.depromeet.linkzupzup.view.main.ui.MainLinkCard
 import com.google.accompanist.glide.rememberGlidePainter
 import com.google.accompanist.imageloading.ImageLoadState
 import com.google.accompanist.imageloading.isFinalState
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 
-class LinkHistoryDetailUI: BaseView<LinkHistoryDetailViewModel>() {
+class LinkHistoryDetailUI(private val clickListener: (Int) -> Unit): BaseView<LinkHistoryDetailViewModel>() {
 
     @Composable
     override fun onCreateViewContent() {
@@ -68,9 +62,7 @@ class LinkHistoryDetailUI: BaseView<LinkHistoryDetailViewModel>() {
                     // 스크랩 링크가 존재하는 경우
                     // addAll(MainContentData.mockMainContentList(4))
                 }
-                vm?.let {
-                    LinkHistoryBodyContent(it)
-                }
+                vm?.let { viewModel -> LinkHistoryBodyContent(viewModel, clickListener = clickListener) }
             }
         }
     }
@@ -78,15 +70,14 @@ class LinkHistoryDetailUI: BaseView<LinkHistoryDetailViewModel>() {
 }
 
 @Composable
-fun LinkHistoryBodyContent(vm: LinkHistoryDetailViewModel) {
-    Scaffold(topBar = { LinkHistoryAppBar() },
+fun LinkHistoryBodyContent(vm: LinkHistoryDetailViewModel, clickListener: (Int) -> Unit) {
+    Scaffold(topBar = { LinkHistoryAppBar(clickListener = clickListener) },
         backgroundColor = Color.White) {
 
         val linkList by vm.linkList.observeAsState(arrayListOf())
 
         LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
                 .padding(horizontal = 16.dp)) {
 
             itemsIndexed(linkList) { index, item ->
@@ -99,21 +90,17 @@ fun LinkHistoryBodyContent(vm: LinkHistoryDetailViewModel) {
             }
         }
 
-        if (linkList.size == 0)
-            LinkEmptyGuide()
+        if (linkList.size == 0) LinkEmptyGuide()
     }
 }
 
 @Composable
-fun LinkHistoryAppBar(appBarColor: MutableState<Color> = remember { mutableStateOf(Color.White) }) {
-
-    val ctx = LocalContext.current
+fun LinkHistoryAppBar(appBarColor: MutableState<Color> = remember { mutableStateOf(Color.White) }, clickListener: (Int) -> Unit) {
 
     TopAppBar(title = {
             Row(horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
                     .background(Color.White)) {
 
                 Text(text = "다 읽은 링크",
@@ -133,11 +120,7 @@ fun LinkHistoryAppBar(appBarColor: MutableState<Color> = remember { mutableState
                     .width(56.dp)
                     .height(52.dp)
                     .background(Color.White)
-                    .noRippleClickable {
-                        Toast
-                            .makeText(ctx, "뒤로가기", Toast.LENGTH_SHORT)
-                            .show()
-                    }) {
+                    .noRippleClickable { clickListener(R.id.activity_close) }) {
 
                 Row(verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.size(52.dp)) {
@@ -157,28 +140,24 @@ fun LinkHistoryAppBar(appBarColor: MutableState<Color> = remember { mutableState
         },
         backgroundColor = appBarColor.value,
         elevation = 0.dp,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
             .height(52.dp)
             .background(Color.White))
 }
 
 @Composable
 fun LinkEmptyGuide() {
-    Column(modifier = Modifier
-        .fillMaxWidth()
+    Column(modifier = Modifier.fillMaxWidth()
         .padding(top = 24.dp, start = 16.dp, end = 16.dp)) {
 
         Card(shape = RoundedCornerShape(8.dp),
             elevation = 0.dp,
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
                 .height(64.dp)) {
 
             Column(verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
                     .wrapContentHeight()
                     .background(Color(0x144177F7))) {
 
@@ -187,8 +166,7 @@ fun LinkEmptyGuide() {
                         fontSize = 12.sp,
                         color = Color(0xFF4076F6),
                         fontFamily = FontFamily(
-                            Font(
-                                resId = R.font.spoqa_hansansneo_regular,
+                            Font(resId = R.font.spoqa_hansansneo_regular,
                                 weight = FontWeight.W400)
                         ),
                         textDecoration = TextDecoration.None,
@@ -242,14 +220,12 @@ fun HistoryLinkCard(index: Int, linkData: LinkData, viewModel: LinkHistoryDetail
         backgroundColor = Color.Transparent,
         modifier = Modifier.noRippleClickable { clickListener(linkId.value) }) {
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
+        Row(modifier = Modifier.fillMaxWidth()
             .background(Color.Transparent)
             .height(96.dp)) {
 
             // 링크 썸네일 이미지
-            Box(modifier = Modifier
-                .background(Blue20)
+            Box(modifier = Modifier.background(Blue20)
                 .size(96.dp)) {
                 Image(contentDescription = null,
                     modifier = Modifier.size(96.dp),
@@ -284,15 +260,12 @@ fun HistoryLinkCard(index: Int, linkData: LinkData, viewModel: LinkHistoryDetail
                         fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700))), maxLines = 2, overflow = TextOverflow.Ellipsis)
 
                 // 작성자
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(16.dp)) {
+                Row(Modifier.fillMaxWidth()
+                    .height(16.dp)) {
 
                     Image(painter = painterResource(id = R.drawable.ic_jubjub),
                         contentDescription = null,
-                        modifier = Modifier
-                            .size(16.dp)
+                        modifier = Modifier.size(16.dp)
                             .clip(CircleShape))
 
                     Spacer(Modifier.width(4.dp))

@@ -21,7 +21,7 @@ interface MemberAPIService {
     fun signInUp(@Body signInUpEntity: SignInUpEntity): Observable<ResponseEntity<SignResponseEntity>>
 
     @PUT(ApiUrl.MEMBERS_LOGOUT)
-    fun logout(@Body signInUpEntity: SignInUpEntity): Observable<ResponseEntity<SignResponseEntity>>
+    fun logout(@Header("loginId") loginId: Long): Observable<ResponseEntity<String?>>
 
     @GET(ApiUrl.MEMBERS_MYPAGE_INFO)
     fun getMyPageInfo(): Observable<ResponseEntity<MyPageInfoResponseEntity>>

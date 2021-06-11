@@ -71,7 +71,7 @@ class LoginViewModel(private var userUseCase: UserUseCases) : BaseViewModel() {
                         callback(status, response)
                     }
                     else -> {
-                        DLog.e("signInUp", response.comment)
+                        toast(response.comment)
                         callback(status, response)
                     }
                 }

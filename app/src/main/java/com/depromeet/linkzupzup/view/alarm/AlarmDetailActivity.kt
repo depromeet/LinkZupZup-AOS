@@ -25,7 +25,7 @@ class AlarmDetailActivity : BaseActivity<AlarmDetailUI, AlarmDetailViewModel>() 
 
     private fun onClick(id: Int) = with(viewModel) {
         when (id) {
-            R.id.avtivity_close -> {
+            R.id.activity_close -> {
                 super.onBackPressed()
                 overridePendingTransition(R.anim.stay, R.anim.act_slide_right_out)
             }

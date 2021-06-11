@@ -12,7 +12,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -35,13 +34,11 @@ import com.depromeet.linkzupzup.extensions.*
 import com.depromeet.linkzupzup.ui.theme.BottomSheetShape
 import com.depromeet.linkzupzup.ui.theme.LinkZupZupTheme
 import com.depromeet.linkzupzup.ui.theme.Round2RectShape
-import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.custom.CustomSwitchCompat
 import com.depromeet.linkzupzup.view.custom.CustomTextCheckBox
 import com.depromeet.linkzupzup.view.custom.CustomTimePicker
 import com.depromeet.linkzupzup.view.custom.WeeklyRepeatToggle
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.*
@@ -70,7 +67,7 @@ fun AlarmDetailAppBar(appBarColor: MutableState<Color> = remember { mutableState
         navigationIcon = {
             Card(elevation = 0.dp,
                 backgroundColor = Color(0xFFF8FAFB),
-                modifier = Modifier.noRippleClickable { clickListener(R.id.avtivity_close) }) {
+                modifier = Modifier.noRippleClickable { clickListener(R.id.activity_close) }) {
 
                 Column(verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.Start,

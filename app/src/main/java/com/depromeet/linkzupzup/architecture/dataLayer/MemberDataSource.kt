@@ -12,9 +12,13 @@ class MemberDataSource(private val api: MemberAPIService) {
     fun signInUp(signInUpEntity: SignInUpEntity): Observable<ResponseEntity<SignResponseEntity>>
         = api.signInUp(signInUpEntity = signInUpEntity)
 
+    fun logout(loginId: Long): Observable<ResponseEntity<String?>>
+        = api.logout(loginId = loginId)
+
     fun getMyPageInfo(): Observable<ResponseEntity<MyPageInfoResponseEntity>>
         = api.getMyPageInfo()
 
     fun setAlarmEnabled(alarmEnabled: String): Observable<ResponseEntity<MyPageInfoResponseEntity>>
         = api.setAlarmEnabled(alarmEnabled = alarmEnabled)
+
 }

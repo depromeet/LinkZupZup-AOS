@@ -10,6 +10,8 @@ interface UserRepository {
 
     fun signInUp(signInEntity: SignInUpEntity): Observable<ResponseEntity<SignResponseEntity>>
 
+    fun logout(loginId: Long): Observable<ResponseEntity<String?>>
+
     fun getMyPageInfo(): Observable<ResponseEntity<MyPageInfoResponseEntity>>
 
     fun setAlarmEnabled(alarmEnabled: String): Observable<ResponseEntity<MyPageInfoResponseEntity>>

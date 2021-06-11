@@ -9,7 +9,7 @@ class TermsAndInfoViewModel: BaseViewModel() {
     private val _urlToRender: MutableLiveData<String> = MutableLiveData()
     var urlToRender: LiveData<String> = _urlToRender
 
-    fun setUrlToWebView(url: String) {
+    fun setUrl(url: String) {
         _urlToRender.value = url
     }
 

@@ -4,6 +4,7 @@ object AppConst {
 
     const val AUTHORIZATION_KEY: String = "Authorization"
     const val USER_ID_KEY: String = "userId"
+    const val LOGIN_ID: String = "loginId"
     const val USER_NAME_KEY: String = "userName"
     const val USER_FCM_TOKEN: String = "fcmToken"
     const val DEVICE_TYPE_KEY: String = "device_type"

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import com.depromeet.linkzupzup.AppConst.AUTHORIZATION_KEY
+import com.depromeet.linkzupzup.AppConst.LOGIN_ID
 import com.depromeet.linkzupzup.AppConst.PUSH_AGREE_KEY
 import com.depromeet.linkzupzup.AppConst.TODAY_READ_KEY
 import com.depromeet.linkzupzup.AppConst.USER_FCM_TOKEN
@@ -27,6 +28,12 @@ class PreferencesManager(ctx: Context, name: String = "pref") {
         saver.commit()
     }
 
+    fun getLoginId(): Long = pref.getLong(LOGIN_ID, 0)
+    fun setLoginId(loginId: Long) {
+        saver.putLong(LOGIN_ID, loginId)
+        saver.commit()
+    }
+
     fun getUserName(): String = pref.getString(USER_NAME_KEY, "") ?: ""
     fun setUserName(userName: String) {
         saver.putString(USER_NAME_KEY, userName)
@@ -40,6 +47,12 @@ class PreferencesManager(ctx: Context, name: String = "pref") {
     }
 
     fun isLogin(): Boolean = getAuthorization().isNotEmpty()
+    fun logout() {
+        saver.remove(AUTHORIZATION_KEY)
+        saver.remove(USER_ID_KEY)
+        saver.remove(LOGIN_ID)
+        saver.commit()
+    }
 
     fun getTodayCount(): Int = pref.getInt(TODAY_READ_KEY, 0)
     fun setTodayCount(cnt: Int) {

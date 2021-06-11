@@ -1,6 +1,5 @@
 package com.depromeet.linkzupzup.view.webView.ui
 
-import android.annotation.SuppressLint
 import android.view.ViewGroup
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -10,11 +9,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,8 +33,12 @@ import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.architecture.presenterLayer.WebViewViewModel
 import com.depromeet.linkzupzup.ui.theme.*
+import com.depromeet.linkzupzup.utils.DLog
 
 class WebViewUI(var clickListener: (Int)->Unit = {}) : BaseView<WebViewViewModel>() {
+
+    var webView: WebView? = null
+
     @Composable
     override fun onCreateViewContent() {
         LinkZupZupTheme {
@@ -46,50 +46,58 @@ class WebViewUI(var clickListener: (Int)->Unit = {}) : BaseView<WebViewViewModel
                 Column(modifier = Modifier.fillMaxSize()) {
                     val openDialog = remember { mutableStateOf(false)  }
                     val readCount = remember { mutableStateOf(0) }
-                    val linkId = vm?.linkId?.value ?: -1
-                    val linkUrl = vm?.linkUrl?.value ?: ""
 
-                    WebPageScreen(urlToRender = linkUrl, openDialog = openDialog, vm = vm, clickListener = clickListener)
-                    WebViewCustomDialog(readCount = readCount, openDialog = openDialog)
+                    vm?.let { viewModel ->
+                        val linkId by viewModel.linkId.observeAsState(-1)
+                        val linkUrl = viewModel.linkUrl.value ?: "naver.com"
+                        Scaffold(
+                            topBar = { WebViewTopBar(openDialog = openDialog, vm = vm, clickListener = clickListener) },
+                            backgroundColor = Color.Transparent,
+                            modifier = Modifier.fillMaxSize()) {
+
+                            AndroidView(factory = {
+                                WebView(it).apply {
+                                    layoutParams = ViewGroup.LayoutParams(
+                                        ViewGroup.LayoutParams.MATCH_PARENT,
+                                        ViewGroup.LayoutParams.MATCH_PARENT
+                                    )
+                                    webViewClient = WebViewClient()
+                                    settings.apply {
+                                        javaScriptEnabled = true    // 자바스크립트 실행 허용
+                                        javaScriptCanOpenWindowsAutomatically = false   // 자바스크립트에서 새창 실행 허용
+                                        setSupportMultipleWindows(false)    // 새 창 실행 허용
+                                        loadWithOverviewMode = true // 메타 태그 허용
+                                        useWideViewPort = true  // 화면 사이즈 맞추기 허용
+                                        setSupportZoom(true)    // 화면 줌 허용
+                                        builtInZoomControls = false // 화면 확대 축소 허용 여부
+                                        cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK // 브라우저 캐시 허용 여부
+                                        domStorageEnabled = true    // 로컬저장소 허용
+                                    }
+
+                                    webView = this
+                                    DLog.e("loadUrl", "link: $linkUrl")
+                                    loadUrl(linkUrl)
+                                }
+                            }, update = {
+                                DLog.e("loadUrl", "update, link: $linkUrl")
+                                it.loadUrl(linkUrl)
+                            })
+                        }
+
+                        WebViewCustomDialog(readCount = readCount, openDialog = openDialog)
+
+                    }
                 }
             }
         }
     }
 }
-@SuppressLint("SetJavaScriptEnabled")
-@Composable
-fun WebPageScreen(urlToRender: String, openDialog: MutableState<Boolean>, vm: WebViewViewModel? = null, clickListener: (Int) -> Unit) {
-    Scaffold(
-        topBar = { WebViewTopBar(openDialog = openDialog, vm = vm, clickListener = clickListener) },
-        backgroundColor = Color.Transparent,
-        modifier = Modifier.fillMaxSize()) {
-
-        AndroidView(factory = {
-            WebView(it).apply {
-                layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
-                webViewClient = WebViewClient()
-                settings.apply {
-                    javaScriptEnabled = true    // 자바스크립트 실행 허용
-                    javaScriptCanOpenWindowsAutomatically = false   // 자바스크립트에서 새창 실행 허용
-                    setSupportMultipleWindows(false)    // 새 창 실행 허용
-                    loadWithOverviewMode = true // 메타 태그 허용
-                    useWideViewPort = true  // 화면 사이즈 맞추기 허용
-                    setSupportZoom(true)    // 화면 줌 허용
-                    builtInZoomControls = false // 화면 확대 축소 허용 여부
-                    cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK // 브라우저 캐시 허용 여부
-                    domStorageEnabled = true    // 로컬저장소 허용
-                }
-                loadUrl(urlToRender)
-            }
-        }, update = {
-            it.loadUrl(urlToRender)
-        })
-    }
-
-}
+//@SuppressLint("SetJavaScriptEnabled")
+//@Composable
+//fun WebPageScreen(urlToRender: String, openDialog: MutableState<Boolean>, vm: WebViewViewModel? = null, clickListener: (Int) -> Unit) {
+//
+//
+//}
 
 
 @Composable
@@ -108,7 +116,7 @@ fun WebViewTopBar(openDialog: MutableState<Boolean>,vm: WebViewViewModel? = null
                 .fillMaxHeight()){
 
             WebViewBackButton(painterResource(id = R.drawable.ic_detail_back)){
-                clickListener(R.id.avtivity_close)
+                clickListener(R.id.activity_close)
             }
         }
 
@@ -182,8 +190,7 @@ fun WebViewBackButton(painter: Painter, onClick : () -> Unit){
 
 @Composable
 fun WebViewCustomDialog(readCount: MutableState<Int>, openDialog : MutableState<Boolean>){
-    if(openDialog.value)
-        WebViewCustomDialog(readCount = readCount){ openDialog.value = false }
+    if (openDialog.value) WebViewCustomDialog(readCount = readCount){ openDialog.value = false }
 }
 
 @Composable

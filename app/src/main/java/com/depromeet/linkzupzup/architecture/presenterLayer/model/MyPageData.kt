@@ -24,11 +24,15 @@ data class MyPageData(
 
         const val MENU_MOVE : Int = 0
         const val MENU_TOGGLE : Int = 1
+
+        const val PRIVATE_POLICY_LINK = "https://www.notion.so/b099119/29e8ed9564ec4fb0aafb0bca48c5553d"
+        const val SEVENSTAR_INTRODUCE_LINK = "https://www.notion.so/d07ca6a626a74ac3ac7a2ce2e83f9e04"
+
         val MENU_DATA : List<MyPageMenuData> = listOf(
             MyPageMenuData("다 읽은 링크", MENU_MOVE, LinkHistoryDetailActivity::class.java),
             MyPageMenuData("푸시 알림", MENU_TOGGLE),
-            MyPageMenuData("개인정보 처리방침", MENU_MOVE, TermsAndInfoActivity::class.java, "https://www.notion.so/b099119/29e8ed9564ec4fb0aafb0bca48c5553d"),
-            MyPageMenuData("칠성파가 누구? ⭐️",MENU_MOVE, TermsAndInfoActivity::class.java, "https://www.notion.so/d07ca6a626a74ac3ac7a2ce2e83f9e04")
+            MyPageMenuData("개인정보 처리방침", MENU_MOVE, TermsAndInfoActivity::class.java, PRIVATE_POLICY_LINK),
+            MyPageMenuData("칠성파가 누구? ⭐️",MENU_MOVE, TermsAndInfoActivity::class.java, SEVENSTAR_INTRODUCE_LINK)
         )
     }
 

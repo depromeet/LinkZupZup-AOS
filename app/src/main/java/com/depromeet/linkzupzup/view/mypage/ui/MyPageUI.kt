@@ -1,7 +1,6 @@
 package com.depromeet.linkzupzup.view.mypage.ui
 
 import android.content.Intent
-import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -40,13 +39,13 @@ import com.depromeet.linkzupzup.view.custom.CustomSwitchCompat
 import com.depromeet.linkzupzup.view.mydonut.MyDonutActivity
 import com.google.accompanist.glide.rememberGlidePainter
 
-class MyPageUI : BaseView<MyPageViewModel>() {
+class MyPageUI(private val clickListener: ((Int)->Unit)? = null) : BaseView<MyPageViewModel>() {
     @Composable
     override fun onCreateViewContent() {
         LinkZupZupTheme {
             Surface(color = Gray10) {
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    vm?.let { MyPageBodyUI(viewModel = it) }
+                    vm?.let { MyPageBodyUI(viewModel = it, clickListener = clickListener) }
                 }
             }
         }
@@ -54,22 +53,23 @@ class MyPageUI : BaseView<MyPageViewModel>() {
 }
 
 @Composable
-fun MyPageBodyUI(viewModel: MyPageViewModel){
+fun MyPageBodyUI(viewModel: MyPageViewModel, clickListener: ((Int)->Unit)? = null) {
 
+    val myPageData: MyPageData by viewModel.myPageData.observeAsState(MyPageData())
     val switchCompat: MutableState<SwitchCompat?> = remember { mutableStateOf(null) }
 
-    Scaffold(topBar = { MyPageTopBar() },
+    Scaffold(topBar = { MyPageTopBar(clickListener) },
         backgroundColor = Color.Transparent,
         modifier = Modifier.fillMaxSize()
             .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
         
         Column(Modifier.fillMaxWidth()
-            .background(Color.Transparent)) {
+                .background(Color.Transparent)) {
 
             /**
              * 상단 프로필
              */
-            MyPageProfile(viewModel)
+            MyPageProfile(myPageData)
 
             Spacer(modifier = Modifier.height(30.dp))
 
@@ -100,7 +100,7 @@ fun MyPageBodyUI(viewModel: MyPageViewModel){
                                 var state = false
                                 CustomSwitchCompat(instanceCallback = {
                                     switchCompat.value = it
-                                    it.isChecked = true
+                                    it.isChecked = myPageData.alarmEnabled
                                 }, checkedOnChangeListener = { view, isChecked ->
                                     if (!state) { state = true }
                                     else viewModel.setAlarmEnabled((if (isChecked) "T" else "F"))
@@ -117,7 +117,8 @@ fun MyPageBodyUI(viewModel: MyPageViewModel){
              */
             Row(horizontalArrangement = Arrangement.End,
                 modifier = Modifier.fillMaxWidth()
-                    .padding(top = 18.dp)){
+                    .padding(start = 18.dp, top = 18.dp, bottom = 18.dp)
+                    .noRippleClickable { viewModel.logout() }) {
 
                 Text(text = "로그아웃",
                     style = TextStyle(fontSize = 12.sp,
@@ -131,14 +132,15 @@ fun MyPageBodyUI(viewModel: MyPageViewModel){
 }
 
 @Composable
-fun MyPageTopBar(){
+fun MyPageTopBar(clickListener: ((Int)->Unit)? = null){
     val ctx = LocalContext.current
     Row(verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .height(52.dp)){
 
         BackButton(painterResource(id = R.drawable.ic_detail_back)){
-            Toast.makeText(ctx,"뒤로가기",Toast.LENGTH_SHORT).show()
+            clickListener?.invoke(R.id.activity_close)
         }
     }
 }
@@ -148,7 +150,8 @@ fun BackButton(painter: Painter, onClick : () -> Unit){
     Card(elevation = 0.dp,
         shape = RoundedCornerShape(0),
         backgroundColor = Color.Transparent,
-        modifier = Modifier.fillMaxHeight()
+        modifier = Modifier
+            .fillMaxHeight()
             .wrapContentWidth()
             .noRippleClickable(onClick = onClick)) {
 
@@ -165,17 +168,18 @@ fun BackButton(painter: Painter, onClick : () -> Unit){
 }
 
 @Composable
-fun MyPageProfile(vm: MyPageViewModel){
+fun MyPageProfile(myPageData: MyPageData){
     val ctx = LocalContext.current
-    val myPageData: MyPageData by vm.myPageData.observeAsState(MyPageData())
 
     Row(verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(vertical = 10.dp)){
 
         Image(painter = rememberGlidePainter(request = myPageData.badgeUrl, fadeIn = true),
             contentDescription = null,
-            modifier = Modifier.size(64.dp, 48.dp)
+            modifier = Modifier
+                .size(64.dp, 48.dp)
                 .padding(end = 10.dp))
 
         Text(
@@ -220,9 +224,7 @@ fun MyPageProfile(vm: MyPageViewModel){
     Button(shape = RoundedCornerShape(4.dp),
         elevation = ButtonDefaults.elevation(0.dp),
         colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Blue50, contentColor = Color.White),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(52.dp),
+        modifier = Modifier.fillMaxWidth().height(52.dp),
         onClick = {
             ctx.startActivity(Intent(ctx,MyDonutActivity::class.java))
         }) {
@@ -242,10 +244,8 @@ fun MyPageProfile(vm: MyPageViewModel){
 fun MyPageProfileCard(title: String, num : Int? = 0, unit : String){
     val decNum = num?.digitFormat1000() ?: 0
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxWidth()
+    Column(horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
             .padding(vertical = 16.dp)){
 
         Text(text = title,
@@ -270,19 +270,16 @@ fun MyPageProfileCard(title: String, num : Int? = 0, unit : String){
 fun MyPageMenuCard(menuData: MyPageMenuData, clickListener: (() -> Unit)? = null, content: @Composable () -> Unit){
 
     Row(modifier = Modifier.padding(5.dp)){
-        Card(
-            elevation = 2.dp,
+        Card(elevation = 2.dp,
             backgroundColor = Gray0t,
             shape = RoundedCornerShape(10),
             modifier = Modifier.fillMaxWidth()
                 .height(56.dp)
                 .noRippleClickable {
                     clickListener?.invoke()
-                }
-        ){
+                }){
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
+            Row(verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
                     .padding(horizontal = 17.dp)){
 
@@ -296,7 +293,6 @@ fun MyPageMenuCard(menuData: MyPageMenuData, clickListener: (() -> Unit)? = null
                 content()
 
             }
-
         }
     }
 }
@@ -314,7 +310,7 @@ fun DetailBtn(painter: Painter){
 
             Image(painter = painter,
                 contentDescription = null,
-                Modifier.size(24.dp))
+                modifier = Modifier.size(24.dp))
         }
     }
 }

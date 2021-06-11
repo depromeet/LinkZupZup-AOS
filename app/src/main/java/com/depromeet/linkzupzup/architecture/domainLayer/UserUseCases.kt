@@ -40,4 +40,8 @@ class UserUseCases(private val userRepositoryImpl: UserRepositoryImpl) {
         return userRepositoryImpl.setAlarmEnabled(alarmEnabled = alarmEnabled)
     }
 
+    fun logout(loginId: Long): Observable<ResponseEntity<String?>> {
+        return userRepositoryImpl.logout(loginId = loginId)
+    }
+
 }

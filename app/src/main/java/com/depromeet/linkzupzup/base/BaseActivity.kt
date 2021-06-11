@@ -116,7 +116,7 @@ abstract class BaseActivity<VIEW: BaseView<VIEWMODEL>, VIEWMODEL: BaseViewModel>
     }
 
     override fun onBackPressed() {
-        overridePendingTransition(R.anim.stay, R.anim.slide_down_out)
+        overridePendingTransition(R.anim.stay, R.anim.act_slide_right_out)
         super.onBackPressed()
     }
 

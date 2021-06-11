@@ -40,6 +40,7 @@ class LoginActivity : BaseActivity<LoginUI, LoginViewModel>() {
                             val firebaseFCMToken = preference?.getFCMToken() ?: ""
                             val authorization =  pref.getAuthorization()
                             val userId = pref.getUserId()
+                            pref.setLoginId(identifier)
 
                             signInUp(SignInUpEntity(loginId = identifier, name = nickName, token = authorization, userId = userId, pushToken = firebaseFCMToken)) { status, response ->
 
@@ -61,6 +62,6 @@ class LoginActivity : BaseActivity<LoginUI, LoginViewModel>() {
         }
     }
 
-    override fun onBackPressed() { /* super.onBackPressed() */ }
+    override fun onBackPressed() = backPressHandler.onBackPressed()
 
 }

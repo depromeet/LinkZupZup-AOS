@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="avtivity_close" type="id" />
+    <item name="activity_close" type="id" />
     <item name="modal_close" type="id" />
     <item name="alarm_save" type="id" />
     <item name="alarm_update" type="id" />
