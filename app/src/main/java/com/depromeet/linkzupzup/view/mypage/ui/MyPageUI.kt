@@ -74,7 +74,7 @@ fun MyPageBodyUI(vm: MyPageViewModel){
             // menu button list
             LazyColumn(Modifier.fillMaxWidth()) {
                 items(MyPageData.MENU_DATA){ menu->
-                    MyPageMenuCard(menu.first, menu.second)
+                    MyPageMenuCard(menu.menuTitle, menu.menuType, menu.moveClass, menu.url)
                 }
             }
 
@@ -238,7 +238,9 @@ fun MyPageProfileCard(title: String, num : Int? = 0, unit : String){
 }
 
 @Composable
-fun MyPageMenuCard(menuName : String, menuType : Int){
+fun MyPageMenuCard(menuName : String, menuType : Int, moveClass: Class<*>? = null, moveUrl: String? = ""){
+
+    val ctx = LocalContext.current
 
     // elevation 으로 인한 그림자도 보이게 하고, 카드끼리 10dp 간격 생성.
     Row(modifier = Modifier.padding(5.dp)){
@@ -252,6 +254,11 @@ fun MyPageMenuCard(menuName : String, menuType : Int){
                 .noRippleClickable {
                     if (menuType == MyPageData.MENU_MOVE) {
                         // 페이지 이동
+                        moveClass?.let {
+                            val intent = Intent(ctx,moveClass)
+                            moveUrl?.let { intent.putExtra("URL",moveUrl) }
+                            ctx.startActivity(intent)
+                        }
                     }
                 }
         ){

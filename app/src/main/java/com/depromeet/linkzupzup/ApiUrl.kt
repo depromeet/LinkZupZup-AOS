@@ -17,7 +17,7 @@ object ApiUrl {
     val BASE_DOMAIN: String = getBaseDomain()
 
     @JvmStatic
-    fun getBaseDomain(): String = "${if(IS_SSL) "https" else "http"}://$DOMAIN:${if(IS_DEV) LIVE_PORT else DEV_PORT}"
+    fun getBaseDomain(): String = "${if(IS_SSL) "https" else "http"}://$DOMAIN:${if(!IS_DEV) LIVE_PORT else DEV_PORT}"
 
     const val LINKS = "links"
     const val ALARM = "alarm"

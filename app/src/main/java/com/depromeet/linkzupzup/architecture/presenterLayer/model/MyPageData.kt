@@ -1,5 +1,7 @@
 package com.depromeet.linkzupzup.architecture.presenterLayer.model
 
+import com.depromeet.linkzupzup.view.linkHistory.LinkHistoryDetailActivity
+
 
 data class MyPageData(
     var userName: String = "",
@@ -20,11 +22,17 @@ data class MyPageData(
 
         const val MENU_MOVE : Int = 0
         const val MENU_TOGGLE : Int = 1
-        val MENU_DATA : List<Pair<String,Int>> = listOf(
-            Pair("다 읽은 링크", MENU_MOVE),
-            Pair("푸시 알림", MENU_TOGGLE),
-            Pair("개인정보 처리방침", MENU_MOVE),
-            Pair("칠성파가 누구? ⭐️",MENU_MOVE)
+        val MENU_DATA : List<MyPageMenuData> = listOf(
+            MyPageMenuData("다 읽은 링크", MENU_MOVE, LinkHistoryDetailActivity::class.java),
+            MyPageMenuData("푸시 알림", MENU_TOGGLE),
+            MyPageMenuData("개인정보 처리방침", MENU_MOVE),
+            MyPageMenuData("칠성파가 누구? ⭐️",MENU_MOVE)
         )
     }
 }
+
+data class MyPageMenuData(
+    var menuTitle: String = "",
+    var menuType: Int = 0,
+    var moveClass: Class<*>? = null,
+    var url: String? = "")
