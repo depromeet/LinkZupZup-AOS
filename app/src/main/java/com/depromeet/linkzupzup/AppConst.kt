@@ -23,7 +23,7 @@ object AppConst {
     const val WEB_LINK_URL = "web_link_url"
     const val WEB_LINK_ID = "web_link_id"
     const val WEB_LINK_COMPLETED = "web_link_completed"
-
+    const val WEB_LINK_READ = "web_link_read"
     const val IS_REFRESH = "is_refresh"
 
     // TCP Handshake가 완료되기까지 지속되는 시간

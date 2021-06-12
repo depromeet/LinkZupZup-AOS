@@ -7,6 +7,7 @@ import com.depromeet.linkzupzup.base.BaseActivity
 import com.depromeet.linkzupzup.view.login.LoginActivity
 import com.depromeet.linkzupzup.view.main.MainActivity
 import com.depromeet.linkzupzup.view.onBoarding.ui.OnBoardingUI
+import com.depromeet.linkzupzup.view.webView.WebViewActivity
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 
 class OnBoardingActivity : BaseActivity<OnBoardingUI, OnBoardingViewModel>()  {
