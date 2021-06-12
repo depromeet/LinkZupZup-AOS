@@ -1,5 +1,7 @@
 package com.depromeet.linkzupzup.view.scrap.ui
 
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
@@ -51,12 +53,9 @@ import com.google.accompanist.glide.rememberGlidePainter
 import com.google.accompanist.imageloading.ImageLoadState
 import com.google.accompanist.imageloading.isFinalState
 import com.google.accompanist.pager.ExperimentalPagerApi
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.launch
 import java.util.*
 
 class ScrapDetailUI(private val clickListener: (Int) -> Unit): BaseView<ScrapDetailViewModel>() {
@@ -123,12 +122,14 @@ fun LinkScrapBottomSheet(viewModel: ScrapDetailViewModel, clickListener: (Int) -
                     when (it) {
                         // 링크 수정
                         R.id.link_update -> {
+                            coroutineScope.launch { sheetState.hide() }
+
                             coroutineScope.launch {
-                                sheetState.hide()
-                                delay(1000)
                                 setSelected(ScrapDetailUI.SCRAP_LINK_UPDATE)
+                                delay(1500)
                                 sheetState.show()
                             }
+
                         }
                         // 링크 삭제
                         R.id.link_delete -> openPopup(true)
@@ -348,11 +349,9 @@ fun LinkScrapBottomSheet(viewModel: ScrapDetailViewModel, clickListener: (Int) -
 @ExperimentalMaterialApi
 @Composable
 fun LinkScrapMenuSheet(sheetState: ModalBottomSheetState, coroutineScope: CoroutineScope, clickListener: (Int)->Unit) {
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .heightIn(min = 164.dp, max = 228.dp)
-            .padding(24.dp)) {
+    Column(Modifier.fillMaxWidth()
+        .heightIn(min = 164.dp, max = 228.dp)
+        .padding(24.dp)) {
 
         ScrapMenuBtn("링크 수정") {
             coroutineScope.launch {
