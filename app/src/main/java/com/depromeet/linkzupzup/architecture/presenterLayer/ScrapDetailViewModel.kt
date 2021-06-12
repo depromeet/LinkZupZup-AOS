@@ -33,6 +33,10 @@ class ScrapDetailViewModel(private val linkUseCases: LinkUseCases, private val m
     private var _isRefresh: MutableLiveData<Boolean> = MutableLiveData(false)
     val isRefresh: LiveData<Boolean> = _isRefresh
 
+    fun setRefresh(refresh: Boolean) {
+        _isRefresh.value = refresh
+    }
+
     private var _linkInfo: MutableLiveData<LinkData> = MutableLiveData(LinkData())
     val linkInfo: LiveData<LinkData> = _linkInfo
 

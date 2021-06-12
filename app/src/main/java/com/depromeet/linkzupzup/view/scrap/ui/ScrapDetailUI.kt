@@ -62,7 +62,6 @@ import java.util.*
 class ScrapDetailUI(private val clickListener: (Int) -> Unit): BaseView<ScrapDetailViewModel>() {
 
     companion object {
-        const val DEFAULT = -1
         const val SCRAP_MENU = 0
         const val SCRAP_ALARM = 1
         const val SCRAP_LINK_UPDATE = 2
@@ -91,12 +90,13 @@ fun LinkScrapBottomSheet(viewModel: ScrapDetailViewModel, clickListener: (Int) -
     /**
      * 삭제 다이얼로그
      */
-    if (popupState && linkInfo.linkId >= 0) AlertDialog(
+    if (popupState) AlertDialog(
         onDismissRequest = {},
         title = { Text(text = "삭제하시겠습니까?") },
         confirmButton = {
             Button(onClick = {
                 viewModel.deleteLink(linkInfo.linkId) {
+                    viewModel.setRefresh(true)
                     clickListener(R.id.activity_close)
                     /**
                      * TODO:리스트로 돌아가서 API 갱신 여부
@@ -110,7 +110,7 @@ fun LinkScrapBottomSheet(viewModel: ScrapDetailViewModel, clickListener: (Int) -
             }) { Text("취소") }
         })
 
-    val (selected, setSelected) = remember(calculation = { mutableStateOf(ScrapDetailUI.DEFAULT) })
+    val (selected, setSelected) = remember(calculation = { mutableStateOf(0) })
     val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
@@ -139,9 +139,8 @@ fun LinkScrapBottomSheet(viewModel: ScrapDetailViewModel, clickListener: (Int) -
                 ScrapDetailUI.SCRAP_ALARM -> ScrapAlarmBottomSheet(sheetState, coroutineScope, viewModel, linkInfo)
                 // 링크 수정
                 ScrapDetailUI.SCRAP_LINK_UPDATE -> ScrapLinkBottomSheet(sheetState, coroutineScope, viewModel, linkInfo)
-                else -> Box(Modifier)
             }
-            DLog.e("SHEET_CONTENT", "selected: $selected")
+            //DLog.e("SHEET_CONTENT", "selected: $selected")
         },
         modifier = Modifier.fillMaxSize()) {
 
@@ -150,18 +149,6 @@ fun LinkScrapBottomSheet(viewModel: ScrapDetailViewModel, clickListener: (Int) -
             modifier = Modifier.fillMaxSize()) {
 
             val middleTopPadding = 20.dp
-
-            val painter = rememberGlidePainter(request = linkInfo.imgURL.also { DLog.e("scrap",it) })
-            LaunchedEffect(painter) {
-                snapshotFlow { painter.loadState }
-                    .filter { it.isFinalState() }
-                    .collect {
-                        when(it){
-                            is ImageLoadState.Empty, is ImageLoadState.Loading, is ImageLoadState.Error -> { painter.request = R.drawable.img_link_detail_placeholder }
-                            else -> {}
-                        }
-                    }
-            }
 
             Box(modifier = Modifier
                 .fillMaxWidth()
@@ -173,6 +160,18 @@ fun LinkScrapBottomSheet(viewModel: ScrapDetailViewModel, clickListener: (Int) -
                     .fillMaxWidth()
                     .fillMaxHeight()
                     .scrollable(state = rememberScrollState(), orientation = Orientation.Vertical)) {
+
+                    val painter = rememberGlidePainter(request = linkInfo.imgURL.also { DLog.e("scrap",it) })
+                    LaunchedEffect(painter) {
+                        snapshotFlow { painter.loadState }
+                            .filter { it.isFinalState() }
+                            .collect {
+                                when(it){
+                                    is ImageLoadState.Empty, is ImageLoadState.Loading, is ImageLoadState.Error -> { painter.request = R.drawable.img_link_detail_placeholder }
+                                    else -> {}
+                                }
+                            }
+                    }
 
                     // top header
                     Image(painter = painter,
@@ -400,7 +399,8 @@ fun ScrapLinkBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Co
     // DLog.e("BottomSheet", "liveData: ${Gson().toJson(linkData)}, linkId: ${linkId.value}, linkUrl: ${linkUrl.value}, hashtags: ${Gson().toJson(hashtags)}")
 
     // in Column Scope
-    Column(modifier = Modifier.fillMaxWidth()
+    Column(modifier = Modifier
+        .fillMaxWidth()
         .height(580.dp)
         .padding(bottom = 16.dp)) {
 
@@ -574,7 +574,8 @@ fun ScrapMenuBtn(menuName: String, backgroundColor: Color = Color(0xFFEAF1FE), t
 @Composable
 fun ScrapAlarmBottomSheet(sheetState : ModalBottomSheetState, coroutineScope: CoroutineScope, viewModel: ScrapDetailViewModel, linkData: LinkData) {
     // in Column Scope
-    Column(modifier = Modifier.fillMaxWidth()
+    Column(modifier = Modifier
+        .fillMaxWidth()
         .height(606.dp)) {
 
         val ctx = LocalContext.current
@@ -588,7 +589,8 @@ fun ScrapAlarmBottomSheet(sheetState : ModalBottomSheetState, coroutineScope: Co
         // 닫기 버튼
         Row(horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .height(56.dp)) {
 
             BottomSheetCloseBtn(painterResource(id = R.drawable.ic_close)){
@@ -597,9 +599,11 @@ fun ScrapAlarmBottomSheet(sheetState : ModalBottomSheetState, coroutineScope: Co
         }
 
         // Alarm Guide Message
-        Column(Modifier.fillMaxWidth()
-            .height(120.dp)
-            .padding(horizontal = 24.dp)) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .height(120.dp)
+                .padding(horizontal = 24.dp)) {
 
             Text(text = "이 아티클은 \n언제 읽으실건가요?",
                 style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700)), fontSize = 24.sp, lineHeight = 32.4.sp, color = Color(0xFF292A2B)),
@@ -637,7 +641,8 @@ fun ScrapAlarmBottomSheet(sheetState : ModalBottomSheetState, coroutineScope: Co
 
         // Time Picker
         CustomTimePicker(date = currentPickDate.value,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .height(210.dp)
                 .padding(horizontal = 24.dp, vertical = 20.dp)) { type, timeVal ->
 
@@ -652,23 +657,30 @@ fun ScrapAlarmBottomSheet(sheetState : ModalBottomSheetState, coroutineScope: Co
         Spacer(Modifier.weight(1f))
 
         // 삭제, 저장하기 버튼
-        Column(Modifier.fillMaxWidth()
-            .height(68.dp)
-            .padding(start = 24.dp, end = 24.dp, bottom = 16.dp)) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .height(68.dp)
+                .padding(start = 24.dp, end = 24.dp, bottom = 16.dp)) {
 
             Row(Modifier.fillMaxSize()) {
 
                 /**
                  * 링크 삭제하기
                  */
-                if (linkData.linkId >= 0) Row(Modifier.width(64.dp)
-                    .fillMaxHeight()) {
+                if (linkData.linkId >= 0) Row(
+                    Modifier
+                        .width(64.dp)
+                        .fillMaxHeight()) {
 
                     Button(colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.White, contentColor = Color(0xFF4076F6)),
                         shape = RoundedCornerShape(4.dp),
                         elevation = ButtonDefaults.elevation(defaultElevation = 0.dp, pressedElevation = 0.dp),
                         border = BorderStroke(width = 1.dp, Color(0xFF4076F6)),
-                        modifier = Modifier.fillMaxWidth().height(52.dp).padding(end = 12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp)
+                            .padding(end = 12.dp),
                         onClick = {
                             DLog.e("Jackson", "save click read button")
                             coroutineScope.launch { sheetState.hide() }
@@ -687,7 +699,9 @@ fun ScrapAlarmBottomSheet(sheetState : ModalBottomSheetState, coroutineScope: Co
                 Button(colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color(0xFF4076F6), contentColor = Color.White),
                     shape = RoundedCornerShape(4.dp),
                     elevation = ButtonDefaults.elevation(defaultElevation = 0.dp, pressedElevation = 0.dp),
-                    modifier = Modifier.weight(1f).height(52.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(52.dp),
                     onClick = {
                         DLog.e("Jackson", "save click read button")
                         coroutineScope.launch {
