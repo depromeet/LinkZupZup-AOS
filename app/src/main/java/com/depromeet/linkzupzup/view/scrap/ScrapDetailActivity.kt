@@ -1,5 +1,7 @@
 package com.depromeet.linkzupzup.view.scrap
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import com.depromeet.linkzupzup.AppConst
 import com.depromeet.linkzupzup.R
@@ -10,12 +12,11 @@ import org.koin.androidx.viewmodel.ext.android.getViewModel
 
 class ScrapDetailActivity : BaseActivity<ScrapDetailUI, ScrapDetailViewModel>() {
 
-    override var view: ScrapDetailUI = ScrapDetailUI()
+    override var view: ScrapDetailUI = ScrapDetailUI(this::onClickListener)
     override fun onCreateViewModel(): ScrapDetailViewModel = getViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        overridePendingTransition(R.anim.slide_down_in, R.anim.stay)
         with(viewModel) {
             val linkId = intent.getIntExtra(AppConst.LINK_ID, -1)
             val linkUrl = intent.getStringExtra(AppConst.LINK_URL) ?: ""
@@ -23,12 +24,16 @@ class ScrapDetailActivity : BaseActivity<ScrapDetailUI, ScrapDetailViewModel>() 
         }
     }
 
-    fun onClick(){
-        this.finish()
+    private fun onClickListener(id: Int){
+        when(id) {
+            R.id.activity_close -> onBackPressed()
+        }
     }
 
     override fun onBackPressed() {
-        overridePendingTransition(R.anim.stay, R.anim.slide_down_out)
+        Intent().apply {
+            putExtra(AppConst.IS_REFRESH, viewModel.isRefresh.value)
+        }.let { setResult(Activity.RESULT_OK, it) }
         super.onBackPressed()
     }
 }

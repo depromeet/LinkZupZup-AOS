@@ -28,6 +28,12 @@ interface LinkAPIService {
     @POST(ApiUrl.LINK_REGISTER)
     fun registerLink(@Body linkRegisterEntity: LinkRegisterEntity): Observable<ResponseEntity<LinkAlarmEntity>>
 
+    @PUT(ApiUrl.LINK_UPDATE)
+    fun updateLink(@Body linkRegisterEntity: LinkRegisterEntity): Observable<ResponseEntity<LinkAlarmEntity>>
+
+    @DELETE("${ApiUrl.LINK_DELETE}/{linkId}")
+    fun deleteLink(@Path("linkId") linkId: Int): Observable<ResponseEntity<LinkAlarmEntity>>
+
     @GET(ApiUrl.LINK_COUNT)
     fun getTodayReadCount(): Observable<ResponseEntity<Int>>
 

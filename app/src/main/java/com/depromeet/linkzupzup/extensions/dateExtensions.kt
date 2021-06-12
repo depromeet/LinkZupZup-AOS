@@ -34,7 +34,6 @@ fun Calendar.timeStr(digitFormat: String = "%02d", isHourOfDay: Boolean = false)
     minute().digitFormat(digitFormat)
 ).joinToString(":")
 
-
 /**
  * 0 : 오전, 1: 오후
  */
@@ -73,11 +72,15 @@ fun Calendar.compareDate(calendar: Calendar): Boolean {
 fun Calendar.isToday(): Boolean = compareDate(Calendar.getInstance())
 
 fun Calendar.getAlarmDateStr(): String {
-    val hour = getDay()
-    val dateStr = "4월 10일 오전 12:50분"
-    val dateLastStr = "에 알림이 울려요!"
-    val alarmDateStr = "${dateStr}${dateLastStr}"
-    return ""
+
+    val month = getMonth()
+    val day = getDay()
+    val amOrPm = if (getAMPM() == Calendar.AM) "오전" else "오후"
+    val hour = hour(false)
+    val minute = minute()
+
+    val dateStr = "${month}월 ${day}일 ${amOrPm} ${hour}:${minute}분"
+    return dateStr
 }
 
 fun Calendar.clearMillis(): Calendar = apply {

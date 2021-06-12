@@ -1,6 +1,9 @@
 package com.depromeet.linkzupzup.view.main
 
+import android.app.Activity
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
+import com.depromeet.linkzupzup.AppConst
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseActivity
 import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
@@ -23,6 +26,16 @@ class MainActivity : BaseActivity<MainUI, MainViewModel>() {
             getTodayLinkList {
                 // 링크 리스트 호출
                 getLinkList()
+            }
+
+            startForResult = registerForActivityResult(
+                ActivityResultContracts.StartActivityForResult() // ◀ StartActivityForResult 처리를 담당
+            ) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    result.data?.let {
+                        if (it.getBooleanExtra(AppConst.IS_REFRESH, false)) { getLinkList() }
+                    }
+                }
             }
         }
     }

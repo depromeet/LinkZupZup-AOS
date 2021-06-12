@@ -19,6 +19,13 @@ class LinkDataSource(private val api: LinkAPIService) {
     fun insertLink(linkRegisterEntity: LinkRegisterEntity): Observable<ResponseEntity<LinkAlarmEntity>>
         = api.registerLink(linkRegisterEntity)
 
+    fun updateLink(linkRegisterEntity: LinkRegisterEntity): Observable<ResponseEntity<LinkAlarmEntity>>
+        = api.updateLink(linkRegisterEntity = linkRegisterEntity)
+
+    fun deleteLink(linkId: Int): Observable<ResponseEntity<LinkAlarmEntity>>
+        = api.deleteLink(linkId = linkId)
+
+
     fun getTodayReadCount(): Observable<ResponseEntity<Int>>
         = api.getTodayReadCount()
 

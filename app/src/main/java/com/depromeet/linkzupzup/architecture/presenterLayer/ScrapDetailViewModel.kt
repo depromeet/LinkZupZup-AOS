@@ -7,49 +7,34 @@ import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.depromeet.linkzupzup.AppConst
 import com.depromeet.linkzupzup.StatusConst
 import com.depromeet.linkzupzup.architecture.domainLayer.LinkUseCases
 import com.depromeet.linkzupzup.base.BaseViewModel
 import com.depromeet.linkzupzup.architecture.domainLayer.MetaUseCases
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmEntity
-import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
 import com.depromeet.linkzupzup.extensions.clearMillis
 import com.depromeet.linkzupzup.extensions.getTotalTimeSum
-import com.depromeet.linkzupzup.architecture.presenterLayer.model.TagColor
-import com.depromeet.linkzupzup.extensions.mapToDataLayer
-import com.depromeet.linkzupzup.extensions.mapToPresenter
 import com.depromeet.linkzupzup.receiver.AlarmReceiver
-import com.depromeet.linkzupzup.utils.CommonUtil
-import com.depromeet.linkzupzup.utils.CommonUtil.process
 import com.depromeet.linkzupzup.utils.DLog
-import com.google.gson.Gson
-import io.reactivex.Observable
-import io.reactivex.Single
+import com.depromeet.linkzupzup.view.webView.WebViewActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import org.koin.java.KoinJavaComponent.get
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 
-class ScrapDetailViewModel(private val linkUseCases: LinkUseCases, private val metaUseCases: MetaUseCases): BaseViewModel() {
+class ScrapDetailViewModel(private val linkUseCases: LinkUseCases, private val metaUseCases: MetaUseCases, private val alarmManager: AlarmManager): BaseViewModel() {
 
-    private val alarmManager: AlarmManager by lazy { get(AlarmManager::class.java) }
+    private var _isRefresh: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isRefresh: LiveData<Boolean> = _isRefresh
 
     private var _linkInfo: MutableLiveData<LinkData> = MutableLiveData(LinkData())
     val linkInfo: LiveData<LinkData> = _linkInfo
-
-    private var _metaInfo: MutableLiveData<LinkData> = MutableLiveData()
-    val metaInfo: LiveData<LinkData> = _metaInfo
-
-    fun getTagList(): ArrayList<String> {
-        return ArrayList(metaInfo.value?.hashtags?.map { it.hashtagName } ?: arrayListOf())
-    }
 
     fun getLinkDetail(linkId: Int){
         progressStatus(true)
@@ -84,30 +69,45 @@ class ScrapDetailViewModel(private val linkUseCases: LinkUseCases, private val m
             }, this@ScrapDetailViewModel::defaultThrowable))
     }
 
-//    private fun ResponseEntity<LinkAlarmEntity>.updateMetaData(callback: ((LinkAlarmEntity)->Unit)? = null): ResponseEntity<LinkAlarmEntity> = apply {
-//        viewModelScope.launch {
-//            data?.run {
-//                metaUseCases.getMetaData(linkUrl = linkURL)?.let { metaData ->
-//                    metaTitle = metaData.title
-//                    metaDescription = metaData.content
-//                    metaImageUrl = metaData.imgUrl
-//                    _metaInfo.value = metaData.mapToPresenter()
-//                    callback?.invoke(this@run)
-//                }
-//            }
-//        }
-//    }
-//
-//
-//    fun getMetaInfo(linkUrl: String, callback: ((LinkData)->Unit)? = null) {
-//        viewModelScope.launch {
-//            metaUseCases.getMetaData(linkUrl = linkUrl)?.let { meta ->
-//                _metaInfo.value = meta.mapToPresenter().also {
-//                    callback?.invoke(it)
-//                }
-//            }
-//        }
-//    }
+    fun updateLink(linkRegisterEntity: LinkRegisterEntity, callback: ((ResponseEntity<LinkAlarmEntity>)->Unit)? = null) {
+        progressStatus(true)
+        addDisposable(linkUseCases.updateLink(linkRegisterEntity)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe ({ response ->
+
+                when(response.getStatus()) {
+                    StatusConst.UPDATE_SUCCESS_STATUS -> {
+
+                    }
+                    else -> {}
+                }
+
+                toast(response.comment)
+                callback?.invoke(response)
+                progressStatus(false)
+            }, this@ScrapDetailViewModel::defaultThrowable))
+    }
+
+    fun deleteLink(linkId: Int, callback: ((ResponseEntity<LinkAlarmEntity>)->Unit)? = null) {
+        progressStatus(true)
+        addDisposable(linkUseCases.deleteLink(linkId)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe ({ response ->
+
+                when(response.getStatus()) {
+                    StatusConst.DELETE_SUCCESS_STATUS -> {
+
+                    }
+                    else -> {}
+                }
+
+                callback?.invoke(response)
+                progressStatus(false)
+            }, this@ScrapDetailViewModel::defaultThrowable))
+    }
+
 
     // 개별 링크 알람 설정
     fun addPersonalLinkAlarm(ctx: Context, date: Calendar) {
@@ -132,6 +132,16 @@ class ScrapDetailViewModel(private val linkUseCases: LinkUseCases, private val m
         // Doze 모드에서 알람이 발생되지 않아, setExactAndAllowWhileIdle에서 setAlarmClock으로 대체
         // alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeMillis, pendingIntent)
         alarmManager.setAlarmClock(AlarmManager.AlarmClockInfo(timeMillis, pendingIntent), pendingIntent)
+    }
+
+
+
+    fun moveWebViewPage(linkData: LinkData) {
+        getIntent(WebViewActivity::class.java)?.apply {
+            putExtra(AppConst.LINK_ID, linkData.linkId)
+            putExtra(AppConst.WEB_LINK_URL, linkData.linkURL)
+            putExtra(AppConst.WEB_LINK_COMPLETED, linkData.completed)
+        }?.let { movePageDelay(it, 300L, false) }
     }
 
 }

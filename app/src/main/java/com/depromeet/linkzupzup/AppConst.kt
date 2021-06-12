@@ -22,6 +22,9 @@ object AppConst {
     const val LINK_ITEM = "link_item"
     const val WEB_LINK_URL = "web_link_url"
     const val WEB_LINK_ID = "web_link_id"
+    const val WEB_LINK_COMPLETED = "web_link_completed"
+
+    const val IS_REFRESH = "is_refresh"
 
     // TCP Handshake가 완료되기까지 지속되는 시간
     const val CONNECTION_TIMEOUT: Long = 15
@@ -31,6 +34,5 @@ object AppConst {
     const val WRITE_TIMEOUT: Long = 15
 
     const val HASH_TAG_MAX_LIMIT = 3
-
 
 }

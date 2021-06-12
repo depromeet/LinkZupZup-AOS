@@ -7,4 +7,6 @@
     <item name="alarm_delete" type="id" />
     <item name="link_save" type="id" />
     <item name="activity_move" type="id" />
+    <item name="link_update" type="id" />
+    <item name="link_delete" type="id" />
 </resources>

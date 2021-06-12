@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.depromeet.linkzupzup.R
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.extensions.clearMillis
 import com.depromeet.linkzupzup.extensions.noRippleClickable
@@ -36,38 +38,34 @@ import com.depromeet.linkzupzup.architecture.presenterLayer.ScrapDetailViewModel
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkHashData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.TagColor
-import com.depromeet.linkzupzup.ui.theme.BottomSheetShape
-import com.depromeet.linkzupzup.ui.theme.LinkZupZupTheme
+import com.depromeet.linkzupzup.extensions.getAlarmDateStr
+import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.CommonUtil
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.utils.DateUtil
 import com.depromeet.linkzupzup.view.custom.BottomSheetCloseBtn
 import com.depromeet.linkzupzup.view.custom.CustomDatePicker
 import com.depromeet.linkzupzup.view.custom.CustomTimePicker
-import com.depromeet.linkzupzup.view.custom.MultiBottomSheet
-import com.depromeet.linkzupzup.view.main.ui.MainHashtagCard
+import com.depromeet.linkzupzup.view.main.ui.*
 import com.google.accompanist.glide.rememberGlidePainter
 import com.google.accompanist.imageloading.ImageLoadState
 import com.google.accompanist.imageloading.isFinalState
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import java.util.*
 
-class ScrapDetailUI: BaseView<ScrapDetailViewModel>() {
+class ScrapDetailUI(private val clickListener: (Int) -> Unit): BaseView<ScrapDetailViewModel>() {
 
     companion object {
-        // menu
-        const val SCRAP_ALARM_MENU_REGISTERED_TYPE = 0      // 링크가 등록된 상태 ( 링크 수정 )
-        const val SCRAP_ALARM_MENU_UNREGISTERED_TYPE = 1    // 링크가 등록되지 않은 상태 ( 링크 등록 )
-
-        // register or update
-        const val SCRAP_ALARM_REGISTER_TYPE = 2             // 링크가 등록되지 않은 상태 ( 링크 등록으로 진입 )
-        const val SCRAP_ALARM_UPDATE_TYPE = 3               // 링크가 등록된 상태 ( 링쿠 수정으로 진입 )
+        const val DEFAULT = -1
+        const val SCRAP_MENU = 0
+        const val SCRAP_ALARM = 1
+        const val SCRAP_LINK_UPDATE = 2
     }
 
     @ExperimentalMaterialApi
@@ -76,7 +74,7 @@ class ScrapDetailUI: BaseView<ScrapDetailViewModel>() {
     override fun onCreateViewContent() {
         LinkZupZupTheme {
             Surface(color = MaterialTheme.colors.background) {
-                vm?.let { viewModel -> bottomSheetTest(viewModel) }
+                vm?.let { viewModel -> LinkScrapBottomSheet(viewModel, clickListener) }
             }
         }
     }
@@ -85,28 +83,70 @@ class ScrapDetailUI: BaseView<ScrapDetailViewModel>() {
 @ExperimentalPagerApi
 @ExperimentalMaterialApi
 @Composable
-fun bottomSheetTest(viewModel: ScrapDetailViewModel) {
+fun LinkScrapBottomSheet(viewModel: ScrapDetailViewModel, clickListener: (Int) -> Unit) {
 
-    val linkInfo: LinkData by viewModel.linkInfo.observeAsState(LinkData())
-    val ctx = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
-    )
-    val bottomSheetType = remember { mutableStateOf(ScrapDetailUI.SCRAP_ALARM_REGISTER_TYPE) }
+    val (popupState, openPopup) = remember { mutableStateOf(false) }
+    val linkInfo by viewModel.linkInfo.observeAsState(LinkData())
 
-    MultiBottomSheet(bottomSheetScaffoldState, coroutineScope) { currentBottomSheet: BottomSheetScreen?, closeSheet: () -> Unit, openSheet: (BottomSheetScreen) -> Unit ->
-
-        BottomSheetScaffold(
-            scaffoldState = bottomSheetScaffoldState,
-            sheetContent = {
-                currentBottomSheet?.let { currentSheet ->
-                    BottomSheetLayout(bottomSheetScaffoldState, coroutineScope, currentSheet, viewModel)
+    /**
+     * 삭제 다이얼로그
+     */
+    if (popupState && linkInfo.linkId >= 0) AlertDialog(
+        onDismissRequest = {},
+        title = { Text(text = "삭제하시겠습니까?") },
+        confirmButton = {
+            Button(onClick = {
+                viewModel.deleteLink(linkInfo.linkId) {
+                    clickListener(R.id.activity_close)
+                    /**
+                     * TODO:리스트로 돌아가서 API 갱신 여부
+                     */
                 }
-            },
-            sheetShape = BottomSheetShape,
-            sheetPeekHeight = 0.dp,
-            sheetGesturesEnabled = false,
+                openPopup(false)
+            }) { Text("삭제") }
+        }, dismissButton = {
+            Button(onClick = {
+                openPopup(false)
+            }) { Text("취소") }
+        })
+
+    val (selected, setSelected) = remember(calculation = { mutableStateOf(ScrapDetailUI.DEFAULT) })
+    val coroutineScope = rememberCoroutineScope()
+    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+
+    ModalBottomSheetLayout(sheetState = sheetState,
+        sheetShape = BottomSheetShape,
+        sheetContent = {
+            when(selected) {
+                // 메뉴
+                ScrapDetailUI.SCRAP_MENU -> LinkScrapMenuSheet(sheetState, coroutineScope) {
+                    when (it) {
+                        // 링크 수정
+                        R.id.link_update -> {
+                            coroutineScope.launch {
+                                sheetState.hide()
+                                delay(1000)
+                                setSelected(ScrapDetailUI.SCRAP_LINK_UPDATE)
+                                sheetState.show()
+                            }
+                        }
+                        // 링크 삭제
+                        R.id.link_delete -> openPopup(true)
+                        else -> {}
+                    }
+                }
+                // 알람 등록
+                ScrapDetailUI.SCRAP_ALARM -> ScrapAlarmBottomSheet(sheetState, coroutineScope, viewModel, linkInfo)
+                // 링크 수정
+                ScrapDetailUI.SCRAP_LINK_UPDATE -> ScrapLinkBottomSheet(sheetState, coroutineScope, viewModel, linkInfo)
+                else -> Box(Modifier)
+            }
+            DLog.e("SHEET_CONTENT", "selected: $selected")
+        },
+        modifier = Modifier.fillMaxSize()) {
+
+        Scaffold(topBar = { },
+            backgroundColor = Color.Transparent,
             modifier = Modifier.fillMaxSize()) {
 
             val middleTopPadding = 20.dp
@@ -137,7 +177,9 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel) {
                     // top header
                     Image(painter = painter,
                         contentDescription = null,
-                        modifier = Modifier.fillMaxWidth().height(240.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(240.dp),
                         contentScale = ContentScale.Crop,
                         alignment = Alignment.Center)
 
@@ -176,9 +218,13 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel) {
                                     .size(44.dp)
                                     .fillMaxHeight()
                                     .noRippleClickable {
-                                        bottomSheetType.value =
-                                            ScrapDetailUI.SCRAP_ALARM_MENU_UNREGISTERED_TYPE
-                                        openSheet(BottomSheetScreen.MenuScreen(bottomSheetType.value))
+                                        /**
+                                         * 메뉴 바텀 시트
+                                         */
+                                        coroutineScope.launch {
+                                            setSelected(ScrapDetailUI.SCRAP_MENU)
+                                            sheetState.show()
+                                        }
                                     }) {
 
                                     Image(painter = painterResource(id = R.drawable.ic_gray_more),
@@ -226,9 +272,13 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel) {
                                         .height(26.dp)
                                         .padding(start = 24.dp, end = 24.dp)
                                         .noRippleClickable {
-                                            bottomSheetType.value =
-                                                ScrapDetailUI.SCRAP_ALARM_REGISTER_TYPE
-                                            openSheet(BottomSheetScreen.AlarmScreen(bottomSheetType.value))
+                                            /**
+                                             * 알람 등록 바텀 시트
+                                             */
+                                            coroutineScope.launch {
+                                                setSelected(ScrapDetailUI.SCRAP_ALARM)
+                                                sheetState.show()
+                                            }
                                         }) {
 
                                     Column {
@@ -261,7 +311,9 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel) {
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(52.dp)
-                                        .padding(horizontal = 24.dp)) {
+                                        .padding(horizontal = 24.dp)
+                                        .clickable { viewModel.moveWebViewPage(linkData = linkInfo) }) {
+
                                     Text("바로 읽기!",
                                         style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W700)), fontSize = 14.sp, lineHeight = 17.5.sp),
                                         textAlign = TextAlign.Center)
@@ -278,7 +330,7 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel) {
                     .size(64.dp)
                     .padding(16.dp)
                     .align(Alignment.TopEnd)
-                    .noRippleClickable {  }) {
+                    .noRippleClickable { clickListener(R.id.activity_close) }) {
 
                     Image(painter = painterResource(id = R.drawable.ic_gray_close),
                         contentDescription = null,
@@ -286,44 +338,211 @@ fun bottomSheetTest(viewModel: ScrapDetailViewModel) {
                 }
             }
         }
+
     }
 }
+
 
 /**
  * 링크 등록, 수정, 삭제 메뉴 시트
  */
 @ExperimentalMaterialApi
 @Composable
-fun ScrapMenuSheet(type: Int, bottomSheetScaffoldState: BottomSheetScaffoldState, coroutineScope: CoroutineScope) {
+fun LinkScrapMenuSheet(sheetState: ModalBottomSheetState, coroutineScope: CoroutineScope, clickListener: (Int)->Unit) {
     Column(
         Modifier
             .fillMaxWidth()
             .heightIn(min = 164.dp, max = 228.dp)
             .padding(24.dp)) {
 
-        val menuName = if (type == ScrapDetailUI.SCRAP_ALARM_MENU_REGISTERED_TYPE) "링크 수정" else "링크 등록"
-        ScrapMenuBtn(menuName) {
+        ScrapMenuBtn("링크 수정") {
             coroutineScope.launch {
-                bottomSheetScaffoldState.bottomSheetState.collapse()
+                clickListener(R.id.link_update)
+                sheetState.hide()
             }
         }
 
         Spacer(Modifier.height(12.dp))
 
-        if (type == ScrapDetailUI.SCRAP_ALARM_MENU_REGISTERED_TYPE) {
-            ScrapMenuBtn("링크 삭제") {
-                coroutineScope.launch {
-                    bottomSheetScaffoldState.bottomSheetState.collapse()
-                }
+        ScrapMenuBtn("링크 삭제") {
+            coroutineScope.launch {
+                clickListener(R.id.link_delete)
+                sheetState.hide()
             }
-
-            Spacer(Modifier.height(12.dp))
         }
 
+        Spacer(Modifier.height(12.dp))
+
         ScrapMenuBtn("취소", Color.White, Color.Black) {
-            coroutineScope.launch {
-                bottomSheetScaffoldState.bottomSheetState.collapse()
+            coroutineScope.launch { sheetState.hide() }
+        }
+    }
+}
+
+/* BottomSheet */
+@ExperimentalMaterialApi
+@Composable
+fun ScrapLinkBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : CoroutineScope, viewModel: ScrapDetailViewModel, linkData: LinkData) {
+
+    val isNewRegister = remember { mutableStateOf(false) }
+    val linkId = remember { mutableStateOf(-1) }
+    val hashtags = remember { mutableStateListOf<LinkHashData>() }
+    val (linkUrl, setLink) = remember { mutableStateOf(linkData.linkURL) }
+
+    val ctx = LocalContext.current
+    val saveBtnColor = if (!linkUrl.isNullOrEmpty()) Blue50 else Gray50t
+    val saveTxtColor = if (!linkUrl.isNullOrEmpty()) Color.White else Gray70
+
+    linkId.value = linkData.linkId
+    isNewRegister.value = linkData.linkId < 0
+    hashtags.addAll(linkData.hashtags)
+
+    // DLog.e("BottomSheet", "liveData: ${Gson().toJson(linkData)}, linkId: ${linkId.value}, linkUrl: ${linkUrl.value}, hashtags: ${Gson().toJson(hashtags)}")
+
+    // in Column Scope
+    Column(modifier = Modifier.fillMaxWidth()
+        .height(580.dp)
+        .padding(bottom = 16.dp)) {
+
+        // 닫기 버튼
+        Row(horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)) {
+
+            BottomSheetCloseBtn(painterResource(id = R.drawable.ic_close)) {
+                coroutineScope.launch { sheetState.hide() }
             }
+        }
+
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f)) {
+
+            /**
+             * Header Title
+             */
+            BottomHeaderCard()
+
+            Spacer(Modifier.height(8.dp))
+
+            /**
+             * 링크 주소 입력창
+             */
+            CustomTextField(txt = linkUrl,
+                hintStr = "\uD83D\uDC49 링크주소를 여기에 붙여넣기 해주세요.",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .padding(horizontal = 24.dp)) {
+                setLink(it)
+                DLog.e("TEST MainUI 텍트스갱신","string: ${it}, url change : $linkUrl")
+
+                // DLog.e("MAIN_TEST", "url: $it")
+                // DLog.e("hashtags", "${Gson().toJson(hashtags)}")
+            }
+
+            Spacer(Modifier.height(40.dp))
+
+            /**
+             * 해시태그 선택
+             */
+            BottomSheetSelect(cnt = hashtags.size) { target ->
+                updateHashtags(hashtags, target)
+                // DLog.e("HASH_TAG", "${Gson().toJson(target)}")
+                // DLog.e("hashtags", "${Gson().toJson(hashtags)}")
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            /**
+             * 커스텀 태그 입력 화면
+             */
+            BottomSheetInputTag { tagName ->
+                updateHashtags(hashtags, LinkHashData(hashtagName = tagName))
+                // DLog.e("CUSTOM_TAG", "$tagName")
+                // DLog.e("hashtags", "${Gson().toJson(hashtags)}")
+            }
+
+        }
+
+        /**
+         * 선택된 해시태그 리스트
+         */
+        val listState = rememberLazyListState(initialFirstVisibleItemIndex = 0)
+
+        LazyRow(
+            state = listState,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)) {
+
+            items(items = hashtags, itemContent = { tag ->
+                // DLog.e("HASH_TAG", "tagName: ${tag.hashtagName}, tag: ${Gson().toJson(tag)}")
+                // DLog.e("hashtags", "${Gson().toJson(hashtags)}")
+                Card(modifier = Modifier
+                    .height(32.dp)
+                    .noRippleClickable { updateHashtags(hashtags, tag) },
+                    shape = RoundedCornerShape(2.dp),
+                    backgroundColor = tag.tagColor.bgColor,
+                    elevation = 0.dp) {
+
+                    Box(contentAlignment = Alignment.Center){
+                        Row(modifier = Modifier.padding(8.dp,0.dp),
+                            horizontalArrangement = Arrangement.spacedBy(5.dp),
+                            verticalAlignment = Alignment.CenterVertically){
+
+                            Text(text = "#${tag.hashtagName}",
+                                style = TextStyle(
+                                    fontSize = 12.sp,
+                                    color = tag.tagColor.textColor,
+                                    fontFamily = FontFamily(Font(
+                                        resId = R.font.spoqa_hansansneo_regular,
+                                        weight = FontWeight.W500))))
+
+                            Image(painter = painterResource(id = R.drawable.ic_close),
+                                contentDescription = null,
+                                modifier = Modifier.size(12.dp))
+
+                        }
+                    }
+                }
+            })
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        /* 하단 저장하기 버튼 */
+        Button(shape = RoundedCornerShape(4.dp),
+            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = saveBtnColor, contentColor = saveTxtColor),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp)
+                .padding(start = 24.dp, end = 24.dp),
+            onClick = {
+                // 링크 수정
+                if(!linkUrl.isNullOrEmpty()) {
+                    viewModel.updateLink(LinkRegisterEntity(
+                        linkURL = linkUrl,
+                        hashtags = ArrayList(hashtags.map { it.hashtagName }))
+                    ){
+                        coroutineScope.launch {
+                            toast(ctx,"링크가 저장되었습니다!")
+                            sheetState.hide()
+                        }
+                    }
+                }
+            }) {
+
+            Text("저장하기",
+                textAlign = TextAlign.Center,
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    lineHeight = 17.5.sp,
+                    fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700))))
         }
     }
 }
@@ -353,34 +572,34 @@ fun ScrapMenuBtn(menuName: String, backgroundColor: Color = Color(0xFFEAF1FE), t
 @ExperimentalPagerApi
 @ExperimentalMaterialApi
 @Composable
-fun ScrapAlarmBottomSheet(type: Int, bottomSheetScaffoldState: BottomSheetScaffoldState, coroutineScope: CoroutineScope, viewModel: ScrapDetailViewModel? = null) {
+fun ScrapAlarmBottomSheet(sheetState : ModalBottomSheetState, coroutineScope: CoroutineScope, viewModel: ScrapDetailViewModel, linkData: LinkData) {
     // in Column Scope
-    Column(modifier = Modifier
-        .fillMaxWidth()
+    Column(modifier = Modifier.fillMaxWidth()
         .height(606.dp)) {
 
         val ctx = LocalContext.current
-        val alarmDate = remember { mutableStateOf(Calendar.getInstance().clearMillis()) }
+        val currentPickDate = remember { mutableStateOf(Calendar.getInstance().clearMillis()) }
+        val datePickerItems = DateUtil.getDateList()
+        val dateStr = currentPickDate.value.getAlarmDateStr()
+
+        val dateLastStr = "에 알림이 울려요!"
+        val alarmDateStr = "${dateStr}${dateLastStr}"
 
         // 닫기 버튼
         Row(horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
                 .height(56.dp)) {
 
             BottomSheetCloseBtn(painterResource(id = R.drawable.ic_close)){
-                coroutineScope.launch {
-                    bottomSheetScaffoldState.bottomSheetState.collapse() }
+                coroutineScope.launch { sheetState.hide() }
             }
         }
 
         // Alarm Guide Message
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .height(120.dp)
-                .padding(horizontal = 24.dp)) {
+        Column(Modifier.fillMaxWidth()
+            .height(120.dp)
+            .padding(horizontal = 24.dp)) {
 
             Text(text = "이 아티클은 \n언제 읽으실건가요?",
                 style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_bold, weight = FontWeight.W700)), fontSize = 24.sp, lineHeight = 32.4.sp, color = Color(0xFF292A2B)),
@@ -388,12 +607,8 @@ fun ScrapAlarmBottomSheet(type: Int, bottomSheetScaffoldState: BottomSheetScaffo
 
             Spacer(Modifier.height(8.dp))
 
-            val dateStr = "4월 10일 오전 12:50분"
-            val dateLastStr = "에 알림이 울려요!"
-            val alarmDateStr = "${dateStr}${dateLastStr}"
-
             AnnotatedString(
-                text = "${dateStr}${dateLastStr}",
+                text = alarmDateStr,
                 spanStyles = listOf(
 
                     AnnotatedString.Range(SpanStyle(
@@ -411,65 +626,52 @@ fun ScrapAlarmBottomSheet(type: Int, bottomSheetScaffoldState: BottomSheetScaffo
                     ), dateStr.length, alarmDateStr.length - 1)
 
                 )
-            ).let {
-                Text(text = it)
-            }
+            ).let { Text(text = it) }
         }
 
+
         // Date Picker
-        val datePickerItems = DateUtil.getDateList()
-        val currentPickDate = remember { mutableStateOf(Calendar.getInstance()) }
         CustomDatePicker(pickDate = currentPickDate.value, items = datePickerItems, onClickListener = { idx: Int, date: Pair<String, Calendar> ->
             currentPickDate.value = date.second
         })
 
         // Time Picker
-        CustomTimePicker(date = alarmDate.value,
-            modifier = Modifier
-                .fillMaxWidth()
+        CustomTimePicker(date = currentPickDate.value,
+            modifier = Modifier.fillMaxWidth()
                 .height(210.dp)
                 .padding(horizontal = 24.dp, vertical = 20.dp)) { type, timeVal ->
 
-            alarmDate.value = when (type) {
-                Calendar.AM_PM -> alarmDate.value.apply { set(Calendar.AM_PM, timeVal) }
-                Calendar.HOUR -> alarmDate.value.apply { set(Calendar.HOUR, timeVal) }
-                Calendar.MINUTE -> alarmDate.value.apply { set(Calendar.MINUTE, timeVal) }
-                else -> alarmDate.value
+            currentPickDate.value = when (type) {
+                Calendar.AM_PM -> currentPickDate.value.apply { set(Calendar.AM_PM, timeVal) }
+                Calendar.HOUR -> currentPickDate.value.apply { set(Calendar.HOUR, timeVal) }
+                Calendar.MINUTE -> currentPickDate.value.apply { set(Calendar.MINUTE, timeVal) }
+                else -> currentPickDate.value
             }
         }
 
         Spacer(Modifier.weight(1f))
 
         // 삭제, 저장하기 버튼
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .height(68.dp)
-                .padding(start = 24.dp, end = 24.dp, bottom = 16.dp)) {
+        Column(Modifier.fillMaxWidth()
+            .height(68.dp)
+            .padding(start = 24.dp, end = 24.dp, bottom = 16.dp)) {
 
             Row(Modifier.fillMaxSize()) {
 
-                if (type == ScrapDetailUI.SCRAP_ALARM_UPDATE_TYPE) Row(
-                    Modifier
-                        .width(64.dp)
-                        .fillMaxHeight()) {
+                /**
+                 * 링크 삭제하기
+                 */
+                if (linkData.linkId >= 0) Row(Modifier.width(64.dp)
+                    .fillMaxHeight()) {
 
                     Button(colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.White, contentColor = Color(0xFF4076F6)),
                         shape = RoundedCornerShape(4.dp),
-                        elevation = ButtonDefaults.elevation(
-                            defaultElevation = 0.dp,
-                            pressedElevation = 0.dp
-                        ),
+                        elevation = ButtonDefaults.elevation(defaultElevation = 0.dp, pressedElevation = 0.dp),
                         border = BorderStroke(width = 1.dp, Color(0xFF4076F6)),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp)
-                            .padding(end = 12.dp),
+                        modifier = Modifier.fillMaxWidth().height(52.dp).padding(end = 12.dp),
                         onClick = {
                             DLog.e("Jackson", "save click read button")
-                            coroutineScope.launch {
-                                bottomSheetScaffoldState.bottomSheetState.collapse()
-                            }
+                            coroutineScope.launch { sheetState.hide() }
                         }) {
 
                         Image(painter = painterResource(id = R.drawable.ic_blue_trash),
@@ -479,19 +681,19 @@ fun ScrapAlarmBottomSheet(type: Int, bottomSheetScaffoldState: BottomSheetScaffo
                     }
                 }
 
+                /**
+                 * 링크 저장하기
+                 */
                 Button(colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color(0xFF4076F6), contentColor = Color.White),
                     shape = RoundedCornerShape(4.dp),
-                    elevation = ButtonDefaults.elevation(
-                        defaultElevation = 0.dp,
-                        pressedElevation = 0.dp
-                    ),
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(52.dp),
+                    elevation = ButtonDefaults.elevation(defaultElevation = 0.dp, pressedElevation = 0.dp),
+                    modifier = Modifier.weight(1f).height(52.dp),
                     onClick = {
                         DLog.e("Jackson", "save click read button")
-                        viewModel?.addPersonalLinkAlarm(ctx, alarmDate.value)
-                        coroutineScope.launch { bottomSheetScaffoldState.bottomSheetState.collapse() }
+                        coroutineScope.launch {
+                            viewModel.addPersonalLinkAlarm(ctx, currentPickDate.value)
+                            sheetState.hide()
+                        }
                     }) {
 
                     Text("저장하기",
@@ -584,23 +786,4 @@ fun TagView(idx: Int, tagStr: String, backgroundColor: Color = Color(0xFFAAAAAA)
 
         }
     }
-}
-
-@ExperimentalPagerApi
-@ExperimentalMaterialApi
-@Composable
-fun BottomSheetLayout(bottomSheetScaffoldState: BottomSheetScaffoldState,
-                      coroutineScope: CoroutineScope,
-                      currentScreen: BottomSheetScreen,
-                      viewModel: ScrapDetailViewModel? = null) {
-
-    when(currentScreen){
-        is BottomSheetScreen.MenuScreen -> ScrapMenuSheet(currentScreen.type, bottomSheetScaffoldState, coroutineScope)
-        is BottomSheetScreen.AlarmScreen -> ScrapAlarmBottomSheet(currentScreen.type, bottomSheetScaffoldState, coroutineScope, viewModel)
-    }
-}
-
-sealed class BottomSheetScreen {
-    class MenuScreen(var type: Int): BottomSheetScreen()
-    class AlarmScreen(val type: Int): BottomSheetScreen()
 }

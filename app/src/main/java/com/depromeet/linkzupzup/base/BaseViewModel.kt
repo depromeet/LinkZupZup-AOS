@@ -71,4 +71,8 @@ open abstract class BaseViewModel : ViewModel() {
     var movePage: (intent: Intent, isFinish: Boolean)->Unit = { intent, isFinish -> }
     var toast: (msg: String)-> Toast? = { msg -> null }
 
+    var movePageForResult: (Intent, Boolean) -> Unit = { intent, isFinish -> }
+    var movePageForResultDelay: (Intent, Long, Boolean) -> Unit = { intent, time, isFinish -> }
+    var openActivityForResult: (Intent) -> Unit = { intent -> }
+
 }

@@ -16,6 +16,10 @@ interface LinkRepository {
 
     fun registerLink(linkRegisterEntity: LinkRegisterEntity): Observable<ResponseEntity<LinkAlarmEntity>>
 
+    fun updateLink(linkRegisterEntity: LinkRegisterEntity): Observable<ResponseEntity<LinkAlarmEntity>>
+
+    fun deleteLink(linkId: Int): Observable<ResponseEntity<LinkAlarmEntity>>
+
     fun getTodayReadCount(): Observable<ResponseEntity<Int>>
 
     fun setLinkRead(linkId: Int): Observable<ResponseEntity<LinkReadEntity>>

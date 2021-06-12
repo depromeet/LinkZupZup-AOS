@@ -8,6 +8,7 @@ import android.os.Looper
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -61,6 +62,10 @@ abstract class BaseActivity<VIEW: BaseView<VIEWMODEL>, VIEWMODEL: BaseViewModel>
             this.movePageDelay = this@BaseActivity.movePageDelay
             this.movePage = this@BaseActivity.movePage
             this.toast = this@BaseActivity.toast
+
+            this.movePageForResult = this@BaseActivity.movePageForResult
+            this.movePageForResultDelay = this@BaseActivity.movePageForResultDelay
+            this.openActivityForResult = this@BaseActivity.openActivityForResult
         }
         with(view) {
             lifecycleOwner = this@BaseActivity
@@ -79,6 +84,10 @@ abstract class BaseActivity<VIEW: BaseView<VIEWMODEL>, VIEWMODEL: BaseViewModel>
     var movePage: (intent: Intent, isFinish: Boolean)->Unit = { intent, isFinish -> movePage(intent, isFinish) }
     var toast: (msg: String) -> Toast = { msg -> toast(this@BaseActivity, msg) }
 
+    var movePageForResult: (Intent, Boolean) -> Unit = { intent, isFinish -> movePageForResult(intent, isFinish) }
+    var movePageForResultDelay: (Intent, Long, Boolean) -> Unit = { intent, time, isFinish -> movePageForResultDelay(intent, time, isFinish) }
+    var openActivityForResult: (Intent) -> Unit = { intent -> openActivityForResult(intent) }
+
     fun movePageDelay(intent: Intent, time: Long = 300L, isFinish: Boolean = false) {
         Observable.timer(time, TimeUnit.MILLISECONDS)
             .subscribe { movePage(intent, isFinish) }
@@ -87,13 +96,25 @@ abstract class BaseActivity<VIEW: BaseView<VIEWMODEL>, VIEWMODEL: BaseViewModel>
         Observable.timer(time, TimeUnit.MILLISECONDS)
             .subscribe { movePage(cls, isFinish) }
     }
-    private fun movePage(cls: Class<*>, isFinish: Boolean = false) {
+    fun movePage(cls: Class<*>, isFinish: Boolean = false) {
         movePage(Intent(this@BaseActivity, cls), isFinish)
     }
-    private fun movePage(intent: Intent, isFinish: Boolean = false) {
+    fun movePage(intent: Intent, isFinish: Boolean = false) {
         intent.let(this::startActivity)
         if (isFinish) finish()
+    }
 
+    var startForResult: ActivityResultLauncher<Intent>? = null
+    fun movePageForResult(intent: Intent, isFinish: Boolean = false) {
+        openActivityForResult(intent)
+        if (isFinish) finish()
+    }
+    fun movePageForResultDelay(intent: Intent, time: Long = 300L, isFinish: Boolean = false) {
+        Observable.timer(time, TimeUnit.MILLISECONDS)
+            .subscribe { movePageForResult(intent, isFinish) }
+    }
+    fun openActivityForResult(intent: Intent) {
+        startForResult?.launch(intent)
     }
 
     private fun toast(msg: String): Toast {

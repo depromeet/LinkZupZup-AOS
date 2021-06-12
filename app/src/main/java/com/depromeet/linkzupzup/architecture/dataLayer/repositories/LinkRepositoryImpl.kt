@@ -25,6 +25,14 @@ class LinkRepositoryImpl(private val roomDB: RoomDB, private val linkDataSource:
         return linkDataSource.insertLink(linkRegisterEntity)
     }
 
+    override fun updateLink(linkRegisterEntity: LinkRegisterEntity): Observable<ResponseEntity<LinkAlarmEntity>> {
+        return linkDataSource.updateLink(linkRegisterEntity = linkRegisterEntity)
+    }
+
+    override fun deleteLink(linkId: Int): Observable<ResponseEntity<LinkAlarmEntity>> {
+        return linkDataSource.deleteLink(linkId = linkId)
+    }
+
     override fun getTodayReadCount(): Observable<ResponseEntity<Int>> {
         return linkDataSource.getTodayReadCount()
     }

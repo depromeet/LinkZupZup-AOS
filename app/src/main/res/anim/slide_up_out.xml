@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Activity에서 팝업과 같은 효과를 적용할때 사용합니다. -->
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <translate
+        android:duration="@integer/activity_anim_time"
+        android:fromYDelta="0%"
+        android:toYDelta="100%" />
+
+</set>

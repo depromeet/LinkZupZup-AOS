@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Activity에서 팝업과 같은 효과를 적용할때 사용합니다. -->
-<set xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shareInterpolator="true">
+<set xmlns:android="http://schemas.android.com/apk/res/android">
 
     <translate
-        android:duration="300"
-        android:fromYDelta="100%"
+        android:duration="@integer/activity_anim_time"
+        android:fromYDelta="-50%"
         android:toYDelta="0%" />
 
 </set>

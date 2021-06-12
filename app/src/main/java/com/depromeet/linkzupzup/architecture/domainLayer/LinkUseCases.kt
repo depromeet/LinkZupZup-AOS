@@ -34,6 +34,20 @@ class LinkUseCases(private val linkRepositoryImpl: LinkRepositoryImpl) {
     }
 
     /**
+     * 링크 수정
+     */
+    fun updateLink(linkRegisterEntity: LinkRegisterEntity): Observable<ResponseEntity<LinkAlarmEntity>> {
+        return linkRepositoryImpl.updateLink(linkRegisterEntity = linkRegisterEntity)
+    }
+
+    /**
+     * 링크 삭제
+     */
+    fun deleteLink(linkId: Int): Observable<ResponseEntity<LinkAlarmEntity>> {
+        return linkRepositoryImpl.deleteLink(linkId = linkId)
+    }
+
+    /**
      * 오늘 읽은 링크 수 조회
      */
     fun getTodayReadCount(): Observable<ResponseEntity<Int>>{
