@@ -350,7 +350,7 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
                     alignment = Alignment.Center,
                     painter =  painter)
 
-                MainAlarmCard() // 리마인더 유무에 따라 현재 행 추가하시면 됩니다.
+                // MainAlarmCard() // 리마인더 유무에 따라 현재 행 추가하시면 됩니다.
             }
 
             Spacer(modifier = Modifier.width(10.dp))
