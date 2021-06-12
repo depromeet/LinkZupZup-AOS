@@ -46,7 +46,7 @@ class WebViewViewModel(private val linkUseCases: LinkUseCases) : BaseViewModel()
     fun setLinkUrl(url: String) {
         _linkUrl.value = url
     }
-    fun setLinkId(Id: Int) {
+    fun setLinkId(id: Int) {
         _linkId.value = id
     }
     fun setIsCompleted(isCompleted: Boolean){
