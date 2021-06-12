@@ -32,7 +32,7 @@ interface LinkAPIService {
     fun getTodayReadCount(): Observable<ResponseEntity<Int>>
 
     @PATCH("${ApiUrl.LINK_READ}/{linkId}")
-    fun setLinkRead(@Path("id") linkId: Int): Observable<ResponseEntity<LinkReadEntity>>
+    fun setLinkRead(@Path("linkId") linkId: Int): Observable<ResponseEntity<LinkReadEntity>>
 
 
 }

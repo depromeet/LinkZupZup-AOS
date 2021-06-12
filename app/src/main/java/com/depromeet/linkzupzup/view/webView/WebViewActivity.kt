@@ -17,8 +17,10 @@ class WebViewActivity : BaseActivity<WebViewUI,WebViewViewModel>() {
         intent?.run {
             val linkId = getIntExtra(AppConst.WEB_LINK_ID, -1)
             val linkUrl = getStringExtra(AppConst.WEB_LINK_URL) ?: ""
+            var isCompleted = getBooleanExtra(AppConst.WEB_LINK_READ, false)
             viewModel.setLinkId(linkId)
             viewModel.setLinkUrl(linkUrl)
+            viewModel.setIsCompleted(isCompleted)
         }
     }
 

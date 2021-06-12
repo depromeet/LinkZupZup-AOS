@@ -22,6 +22,7 @@ object AppConst {
     const val LINK_ITEM = "link_item"
     const val WEB_LINK_URL = "web_link_url"
     const val WEB_LINK_ID = "web_link_id"
+    const val WEB_LINK_READ = "web_link_read"
 
     // TCP Handshake가 완료되기까지 지속되는 시간
     const val CONNECTION_TIMEOUT: Long = 15

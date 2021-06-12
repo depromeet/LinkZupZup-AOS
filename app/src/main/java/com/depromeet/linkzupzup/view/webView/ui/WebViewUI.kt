@@ -32,6 +32,7 @@ import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.base.BaseView
 import com.depromeet.linkzupzup.extensions.noRippleClickable
 import com.depromeet.linkzupzup.architecture.presenterLayer.WebViewViewModel
+import com.depromeet.linkzupzup.extensions.mutableStateValue
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.DLog
 
@@ -45,15 +46,23 @@ class WebViewUI(var clickListener: (Int)->Unit = {}) : BaseView<WebViewViewModel
             Surface(color = Color.White) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     val openDialog = remember { mutableStateOf(false)  }
-                    val readCount = remember { mutableStateOf(0) }
 
                     vm?.let { viewModel ->
                         val linkId by viewModel.linkId.observeAsState(-1)
-                        val linkUrl = viewModel.linkUrl.value ?: "naver.com"
+                        val linkUrl = viewModel.linkUrl.value ?: "https://www.naver.com"
+                        val readCount by viewModel.todayReadCnt.observeAsState(0)
+                        val isCompleted by viewModel.isCompleted.observeAsState(false)
+
+                        val completed = remember { mutableStateOf(isCompleted) }
+
                         Scaffold(
-                            topBar = { WebViewTopBar(openDialog = openDialog, vm = vm, clickListener = clickListener) },
                             backgroundColor = Color.Transparent,
-                            modifier = Modifier.fillMaxSize()) {
+                            modifier = Modifier.fillMaxSize(),
+                            topBar = { WebViewTopBar(completed, clickListener = clickListener){
+                                viewModel.setLinkRead(linkId = linkId){
+                                    openDialog.value = true
+                                } }
+                            }) {
 
                             AndroidView(factory = {
                                 WebView(it).apply {
@@ -70,7 +79,6 @@ class WebViewUI(var clickListener: (Int)->Unit = {}) : BaseView<WebViewViewModel
                                         useWideViewPort = true  // 화면 사이즈 맞추기 허용
                                         setSupportZoom(true)    // 화면 줌 허용
                                         builtInZoomControls = false // 화면 확대 축소 허용 여부
-                                        cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK // 브라우저 캐시 허용 여부
                                         domStorageEnabled = true    // 로컬저장소 허용
                                     }
 
@@ -84,7 +92,7 @@ class WebViewUI(var clickListener: (Int)->Unit = {}) : BaseView<WebViewViewModel
                             })
                         }
 
-                        WebViewCustomDialog(readCount = readCount, openDialog = openDialog)
+                        WebViewCustomDialog(viewModel, readCount = readCount, openDialog = openDialog, completed)
 
                     }
                 }
@@ -92,18 +100,15 @@ class WebViewUI(var clickListener: (Int)->Unit = {}) : BaseView<WebViewViewModel
         }
     }
 }
-//@SuppressLint("SetJavaScriptEnabled")
-//@Composable
-//fun WebPageScreen(urlToRender: String, openDialog: MutableState<Boolean>, vm: WebViewViewModel? = null, clickListener: (Int) -> Unit) {
-//
-//
-//}
 
 
 @Composable
-fun WebViewTopBar(openDialog: MutableState<Boolean>,vm: WebViewViewModel? = null,clickListener: (Int) -> Unit){
+fun WebViewTopBar(isCompleted: MutableState<Boolean>, clickListener: (Int) -> Unit, onReadClick: () -> Unit){
 
-    val todayCnt = vm?.todayReadCnt?.observeAsState()
+    val readBtnColor = if (!isCompleted.value) Blue50 else Gray50t
+    val readTxtColor = if (!isCompleted.value) Color.White else Gray70
+    val readBtnEnabled = !isCompleted.value
+
 
     Box(modifier = Modifier
         .fillMaxWidth()
@@ -136,19 +141,13 @@ fun WebViewTopBar(openDialog: MutableState<Boolean>,vm: WebViewViewModel? = null
                             weight = FontWeight.W500))))
 
             Button(shape = RoundedCornerShape(4.dp),
-                colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Blue50, contentColor = Color.White),
+                colors = ButtonDefaults.outlinedButtonColors(backgroundColor = readBtnColor, contentColor = readTxtColor),
                 modifier = Modifier
                     .width(60.dp)
                     .height(36.dp),
+                enabled = readBtnEnabled,
                 onClick = {
-                    vm?.run {
-                        setLinkRead(2)  // 링크 아이디
-                        todayCnt?.value?.let {
-                            if(it.completed){
-                                openDialog.value = true
-                            }
-                        }
-                    }
+                    onReadClick()
                 }) {
 
                 Text("완료!",
@@ -189,14 +188,18 @@ fun WebViewBackButton(painter: Painter, onClick : () -> Unit){
 }
 
 @Composable
-fun WebViewCustomDialog(readCount: MutableState<Int>, openDialog : MutableState<Boolean>){
-    if (openDialog.value) WebViewCustomDialog(readCount = readCount){ openDialog.value = false }
+fun WebViewCustomDialog(vm:WebViewViewModel, readCount: Int, openDialog : MutableState<Boolean>, isCompleted: MutableState<Boolean>){
+    if (openDialog.value) CustomDialog(readCount = readCount){
+        openDialog.value = false
+        vm.setIsCompleted(true)
+        isCompleted.value = true
+    }
 }
 
 @Composable
-fun WebViewCustomDialog( readCount: MutableState<Int>, onDismissRequest: () -> Unit){
+fun CustomDialog( readCount: Int, onDismissRequest: () -> Unit){
     Dialog(onDismissRequest = onDismissRequest) {
-        DialogBody(readCount.value, onDismissRequest)
+        DialogBody(readCount, onDismissRequest)
     }
 }
 
