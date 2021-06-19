@@ -142,9 +142,9 @@ class ScrapDetailViewModel(private val linkUseCases: LinkUseCases, private val m
 
     fun moveWebViewPage(linkData: LinkData) {
         getIntent(WebViewActivity::class.java)?.apply {
-            putExtra(AppConst.LINK_ID, linkData.linkId)
+            putExtra(AppConst.WEB_LINK_ID, linkData.linkId)
             putExtra(AppConst.WEB_LINK_URL, linkData.linkURL)
-            putExtra(AppConst.WEB_LINK_COMPLETED, linkData.completed)
+            putExtra(AppConst.WEB_LINK_READ, linkData.completed)
         }?.let { movePageDelay(it, 300L, false) }
     }
 

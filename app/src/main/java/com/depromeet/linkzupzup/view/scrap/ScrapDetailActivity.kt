@@ -26,14 +26,22 @@ class ScrapDetailActivity : BaseActivity<ScrapDetailUI, ScrapDetailViewModel>() 
 
     private fun onClickListener(id: Int){
         when(id) {
-            R.id.activity_close -> onBackPressed()
+            R.id.activity_close -> {
+                val isRefresh = viewModel.isRefresh.value ?: false
+                setResult(isRefresh)
+                onBackPressed()
+            }
         }
     }
 
-    override fun onBackPressed() {
+    private fun setResult(isRefresh: Boolean) {
         Intent().apply {
             putExtra(AppConst.IS_REFRESH, viewModel.isRefresh.value)
         }.let { setResult(Activity.RESULT_OK, it) }
+    }
+
+    override fun onBackPressed() {
+
         super.onBackPressed()
     }
 }

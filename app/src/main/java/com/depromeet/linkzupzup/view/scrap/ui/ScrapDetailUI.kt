@@ -305,14 +305,13 @@ fun LinkScrapBottomSheet(viewModel: ScrapDetailViewModel, clickListener: (Int) -
 
                                 Spacer(Modifier.height(20.dp))
 
-                                Button(onClick = { DLog.e("Jackson", "click read button") },
+                                Button(onClick = { viewModel.moveWebViewPage(linkData = linkInfo) },
                                     colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color(0xFF4076F6), contentColor = Color.White),
                                     shape = RoundedCornerShape(4.dp),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(52.dp)
-                                        .padding(horizontal = 24.dp)
-                                        .clickable { viewModel.moveWebViewPage(linkData = linkInfo) }) {
+                                        .padding(horizontal = 24.dp)) {
 
                                     Text("바로 읽기!",
                                         style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W700)), fontSize = 14.sp, lineHeight = 17.5.sp),
