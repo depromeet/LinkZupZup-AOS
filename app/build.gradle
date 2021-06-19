@@ -71,6 +71,10 @@ dependencies {
     implementation lib.koin.scope
     implementation lib.koin.architecture
 
+    lib.anko.libNames.each { name ->
+        implementation "org.jetbrains.anko:anko-$name:$ankoVersion"
+    }
+
     implementation lib.rxJava2.runtime
     implementation lib.rxJava2.rxAndroid
     implementation lib.retrofit2.runtime

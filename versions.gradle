@@ -1,6 +1,7 @@
 ext {
     kotlinVersion = '1.4.32'
     composeVersion = '1.0.0-beta06'
+    ankoVersion = "0.10.8"
     koinVersion = '2.2.0'
     rxjava2Version = "2.0.1"
     retrofit2Version = "2.1.0"
@@ -49,6 +50,11 @@ koin.test = "org.koin:koin-test:$koinVersion"
 // Needed JUnit version
 koin.testJunit = "org.koin:koin-test-junit4:$koinVersion"
 lib.koin = koin
+
+/* Anko */
+def anko = [:]
+anko.libNames = ['sdk15', 'support-v4', 'design', 'appcompat-v7', 'recyclerview-v7', 'percent', 'cardview-v7', 'design-coroutines', 'constraint-layout']
+lib.anko = anko
 
 /* RxJava2 */
 def rxJava2 = [:]
