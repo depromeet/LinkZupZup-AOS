@@ -157,8 +157,7 @@ fun LinkScrapBottomSheet(viewModel: ScrapDetailViewModel, clickListener: (Int) -
                 .background(color = Color.White)) {
 
                 // content
-                Column(modifier = Modifier
-                    .fillMaxWidth()
+                Column(modifier = Modifier.fillMaxWidth()
                     .fillMaxHeight()
                     .scrollable(state = rememberScrollState(), orientation = Orientation.Vertical)) {
 

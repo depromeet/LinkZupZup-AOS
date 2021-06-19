@@ -8,8 +8,6 @@ import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.architecture.presenterLayer.ScrapDetailViewModel
 import com.depromeet.linkzupzup.base.BaseAnkoActivity
 import com.depromeet.linkzupzup.view.scrap.ui.ScrapDetailAnkoUI
-import org.jetbrains.anko.UI
-import org.jetbrains.anko.verticalLayout
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 
 class ScrapDetailAnkoActivity : BaseAnkoActivity<ScrapDetailAnkoUI, ScrapDetailViewModel>() {
@@ -24,10 +22,6 @@ class ScrapDetailAnkoActivity : BaseAnkoActivity<ScrapDetailAnkoUI, ScrapDetailV
             val linkUrl = intent.getStringExtra(AppConst.LINK_URL) ?: ""
             getLinkDetail(linkId = linkId)
         }
-
-        UI {
-            verticalLayout {  }
-        }.view
     }
 
     private fun onClickListener(id: Int){
