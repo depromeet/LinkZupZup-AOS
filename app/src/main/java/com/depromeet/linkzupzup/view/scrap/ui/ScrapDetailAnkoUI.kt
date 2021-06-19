@@ -1,9 +1,9 @@
 package com.depromeet.linkzupzup.view.scrap.ui
 import android.app.Activity
 import android.graphics.Color
+import android.view.Gravity
 import android.widget.ImageView
-import androidx.compose.ui.unit.dp
-import androidx.core.view.marginTop
+import androidx.core.content.res.ResourcesCompat
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.architecture.presenterLayer.ScrapDetailViewModel
 import com.depromeet.linkzupzup.base.BaseAnkoView
@@ -31,7 +31,25 @@ class ScrapDetailAnkoUI(private val clickListener: (Int) -> Unit): BaseAnkoView<
 
 
                         linearLayout {
-                            imageView()
+                            gravity = Gravity.BOTTOM
+
+                            /**
+                             * 작성자 프로필 이미지
+                             */
+                            imageView {
+                            }.lparams(width= dip(48), height= dip(48)) {
+                                rightMargin = dip(8)
+                            }
+
+                            /**
+                             * 작성자 이름
+                             */
+                            textView("글쓴이") {
+                                textSize = dip(12).toFloat()
+                                textColor = Color.parseColor("#878D91")
+                                typeface = ResourcesCompat.getFont(context, R.font.spoqa_hansansneo_medium)
+                                gravity = Gravity.CENTER
+                            }.lparams(width= wrapContent, height= wrapContent)
                         }.lparams(width= wrapContent, height= dip(48))
 
                     }.lparams(width= matchParent, height= dip(60)) {
