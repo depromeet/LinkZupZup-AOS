@@ -2,6 +2,7 @@ package com.depromeet.linkzupzup.architecture.presenterLayer
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.depromeet.linkzupzup.StatusConst
 import com.depromeet.linkzupzup.architecture.domainLayer.LinkUseCases
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkReadEntity
@@ -9,6 +10,7 @@ import com.depromeet.linkzupzup.base.BaseViewModel
 import com.depromeet.linkzupzup.utils.DLog
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.launch
 
 class WebViewViewModel(private val linkUseCases: LinkUseCases) : BaseViewModel() {
 
@@ -35,7 +37,11 @@ class WebViewViewModel(private val linkUseCases: LinkUseCases) : BaseViewModel()
                         response.data?.let {
                             _todayReadCnt.value = it.seasonCount
                             callback()
+
                             preference?.let { pref-> pref.setTodayCount( pref.getTodayCount() + 1 ) }
+                            viewModelScope.launch {
+                                linkUseCases.readComplete(linkId = linkId)
+                            }
                         }
                     }
                     else -> { DLog.e("WebView response", response.comment) }

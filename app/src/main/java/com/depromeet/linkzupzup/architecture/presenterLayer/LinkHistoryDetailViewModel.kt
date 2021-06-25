@@ -16,6 +16,7 @@ import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData.Compa
 import com.depromeet.linkzupzup.component.MetaDataManager
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.scrap.ScrapDetailActivity
+import com.depromeet.linkzupzup.view.scrap.ScrapDetailAnkoActivity
 import com.google.gson.Gson
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -111,6 +112,7 @@ class LinkHistoryDetailViewModel(private val linkUseCases: LinkUseCases): BaseVi
                             it.description = metaData.content
                             it.imgURL = metaData.imgUrl
                             it.author = metaData.author
+                            it.authorImgUrl = metaData.authorImgUrl
                         }
                     }
                     callback(metaData)
@@ -136,7 +138,7 @@ class LinkHistoryDetailViewModel(private val linkUseCases: LinkUseCases): BaseVi
     }
 
     fun moveScrapDetail(linkData: LinkData) {
-        getIntent(ScrapDetailActivity::class.java)?.apply {
+        getIntent(ScrapDetailAnkoActivity::class.java)?.apply {
             putExtra(AppConst.LINK_ID, linkData.linkId)
             putExtra(AppConst.LINK_URL, linkData.linkURL)
         }?.let { movePageDelay(it, 300L, false) }

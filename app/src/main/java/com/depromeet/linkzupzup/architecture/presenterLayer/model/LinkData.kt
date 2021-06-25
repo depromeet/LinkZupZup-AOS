@@ -18,12 +18,15 @@ data class LinkData(
     var imgURL : String = "",
     var description : String = "",
     var author : String = "",
+    var authorImgUrl : String = "",
     var hasReminder: Boolean = false,
     var hashtags: ArrayList<LinkHashData> = arrayListOf(),
     var createdAt: Date = Date(0),
     var completedAt: Date = Date(0),
     var completed: Boolean = false,
-    var tagColor: TagColor = CommonUtil.getRandomeTagColor()): Parcelable {
+    var tagColor: TagColor = CommonUtil.getRandomeTagColor(),
+    var alarmEnabled: Boolean = false,
+    var alarmDt: Date? = null): Parcelable {
 
     /* 향후 삭제 예정 */
     companion object {

@@ -87,6 +87,7 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
                             metaDescription = target.content
                             metaImageUrl = target.imgUrl
                             metaAuthor = target.author
+                            metaAuthorImgUrl = target.authorImgUrl
 
                             DLog.e("Main","메타 $metaAuthor 엔티티 ${target.author}")
                         }
@@ -119,6 +120,7 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
                         it.description = metaData.content
                         it.imgURL = metaData.imgUrl
                         it.author = metaData.author
+                        it.authorImgUrl = metaData.authorImgUrl
                     }
                 }
                 callback(metaData)

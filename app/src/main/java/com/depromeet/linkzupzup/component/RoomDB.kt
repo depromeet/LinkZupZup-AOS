@@ -4,8 +4,9 @@ import android.content.Context
 import androidx.room.*
 import com.depromeet.linkzupzup.architecture.dataLayer.dao.LinkMetaInfoDao
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.PersonalLinkEntity
 
-@Database(version = 1, entities = [LinkMetaInfoEntity::class], exportSchema = false)
+@Database(version = 1, entities = [LinkMetaInfoEntity::class, PersonalLinkEntity::class], exportSchema = false)
 @TypeConverters(RoomConverter::class)
 abstract class RoomDB : RoomDatabase(){
 

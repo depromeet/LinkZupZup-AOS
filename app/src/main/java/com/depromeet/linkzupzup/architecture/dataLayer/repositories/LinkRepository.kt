@@ -6,6 +6,7 @@ import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmE
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkReadEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.PersonalLinkEntity
 import io.reactivex.Observable
 
 interface LinkRepository {
@@ -27,5 +28,11 @@ interface LinkRepository {
     suspend fun getMetaList(urls: ArrayList<String>) : List<LinkMetaInfoEntity>
 
     suspend fun insertMetaInfo(metaInfoEntity: LinkMetaInfoEntity)
+
+    suspend fun insertPersonalLinkAlarm(personalLinkEntity: PersonalLinkEntity): Long
+
+    suspend fun getPersonalLinkAlarm(linkId: Int): PersonalLinkEntity?
+
+    suspend fun readComplete(linkId: Int)
 
 }

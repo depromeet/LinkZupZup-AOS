@@ -28,14 +28,14 @@ class WebViewActivity : BaseActivity<WebViewUI,WebViewViewModel>() {
         when (id) {
             R.id.activity_close -> {
                 super.onBackPressed()
-                overridePendingTransition(R.anim.stay, R.anim.act_slide_right_out)
             }
             else -> {}
         }
     }
 
-    override fun onBackPressed() = view.webView?.run {
-        if (canGoBack()) goBack() else super.onBackPressed()
-    } ?: super.onBackPressed()
-
+    override fun onBackPressed() {
+        view.webView?.run {
+            if (canGoBack()) goBack() else super.onBackPressed()
+        } ?: super.onBackPressed()
+    }
 }

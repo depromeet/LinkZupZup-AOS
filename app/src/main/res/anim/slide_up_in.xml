@@ -4,7 +4,7 @@
 
     <translate
         android:duration="@integer/activity_anim_time"
-        android:fromYDelta="-50%"
+        android:fromYDelta="100%p"
         android:toYDelta="0%" />
 
 </set>

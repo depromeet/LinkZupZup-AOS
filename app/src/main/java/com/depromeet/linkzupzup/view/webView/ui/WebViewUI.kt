@@ -84,11 +84,11 @@ class WebViewUI(var clickListener: (Int)->Unit = {}) : BaseView<WebViewViewModel
 
                                     webView = this
                                     DLog.e("loadUrl", "link: $linkUrl")
-                                    loadUrl(linkUrl)
+                                    postDelayed({ loadUrl(linkUrl) }, 300)
                                 }
                             }, update = {
                                 DLog.e("loadUrl", "update, link: $linkUrl")
-                                it.loadUrl(linkUrl)
+                                it.postDelayed({ it.loadUrl(linkUrl) }, 300)
                             })
                         }
 

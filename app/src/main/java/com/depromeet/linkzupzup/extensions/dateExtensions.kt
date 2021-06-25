@@ -111,7 +111,7 @@ fun Calendar.setAMorPM(amOrPm: Int): Calendar = apply { set(Calendar.AM_PM, amOr
 /**
  * Calendar -> Month
  */
-fun Calendar.getMonth(): Int = get(Calendar.MONTH)
+fun Calendar.getMonth(): Int = get(Calendar.MONTH).plus(1)
 fun Calendar.setMonth(month: Int): Calendar = apply { set(Calendar.MONTH, month) }
 
 /**

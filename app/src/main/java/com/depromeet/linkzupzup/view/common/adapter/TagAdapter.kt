@@ -12,7 +12,7 @@ import com.depromeet.linkzupzup.view.common.PaddingValues
 import com.depromeet.linkzupzup.view.common.holder.TagUI
 import com.depromeet.linkzupzup.view.common.holder.TagViewHolder
 
-class TagAdapter(override val ctx: Context, var tagType: Int = TAG_TYPE_SMALL) : BaseAdapter() {
+class TagAdapter(override val ctx: Context, var tagType: Int = TAG_TYPE_SMALL) : BaseAdapter<RecyclerView.ViewHolder>() {
 
     companion object {
         const val TAG_TYPE_SMALL = 101010
@@ -43,7 +43,7 @@ class TagAdapter(override val ctx: Context, var tagType: Int = TAG_TYPE_SMALL) :
 
     override fun getItemViewType(position: Int): Int = tagType
 
-    fun addList(list: ArrayList<LinkHashData>) {
+    fun initList(list: ArrayList<LinkHashData>) {
         this.list.clear()
         this.list.addAll(list)
         setBasicItemCount(this.list.size)

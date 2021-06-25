@@ -1,5 +1,6 @@
 package com.depromeet.linkzupzup.component
 
+import android.net.Uri
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
 import com.depromeet.linkzupzup.extensions.verifyImgUrlDomain
 import com.depromeet.linkzupzup.utils.DLog
@@ -63,10 +64,15 @@ object MetaDataManager {
         try {
             val sslSocketFactory = SSLHelper.initSSL()
             val doc : Document = Jsoup.connect(url).sslSocketFactory(sslSocketFactory).userAgent("Mozilla").get()
+
+            val uri = Uri.parse(url)
+            val favicon = with(uri) { "${scheme}://${authority}/favicon.ico"}
+
             metaData.title = doc.select("meta[property=og:title]")?.first()?.attr("content") ?: ""
             metaData.content = doc.select("meta[property=og:description]")?.first()?.attr("content") ?: ""
             metaData.imgUrl = doc.select("meta[property=og:image]")?.first()?.attr("content")?.verifyImgUrlDomain() ?: ""
             metaData.author = doc.select("meta[property=og:site_name]")?.first()?.attr("content") ?: "글쓴이"
+            metaData.authorImgUrl = doc.head().select("link[href~=.*\\.ico]")?.first()?.attr("href")?.verifyImgUrlDomain() ?: favicon
 
             // brunch, Medium 두 가지 사이트에 대해서만 저자 정보를 따로 저장해주고, 나머지는 사이트명으로 대체합니다.
             metaData.author = when(metaData.author){

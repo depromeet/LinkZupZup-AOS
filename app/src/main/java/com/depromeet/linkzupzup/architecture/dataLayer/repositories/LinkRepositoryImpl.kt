@@ -7,8 +7,8 @@ import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmE
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkReadEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.PersonalLinkEntity
 import com.depromeet.linkzupzup.component.RoomDB
-import com.depromeet.linkzupzup.utils.DLog
 import io.reactivex.Observable
 
 class LinkRepositoryImpl(private val roomDB: RoomDB, private val linkDataSource: LinkDataSource): LinkRepository {
@@ -42,13 +42,23 @@ class LinkRepositoryImpl(private val roomDB: RoomDB, private val linkDataSource:
     }
 
     override suspend fun getMetaList(urls: ArrayList<String>): List<LinkMetaInfoEntity> {
-        DLog.e("TEST","SELECT * FROM LinkMetaInfo WHERE meta_url IN(${ urls.joinToString(",") })")
         return roomDB.metaDao().getMetaInfoList(urls)
     }
 
     override suspend fun insertMetaInfo(metaInfoEntity: LinkMetaInfoEntity) {
-        DLog.e("TEST","INSERT INTO LinkMetaInfo : ${metaInfoEntity.url} ${metaInfoEntity.imgUrl}")
         roomDB.metaDao().insertMetaInfo(metaInfoEntity)
+    }
+
+    override suspend fun insertPersonalLinkAlarm(personalLinkEntity: PersonalLinkEntity): Long {
+        return roomDB.metaDao().insertPersonalLinkAlarm(personalLinkEntity = personalLinkEntity)
+    }
+
+    override suspend fun getPersonalLinkAlarm(linkId: Int): PersonalLinkEntity? {
+        return roomDB.metaDao().getPersonalLinkAlarm(linkId= linkId)
+    }
+
+    override suspend fun readComplete(linkId: Int) {
+        return roomDB.metaDao().readComplete(linkId = linkId)
     }
 
 }

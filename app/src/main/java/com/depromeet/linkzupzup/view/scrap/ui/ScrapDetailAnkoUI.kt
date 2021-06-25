@@ -6,13 +6,20 @@ import android.text.TextUtils
 import android.util.TypedValue
 import android.view.Gravity
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.architecture.presenterLayer.ScrapDetailViewModel
 import com.depromeet.linkzupzup.base.BaseAnkoView
+import com.depromeet.linkzupzup.utils.DeviceUtils
 import com.depromeet.linkzupzup.view.common.adapter.TagAdapter
+import com.depromeet.linkzupzup.view.dialog.LinkAlaramBottomDialog
+import com.depromeet.linkzupzup.view.dialog.LinkAlaramBottomDialog.Companion.ALARM_REGIST_TYPE
+import com.depromeet.linkzupzup.view.dialog.LinkAlaramBottomDialog.Companion.ALARM_UPDATE_TYPE
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import org.jetbrains.anko.*
 import org.jetbrains.anko.cardview.v7.cardView
 import org.jetbrains.anko.recyclerview.v7.recyclerView
@@ -21,9 +28,23 @@ class ScrapDetailAnkoUI(private val clickListener: (Int) -> Unit): BaseAnkoView<
 
     lateinit var mTopBannerImg: ImageView
 
+    lateinit var mWriterImg: ImageView
+
+    lateinit var mWriterTv: TextView
+
+    lateinit var mScrapTitleTv: TextView
+
+    lateinit var mScrapContentTv: TextView
+
     lateinit var rv: RecyclerView
 
+    lateinit var mAlarmSetBtn: LinearLayout
+
+    lateinit var mAlarmSetTv: TextView
+
     var adapter: TagAdapter? = null
+
+    private val bottomDialog: LinkAlaramBottomDialog = LinkAlaramBottomDialog { vm!! }
 
     override fun createView(ui: AnkoContext<Activity>) = with(ui) {
         relativeLayout {
@@ -47,7 +68,9 @@ class ScrapDetailAnkoUI(private val clickListener: (Int) -> Unit): BaseAnkoView<
                             /**
                              * 작성자 프로필 이미지
                              */
-                            imageView(R.drawable.ic_scrap_profile_img) {
+                            mWriterImg = imageView(R.drawable.ic_scrap_profile_img) {
+                                backgroundResource = R.drawable.writer_round_shape
+                                clipToOutline = true
                             }.lparams(width= dip(48), height= dip(48)) {
                                 rightMargin = dip(8)
                             }
@@ -55,7 +78,7 @@ class ScrapDetailAnkoUI(private val clickListener: (Int) -> Unit): BaseAnkoView<
                             /**
                              * 작성자 이름
                              */
-                            textView("글쓴이") {
+                            mWriterTv = textView("글쓴이") {
                                 typeface = ResourcesCompat.getFont(context, R.font.spoqa_hansansneo_regular)
                                 setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.scrap_writer_text_size))
                                 setLineSpacing(resources.getDimension(R.dimen.scrap_writer_line_height), 1.0f)
@@ -92,7 +115,7 @@ class ScrapDetailAnkoUI(private val clickListener: (Int) -> Unit): BaseAnkoView<
                     /**
                      * 링크 타이틀
                      */
-                    textView("스타트업과 안맞는 대기업 임원 DNA는 어떻게 찾아낼까?") {
+                    mScrapTitleTv = textView("스타트업과 안맞는 대기업 임원 DNA는 어떻게 찾아낼까?") {
 
                         typeface = ResourcesCompat.getFont(context, R.font.spoqa_hansansneo_bold)
                         setTextSize(TypedValue.COMPLEX_UNIT_PX, dip(18).toFloat())
@@ -109,7 +132,7 @@ class ScrapDetailAnkoUI(private val clickListener: (Int) -> Unit): BaseAnkoView<
                     /**
                      * 링크 상세
                      */
-                    textView("IT 기업을 중심으로 빠르게 사업을 실행을 하는 것이 사업의 중요한 경쟁력이 된다는 것은 이미 공감대가 만들어져 있다. 그리고 서바이벌을 고민해야 하는 스타트업에서는 그 중요성은 더욱더 크게 받...") {
+                    mScrapContentTv = textView("IT 기업을 중심으로 빠르게 사업을 실행을 하는 것이 사업의 중요한 경쟁력이 된다는 것은 이미 공감대가 만들어져 있다. 그리고 서바이벌을 고민해야 하는 스타트업에서는 그 중요성은 더욱더 크게 받...") {
 
                         typeface = ResourcesCompat.getFont(context, R.font.spoqa_hansansneo_medium)
                         setTextSize(TypedValue.COMPLEX_UNIT_PX, dip(12).toFloat())
@@ -138,15 +161,32 @@ class ScrapDetailAnkoUI(private val clickListener: (Int) -> Unit): BaseAnkoView<
                     /**
                      * 이 링크는 따로 알람을 받고싶어요!
                      */
-                    linearLayout {
+                    mAlarmSetBtn = linearLayout {
                         gravity = Gravity.CENTER_VERTICAL
+
+                        setOnClickListener {
+                            fragmentManager?.let {
+                                bottomDialog.show(it, null)
+//                                BottomSheetDialog(context, R.style.CustomBottomSheetDialog).apply {
+//                                    setContentView(context.UI {
+//                                        verticalLayout {
+//                                            val sheetHeight = (DeviceUtils.getDeviceSize(context)?.y ?: dip(667)) - dip(52)
+//                                            lparams(width= matchParent, height= sheetHeight)
+//                                            gravity = Gravity.CENTER
+//
+//                                            textView("test")
+//                                        }
+//                                    }.view)
+//                                }.show()
+                            }
+                        }
 
                         imageView(R.drawable.ic_link_alram_img) {
                         }.lparams(width= dip(16), height= dip(16)) {
                             rightMargin = dip(4)
                         }
 
-                        textView("이 링크는 따로 알람을 받고싶어요!") {
+                        mAlarmSetTv = textView("이 링크는 따로 알람을 받고싶어요!") {
                             setTextSize(TypedValue.COMPLEX_UNIT_PX, dip(12).toFloat())
                             textColor = Color.parseColor("#292A2B")
                             typeface = ResourcesCompat.getFont(context, R.font.spoqa_hansansneo_regular)
@@ -167,6 +207,8 @@ class ScrapDetailAnkoUI(private val clickListener: (Int) -> Unit): BaseAnkoView<
                     cardView {
                         radius = dip(4).toFloat()
                         elevation = 0f
+
+                        setOnClickListener { vm?.moveWebViewPage() }
 
                         verticalLayout {
                             backgroundColor = Color.parseColor("#4076F6")

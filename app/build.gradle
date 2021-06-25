@@ -84,6 +84,7 @@ dependencies {
     implementation lib.okhttp3.interceptor
     implementation lib.okhttp3.urlconnection
     implementation lib.recyclerView.runtime
+    implementation lib.viewPager2.runtime
     implementation lib.tedPermission.runtime
     implementation lib.recyclerView.runtime
     implementation lib.accompanist.insets

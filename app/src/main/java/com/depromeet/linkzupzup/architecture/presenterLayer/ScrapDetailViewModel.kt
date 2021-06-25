@@ -16,6 +16,7 @@ import com.depromeet.linkzupzup.architecture.domainLayer.entities.ResponseEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
+import com.depromeet.linkzupzup.component.MetaDataManager
 import com.depromeet.linkzupzup.extensions.clearMillis
 import com.depromeet.linkzupzup.extensions.getTotalTimeSum
 import com.depromeet.linkzupzup.receiver.AlarmReceiver
@@ -23,6 +24,7 @@ import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.view.webView.WebViewActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -40,7 +42,11 @@ class ScrapDetailViewModel(private val linkUseCases: LinkUseCases, private val m
     private var _linkInfo: MutableLiveData<LinkData> = MutableLiveData(LinkData())
     val linkInfo: LiveData<LinkData> = _linkInfo
 
-    fun getLinkDetail(linkId: Int){
+    fun initLinkInfo(linkData: LinkData) {
+        _linkInfo.value = linkData
+    }
+
+    fun getLinkDetail(linkId: Int, callback: ((LinkData) -> Unit)? = null){
         progressStatus(true)
 
         addDisposable(linkUseCases.getLinkDetail(linkId = linkId)
@@ -50,18 +56,42 @@ class ScrapDetailViewModel(private val linkUseCases: LinkUseCases, private val m
 
                 when(response.getStatus()) {
                     StatusConst.SELECT_SUSSCESS_STATUS -> {
-
                         response.data?.apply {
-
                             _linkInfo.value = LinkData(this).apply {
                                 viewModelScope.launch {
+
+                                    linkUseCases.getPersonalLinkAlarm(linkId)?.let { alarm ->
+                                        alarmEnabled = alarm.alarmEnable
+                                        alarmDt = alarmDt
+                                    }
+
                                     metaUseCases.getMetaData(linkURL)?.let { meta ->
                                         linkTitle = meta.title
                                         imgURL = meta.imgUrl
                                         description = meta.content
                                         author = meta.author
+                                        authorImgUrl = meta.authorImgUrl
 
                                         DLog.e("Scrape Detail","${_linkInfo.value?.linkURL} ${_linkInfo.value?.linkTitle}")
+                                        callback?.invoke(this@apply)
+                                    } ?: let {
+                                        viewModelScope.launch(Dispatchers.IO) {
+                                            MetaDataManager.extractUrlFormText(linkURL)?.let { url ->
+                                                MetaDataManager.getMetaDataFromUrl(url).let { metaData ->
+                                                    // List UI를 갱신하기 위해 콜백
+                                                    linkTitle = metaData.title
+                                                    imgURL = metaData.imgUrl
+                                                    description = metaData.content
+                                                    author = metaData.author
+                                                    authorImgUrl = metaData.authorImgUrl
+
+                                                    // 별도 db 갱신
+                                                    linkUseCases.insertMetaInfo(metaData)
+
+                                                    callback?.invoke(this@apply)
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -146,6 +176,18 @@ class ScrapDetailViewModel(private val linkUseCases: LinkUseCases, private val m
             putExtra(AppConst.WEB_LINK_URL, linkData.linkURL)
             putExtra(AppConst.WEB_LINK_READ, linkData.completed)
         }?.let { movePageDelay(it, 300L, false) }
+    }
+
+
+
+    fun moveWebViewPage() {
+        linkInfo.value?.let { linkData ->
+            getIntent(WebViewActivity::class.java)?.apply {
+                putExtra(AppConst.WEB_LINK_ID, linkData.linkId)
+                putExtra(AppConst.WEB_LINK_URL, linkData.linkURL)
+                putExtra(AppConst.WEB_LINK_READ, linkData.completed)
+            }?.let { movePageDelay(it, 300L, false) }
+        }
     }
 
 }

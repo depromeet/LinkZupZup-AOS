@@ -39,7 +39,7 @@ abstract class BaseAnkoActivity<VIEW: BaseAnkoView<VIEWMODEL>, VIEWMODEL: BaseVi
     abstract fun onCreateViewModel(): VIEWMODEL
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        overridePendingTransition(R.anim.act_slide_right_in, R.anim.stay)
+        //overridePendingTransition(R.anim.act_slide_right_in, R.anim.stay)
         supportActionBar?.hide()
         super.onCreate(savedInstanceState)
         // top status bar color
@@ -142,7 +142,7 @@ abstract class BaseAnkoActivity<VIEW: BaseAnkoView<VIEWMODEL>, VIEWMODEL: BaseVi
     }
 
     override fun onBackPressed() {
-        overridePendingTransition(R.anim.stay, R.anim.act_slide_right_out)
+        //overridePendingTransition(R.anim.stay, R.anim.act_slide_right_out)
         super.onBackPressed()
     }
 

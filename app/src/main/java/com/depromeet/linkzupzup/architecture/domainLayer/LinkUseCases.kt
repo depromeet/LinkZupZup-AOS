@@ -7,6 +7,7 @@ import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmE
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkReadEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.PersonalLinkEntity
 import io.reactivex.Observable
 
 class LinkUseCases(private val linkRepositoryImpl: LinkRepositoryImpl) {
@@ -67,6 +68,14 @@ class LinkUseCases(private val linkRepositoryImpl: LinkRepositoryImpl) {
 
     suspend fun insertMetaInfo(linkMetaInfoEntity: LinkMetaInfoEntity) {
         linkRepositoryImpl.insertMetaInfo(linkMetaInfoEntity)
+    }
+
+    suspend fun getPersonalLinkAlarm(linkId: Int): PersonalLinkEntity? {
+        return linkRepositoryImpl.getPersonalLinkAlarm(linkId= linkId)
+    }
+
+    suspend fun readComplete(linkId: Int) {
+        return linkRepositoryImpl.readComplete(linkId = linkId)
     }
 
 }

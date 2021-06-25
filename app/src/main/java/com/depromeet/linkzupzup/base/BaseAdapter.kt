@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
-abstract class BaseAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+abstract class BaseAdapter<T: RecyclerView.ViewHolder>: RecyclerView.Adapter<T>() {
 
     abstract val ctx: Context
 
@@ -44,18 +44,18 @@ abstract class BaseAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     /**
      * Create ViewHolder
      */
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): T
         = when (viewType) {
             TYPE_HEADER -> onCreateHeaderViewHolder(parent, viewType)!!
             TYPE_FOOTER -> onCreateFooterViewHolder(parent, viewType)!!
             else -> onCreateBasicViewHolder(parent, viewType)
-        }
+        } as T
 
 
     /**
      * Bind ViewHolder
      */
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: T, position: Int) {
         when {
             (position == 0 && useHeader()) -> onBindHeaderItemView(holder, position)
             (position == itemCount - 1 && useFooter()) -> onBindFooterItemView(holder, position)
@@ -70,21 +70,21 @@ abstract class BaseAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
      * Header
      */
     open fun useHeader() = false
-    open fun onCreateHeaderViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder? = null
-    open fun onBindHeaderItemView(holder: RecyclerView.ViewHolder, position: Int) {}
+    open fun onCreateHeaderViewHolder(parent: ViewGroup, viewType: Int): T? = null
+    open fun onBindHeaderItemView(holder: T, position: Int) {}
 
     /**
      * Footer
      */
     open fun useFooter() = false
-    open fun onCreateFooterViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder? = null
-    open fun onBindFooterItemView(holder: RecyclerView.ViewHolder, position: Int) {}
+    open fun onCreateFooterViewHolder(parent: ViewGroup, viewType: Int): T? = null
+    open fun onBindFooterItemView(holder: T, position: Int) {}
 
     /**
      * Default View Holder
      */
-    abstract fun onCreateBasicViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder
-    abstract fun onBindBasicItemView(holder: RecyclerView.ViewHolder?, position: Int)
+    abstract fun onCreateBasicViewHolder(parent: ViewGroup, viewType: Int): T
+    abstract fun onBindBasicItemView(holder: T?, position: Int)
 
     private var basicItemCount: Int = 0
     fun getBasicItemCount() = basicItemCount
