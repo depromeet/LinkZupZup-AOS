@@ -111,6 +111,10 @@ fun Color.isEquals(target: Color): Boolean {
             green == target.green
 }
 
+fun String.composeColor(): androidx.compose.ui.graphics.Color = androidx.compose.ui.graphics.Color(colorInt())
+fun String.colorInt(): Int = android.graphics.Color.parseColor(this)
+fun Int.composeColor(): androidx.compose.ui.graphics.Color = androidx.compose.ui.graphics.Color(this)
+
 fun Boolean.getInt(): Int = if (this) 1 else 0
 fun Int.getBoolean(): Boolean = this == 1
 

@@ -15,17 +15,22 @@ import com.depromeet.linkzupzup.view.common.holder.TagViewHolder
 class TagAdapter(override val ctx: Context, var tagType: Int = TAG_TYPE_SMALL) : BaseAdapter() {
 
     companion object {
-        const val TAG_TYPE_SMALL = 10101010
-        const val TAG_TYPE_LARGE = 10101010
+        const val TAG_TYPE_SMALL = 101010
+        const val TAG_TYPE_LARGE = TAG_TYPE_SMALL.plus(1)
     }
+
+    private val DEFAULT_TAG_PADDING = PaddingValues(verticalPadding = ctx.dip(4), horizontalPadding = ctx.dip(6))
+    private val DEFAULT_TAG_FONT_SET = FontValues(textSizeRes = R.dimen.default_tag_text_size, textLineHeightRes = R.dimen.default_tag_line_height, fontRes = R.font.spoqa_hansansneo_medium)
+    private val LARGE_TAG_PADDING = PaddingValues(padding = ctx.dip(8))
+    private val LARGE_TAG_FONT_SET = FontValues(textSizeRes = R.dimen.large_tag_text_size, textLineHeightRes = R.dimen.large_tag_line_height, fontRes = R.font.spoqa_hansansneo_medium)
 
     var list: ArrayList<LinkHashData> = arrayListOf()
     var clickListener: ((Int, LinkHashData) -> Unit)? = null
 
     override fun onCreateBasicViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder = with(ctx) {
         when (viewType) {
-            TAG_TYPE_LARGE -> TagViewHolder(parent, TagUI(paddingValues = PaddingValues(padding = dip(8)), radius = dip(2).toFloat(), fontSet = FontValues(textSize = dip(12).toFloat(), fontRes = R.font.spoqa_hansansneo_medium)), clickListener)
-            else -> TagViewHolder(parent, TagUI(paddingValues = PaddingValues(verticalPadding = dip(4), horizontalPadding = dip(6)), radius = dip(2).toFloat(), fontSet = FontValues(textSize = dip(10).toFloat(), fontRes = R.font.spoqa_hansansneo_medium)), clickListener)
+            TAG_TYPE_LARGE -> TagViewHolder(parent, TagUI(), LARGE_TAG_PADDING, dip(2).toFloat(), LARGE_TAG_FONT_SET, clickListener)
+            else -> TagViewHolder(parent, TagUI(), DEFAULT_TAG_PADDING, dip(2).toFloat(), DEFAULT_TAG_FONT_SET, clickListener)
         }
     }
 

@@ -2,32 +2,47 @@ package com.depromeet.linkzupzup.ui.theme
 
 import androidx.compose.ui.graphics.Color
 import com.depromeet.linkzupzup.R
+import com.depromeet.linkzupzup.extensions.colorInt
 
 val Gray200 = Color(R.color.gray_200)
 val Gray500 = Color(R.color.gray_500)
 val Gray700 = Color(R.color.gray_700)
 val Teal200 = Color(R.color.teal_200)
 
-val TagBgColor01 = Color(0xFFFFECEC)
-val TagTextColor01 = Color(0xFFE88484)
+val TagBgColorDefault01 = "#FFECEC".colorInt()
+val TagTextColorDefault01 = "#E88484".colorInt()
+val TagBgColor01 = Color(TagBgColorDefault01)
+val TagTextColor01 = Color(TagTextColorDefault01)
 
-val TagBgColor02 = Color(0xFFD9F8F4)
-val TagTextColor02 = Color(0xFF57B9AF)
+val TagBgColorDefault02 = "#D9F8F4".colorInt()
+val TagTextColorDefault02 = "#57B9AF".colorInt()
+val TagBgColor02 = Color(TagBgColorDefault02)
+val TagTextColor02 = Color(TagTextColorDefault02)
 
-val TagBgColor03 = Color(0xFFDAE3FF)
-val TagTextColor03 = Color(0xFF2C5AE9)
+val TagBgColorDefault03 = "#DAE3FF".colorInt()
+val TagTextColorDefault03 = "#2C5AE9".colorInt()
+val TagBgColor03 = Color(TagBgColorDefault03)
+val TagTextColor03 = Color(TagTextColorDefault03)
 
-val TagBgColor04 = Color(0xFFFFE0F3)
-val TagTextColor04 = Color(0xFFEC4DA9)
+val TagBgColorDefault04 = "#FFE0F3".colorInt()
+val TagTextColorDefault04 = "#EC4DA9".colorInt()
+val TagBgColor04 = Color(TagBgColorDefault04)
+val TagTextColor04 = Color(TagTextColorDefault04)
 
-val TagBgColor05 = Color(0xFFFFF8BD)
-val TagTextColor05 = Color(0xFFAC9F2A)
+val TagBgColorDefault05 = "#FFF8BD".colorInt()
+val TagTextColorDefault05 = "#AC9F2A".colorInt()
+val TagBgColor05 = Color(TagBgColorDefault05)
+val TagTextColor05 = Color(TagTextColorDefault05)
 
-val TagBgColor06 = Color(0xFFE6FFBD)
-val TagTextColor06 = Color(0xFF88B441)
+val TagBgColorDefault06 = "#E6FFBD".colorInt()
+val TagTextColorDefault06 = "#88B441".colorInt()
+val TagBgColor06 = Color(TagBgColorDefault06)
+val TagTextColor06 = Color(TagTextColorDefault06)
 
-val TagBgColor07 = Color(0xFFEEE0FF)
-val TagTextColor07 = Color(0xFF8959C7)
+val TagBgColorDefault07 = "#EEE0FF".colorInt()
+val TagTextColorDefault07 = "#8959C7".colorInt()
+val TagBgColor07 = Color(TagBgColorDefault07)
+val TagTextColor07 = Color(TagTextColorDefault07)
 
 val Gray0t = Color(0xffFFFFFF)
 val Gray10 = Color(0xffF8FAFB)

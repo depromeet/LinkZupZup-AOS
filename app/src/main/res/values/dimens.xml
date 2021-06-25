@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="scrap_detail_writer_text_size">12dp</dimen>
+
+    <dimen name="scrap_writer_text_size">12dp</dimen>
+    <dimen name="scrap_writer_line_height">16.8dp</dimen>
+
+    <dimen name="default_tag_text_size">10dp</dimen>
+    <dimen name="default_tag_line_height">10dp</dimen>
+
+    <dimen name="large_tag_text_size">12dp</dimen>
+    <dimen name="large_tag_line_height">12dp</dimen>
+
 </resources>

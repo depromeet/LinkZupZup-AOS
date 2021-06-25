@@ -16,23 +16,18 @@ object CommonUtil {
     fun parseStr(colorStr: String): Color = Color(android.graphics.Color.parseColor(colorStr))
 
     private val TagColors: ArrayList<TagColor> = arrayListOf<TagColor>().apply {
-        add(TagColor(TagBgColor01, TagTextColor01))
-        add(TagColor(TagBgColor02, TagTextColor02))
-        add(TagColor(TagBgColor03, TagTextColor03))
-        add(TagColor(TagBgColor04, TagTextColor04))
-        add(TagColor(TagBgColor05, TagTextColor05))
-        add(TagColor(TagBgColor06, TagTextColor06))
-        add(TagColor(TagBgColor07, TagTextColor07))
+        add(TagColor(TagBgColorDefault01, TagTextColorDefault01))
+        add(TagColor(TagBgColorDefault02, TagTextColorDefault02))
+        add(TagColor(TagBgColorDefault03, TagTextColorDefault03))
+        add(TagColor(TagBgColorDefault04, TagTextColorDefault04))
+        add(TagColor(TagBgColorDefault05, TagTextColorDefault05))
+        add(TagColor(TagBgColorDefault06, TagTextColorDefault06))
+        add(TagColor(TagBgColorDefault07, TagTextColorDefault07))
     }
     fun getRandomeTagColor(bound: Int = 7, colors: ArrayList<TagColor> = TagColors): TagColor {
         Random().nextInt(bound).let { randomNum ->
             return colors[randomNum]
         }
-    }
-    fun convertComposeColor(color: Color): Int = with(color) {
-        // Integer.toBinaryString(alpha.toInt())
-        // android.graphics.Color.parseColor(String.format("#%02%02%02%02", alpha, red, green, blue))
-        android.graphics.Color.BLUE
     }
 
     fun lerp(startValue: Float, endValue: Float, fraction: Float): Float {

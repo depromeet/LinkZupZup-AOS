@@ -33,14 +33,11 @@ import androidx.compose.ui.unit.sp
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import com.depromeet.linkzupzup.base.BaseView
-import com.depromeet.linkzupzup.extensions.clearMillis
-import com.depromeet.linkzupzup.extensions.noRippleClickable
-import com.depromeet.linkzupzup.extensions.toast
 import com.depromeet.linkzupzup.architecture.presenterLayer.ScrapDetailViewModel
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkHashData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.TagColor
-import com.depromeet.linkzupzup.extensions.getAlarmDateStr
+import com.depromeet.linkzupzup.extensions.*
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.CommonUtil
 import com.depromeet.linkzupzup.utils.DLog
@@ -484,7 +481,7 @@ fun ScrapLinkBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Co
                     .height(32.dp)
                     .noRippleClickable { updateHashtags(hashtags, tag) },
                     shape = RoundedCornerShape(2.dp),
-                    backgroundColor = tag.tagColor.bgColor,
+                    backgroundColor = tag.tagColor.bgColor.composeColor(),
                     elevation = 0.dp) {
 
                     Box(contentAlignment = Alignment.Center){
@@ -495,7 +492,7 @@ fun ScrapLinkBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Co
                             Text(text = "#${tag.hashtagName}",
                                 style = TextStyle(
                                     fontSize = 12.sp,
-                                    color = tag.tagColor.textColor,
+                                    color = tag.tagColor.textColor.composeColor(),
                                     fontFamily = FontFamily(Font(
                                         resId = R.font.spoqa_hansansneo_regular,
                                         weight = FontWeight.W500))))
@@ -726,13 +723,13 @@ fun SingleLineTagList(tags: ArrayList<LinkHashData>, contentPadding: PaddingValu
         contentPadding = contentPadding){
 
         items(tags) { tag ->
-            MainHashtagCard(tagName = tag.hashtagName, backColor = tag.tagColor.bgColor, textColor = tag.tagColor.textColor)
+            MainHashtagCard(tagName = tag.hashtagName, backColor = tag.tagColor.bgColor.composeColor(), textColor = tag.tagColor.textColor.composeColor())
         }
     }
 }
 
 @Composable
-fun MultiLineTagList(tags: List<String>, horizontalItemLimit: Int = 10, backgroundColor: Color = Color(0xFFAAAAAA), textColor: Color = Color(0xFFAAAAAA), contentPadding: PaddingValues = PaddingValues(0.dp)) {
+fun MultiLineTagList(tags: List<String>, horizontalItemLimit: Int = 10, backgroundColor: Int = "#AAAAAA".colorInt(), textColor: Int = "#AAAAAA".colorInt(), contentPadding: PaddingValues = PaddingValues(0.dp)) {
 
     val colors = remember { mutableStateOf(arrayListOf<TagColor>().apply {
         tags.forEach { TagColor(backgroundColor, textColor) }
@@ -779,18 +776,18 @@ fun TagList(tags: List<String>, colors: MutableState<ArrayList<TagColor>>, conte
 }
 
 @Composable
-fun TagView(idx: Int, tagStr: String, backgroundColor: Color = Color(0xFFAAAAAA), textColor: Color = Color(0xFFAAAAAA)) {
+fun TagView(idx: Int, tagStr: String, backgroundColor: Int = "#AAAAAA".colorInt(), textColor: Int = "#AAAAAA".colorInt()) {
     val colors = remember { mutableStateOf(TagColor(backgroundColor, textColor)) }
     Card(Modifier.clickable { DLog.e("Jackson", "idx: $idx, click, Tag: $tagStr")  },
         shape = RoundedCornerShape(2.dp),
         elevation = 0.dp,
-        backgroundColor = colors.value.bgColor) {
+        backgroundColor = colors.value.bgColor.composeColor()) {
 
         Column(modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp)) {
 
             Text(tagStr,
                 style = TextStyle(fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_medium, weight = FontWeight.W400)), fontSize = 10.sp, lineHeight = 2.sp, color = Color(0xFFE88484)),
-                color = colors.value.textColor,
+                color = colors.value.textColor.composeColor(),
                 modifier = Modifier
                     .height(12.dp)
                     .absolutePadding(0.dp, 0.dp, 0.dp, 0.dp), maxLines = 1)

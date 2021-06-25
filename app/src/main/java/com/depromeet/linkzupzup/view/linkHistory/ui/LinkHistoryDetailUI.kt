@@ -37,6 +37,7 @@ import com.depromeet.linkzupzup.architecture.presenterLayer.LinkHistoryDetailVie
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkHashData
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.MainContentData
+import com.depromeet.linkzupzup.extensions.composeColor
 import com.depromeet.linkzupzup.ui.theme.Blue20
 import com.depromeet.linkzupzup.ui.theme.Gray100t
 import com.depromeet.linkzupzup.ui.theme.Gray70
@@ -244,7 +245,7 @@ fun HistoryLinkCard(index: Int, linkData: LinkData, viewModel: LinkHistoryDetail
                 LazyRow(modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(4.dp)){
                     items(tagList) { tag ->
-                        MainHashtagCard(tagName = tag.hashtagName, backColor = tag.tagColor.bgColor, textColor = tag.tagColor.textColor)
+                        MainHashtagCard(tagName = tag.hashtagName, backColor = tag.tagColor.bgColor.composeColor(), textColor = tag.tagColor.textColor.composeColor())
                     }
                 }
 

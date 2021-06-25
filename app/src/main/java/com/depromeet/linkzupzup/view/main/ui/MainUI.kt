@@ -366,7 +366,7 @@ fun MainLinkCard(index: Int, linkData: LinkData, viewModel: MainViewModel? = nul
                 LazyRow(modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(4.dp)){
                     items(tagList) { tag ->
-                        MainHashtagCard(tagName = tag.hashtagName, backColor = tag.tagColor.bgColor, textColor = tag.tagColor.textColor)
+                        MainHashtagCard(tagName = tag.hashtagName, backColor = tag.tagColor.bgColor.composeColor(), textColor = tag.tagColor.textColor.composeColor())
                     }
                 }
 
@@ -563,7 +563,7 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
                     .height(32.dp)
                     .noRippleClickable { updateHashtags(hashtags, tag) },
                     shape = RoundedCornerShape(2.dp),
-                    backgroundColor = tag.tagColor.bgColor,
+                    backgroundColor = tag.tagColor.bgColor.composeColor(),
                     elevation = 0.dp) {
 
                     Box(contentAlignment = Alignment.Center){
@@ -574,7 +574,7 @@ fun MainBottomSheet(sheetState : ModalBottomSheetState, coroutineScope : Corouti
                             Text(text = "#${tag.hashtagName}",
                                 style = TextStyle(
                                     fontSize = 12.sp,
-                                    color = tag.tagColor.textColor,
+                                    color = tag.tagColor.textColor.composeColor(),
                                     fontFamily = FontFamily(Font(
                                         resId = R.font.spoqa_hansansneo_regular,
                                         weight = FontWeight.W500))))
@@ -776,7 +776,7 @@ fun BottomSheetInputTag(onClick: (String) -> Unit){
 @Composable
 fun BottomSheetHashtagCard(tag: LinkHashData, isSelected: Boolean = false, onClick: (LinkHashData) -> Unit){
     Card(elevation = 0.dp,
-        backgroundColor = tag.tagColor.bgColor,
+        backgroundColor = tag.tagColor.bgColor.composeColor(),
         modifier = Modifier
             .height(32.dp)
             .clickable { onClick(tag) }){
@@ -789,7 +789,7 @@ fun BottomSheetHashtagCard(tag: LinkHashData, isSelected: Boolean = false, onCli
 
                 Text(text = "#${tag.hashtagName}",
                     style = TextStyle(fontSize = 12.sp,
-                        color = tag.tagColor.textColor,
+                        color = tag.tagColor.textColor.composeColor(),
                         fontFamily = FontFamily(Font(resId = R.font.spoqa_hansansneo_regular, weight = FontWeight.W300))))
 
                 if(isSelected){

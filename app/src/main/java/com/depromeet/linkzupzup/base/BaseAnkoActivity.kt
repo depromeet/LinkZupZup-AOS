@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.Window
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
@@ -39,6 +40,7 @@ abstract class BaseAnkoActivity<VIEW: BaseAnkoView<VIEWMODEL>, VIEWMODEL: BaseVi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         overridePendingTransition(R.anim.act_slide_right_in, R.anim.stay)
+        supportActionBar?.hide()
         super.onCreate(savedInstanceState)
         // top status bar color
         window.statusBarColor = ContextCompat.getColor(this, R.color.status_bar_color)

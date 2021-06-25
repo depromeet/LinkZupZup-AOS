@@ -1,9 +1,9 @@
 package com.depromeet.linkzupzup.architecture.presenterLayer.model
 
 import android.os.Parcelable
-import androidx.compose.ui.graphics.Color
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkAlarmEntity
 import com.depromeet.linkzupzup.architecture.domainLayer.entities.db.LinkMetaInfoEntity
+import com.depromeet.linkzupzup.extensions.colorInt
 import com.depromeet.linkzupzup.ui.theme.*
 import com.depromeet.linkzupzup.utils.CommonUtil
 import kotlinx.parcelize.Parcelize
@@ -29,8 +29,8 @@ data class LinkData(
     companion object {
         fun mockData(): LinkData {
             arrayListOf<LinkHashData>().apply {
-                add(LinkHashData(hashtagName = "디자인", tagColor = TagColor(Color(0xFFFFECEC), Color(0xFFE88484))))
-                add(LinkHashData(hashtagName = "포토폴리오", tagColor = TagColor(Color(0xFFD9F8F4), Color(0xFF57B9AF))))
+                add(LinkHashData(hashtagName = "디자인", tagColor = TagColor("#FFECEC".colorInt(), "#E88484".colorInt())))
+                add(LinkHashData(hashtagName = "포토폴리오", tagColor = TagColor("#D9F8F4".colorInt(), "#57B9AF".colorInt())))
             }.let { hashDataList ->
                 return LinkData(hashtags = hashDataList)
             }
@@ -95,20 +95,20 @@ data class LinkHashData(
 
     companion object {
         val tc1: List<LinkHashData> = listOf(
-            LinkHashData(0, "디자인", "", TagColor(TagBgColor01, TagTextColor01)),
-            LinkHashData(1, "포트폴리오", "", TagColor(TagBgColor02, TagTextColor02)),
-            LinkHashData(2, "UX", "", TagColor(TagBgColor03, TagTextColor03)),
-            LinkHashData(3, "UI", "", TagColor(TagBgColor04, TagTextColor04)),
-            LinkHashData(4, "마케팅", "", TagColor(TagBgColor05, TagTextColor05)),
-            LinkHashData(5, "인공지능", "", TagColor(TagBgColor06, TagTextColor06))
+            LinkHashData(0, "디자인", "", TagColor(TagBgColorDefault01, TagTextColorDefault01)),
+            LinkHashData(1, "포트폴리오", "", TagColor(TagBgColorDefault02, TagTextColorDefault02)),
+            LinkHashData(2, "UX", "", TagColor(TagBgColorDefault03, TagTextColorDefault03)),
+            LinkHashData(3, "UI", "", TagColor(TagBgColorDefault04, TagTextColorDefault04)),
+            LinkHashData(4, "마케팅", "", TagColor(TagBgColorDefault05, TagTextColorDefault05)),
+            LinkHashData(5, "인공지능", "", TagColor(TagBgColorDefault06, TagTextColorDefault06))
         )
 
         val tc2: List<LinkHashData> = listOf(
-            LinkHashData(6, "프론트 개발", "", TagColor(TagBgColor07, TagTextColor07)),
-            LinkHashData(7, "그로스 해킹", "", TagColor(TagBgColor03, TagTextColor03)),
-            LinkHashData(8, "Android", "", TagColor(TagBgColor01, TagTextColor01)),
-            LinkHashData(9, "스타트업", "", TagColor(TagBgColor02, TagTextColor02)),
-            LinkHashData(10, "ios", "", TagColor(TagBgColor04, TagTextColor04))
+            LinkHashData(6, "프론트 개발", "", TagColor(TagBgColorDefault07, TagTextColorDefault07)),
+            LinkHashData(7, "그로스 해킹", "", TagColor(TagBgColorDefault03, TagTextColorDefault03)),
+            LinkHashData(8, "Android", "", TagColor(TagBgColorDefault01, TagTextColorDefault01)),
+            LinkHashData(9, "스타트업", "", TagColor(TagBgColorDefault02, TagTextColorDefault02)),
+            LinkHashData(10, "ios", "", TagColor(TagBgColorDefault04, TagTextColorDefault04))
         )
     }
 
