@@ -42,9 +42,7 @@ class LinkRepositoryImpl(private val roomDB: RoomDB, private val linkDataSource:
     }
 
     override suspend fun getMetaList(urls: ArrayList<String>): List<LinkMetaInfoEntity> {
-        var logStr = ""
-        urls.forEach { logStr += "$it," }
-        DLog.e("TEST","SELECT * FROM LinkMetaInfo WHERE meta_url IN($logStr)")
+        DLog.e("TEST","SELECT * FROM LinkMetaInfo WHERE meta_url IN(${ urls.joinToString(",") })")
         return roomDB.metaDao().getMetaInfoList(urls)
     }
 

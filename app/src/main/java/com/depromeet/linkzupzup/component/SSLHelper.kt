@@ -37,16 +37,19 @@ object SSLHelper {
         }
     }
 
-    fun initSSL() = arrayOf<TrustManager>(object : X509TrustManager {
+    fun initSSL(): SSLSocketFactory {
+        arrayOf<TrustManager>(object : X509TrustManager {
             override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
             override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) { }
             override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) { }
         }).let { trustAllCerts ->
-            with(SSLContext.getInstance("SSL")) {
+            with(SSLContext.getInstance("TLSv1")) {
                 init(null, trustAllCerts, SecureRandom())
                 HttpsURLConnection.setDefaultSSLSocketFactory(socketFactory)
                 HttpsURLConnection.setDefaultHostnameVerifier { _, _ -> true }
+                return socketFactory
             }
         }
+    }
 
 }

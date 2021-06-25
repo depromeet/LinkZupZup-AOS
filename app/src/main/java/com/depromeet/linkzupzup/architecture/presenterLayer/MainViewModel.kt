@@ -105,7 +105,7 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
         if(!isMetaSet()) {
             addDisposable(Observable.create<LinkMetaInfoEntity> {
                 // 비동기, Meta data 조회
-                getMetadata(linkData.linkURL) { metaData ->
+                getMetaData(linkData.linkURL) { metaData ->
                     it.onNext(metaData)
                     it.onComplete()
                 }
@@ -124,13 +124,13 @@ class MainViewModel(private val linkUseCases: LinkUseCases): BaseViewModel() {
                 callback(metaData)
             })
         } else {
-            getMetadata(linkData.linkURL) {
+            getMetaData(linkData.linkURL) {
                 callback(it)
             }
         }
     }
 
-    private fun getMetadata(url : String, callback: (LinkMetaInfoEntity) -> Unit){
+    private fun getMetaData(url : String, callback: (LinkMetaInfoEntity) -> Unit){
         viewModelScope.launch(Dispatchers.IO) {
             extractUrlFormText(url)?.let { rightUrl ->
                 getMetaDataFromUrl(rightUrl).let { metaData ->
