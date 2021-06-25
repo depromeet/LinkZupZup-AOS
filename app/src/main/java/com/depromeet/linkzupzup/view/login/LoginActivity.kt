@@ -42,7 +42,7 @@ class LoginActivity : BaseActivity<LoginUI, LoginViewModel>() {
                             val userId = pref.getUserId()
                             pref.setLoginId(identifier)
 
-                            signInUp(SignInUpEntity(loginId = identifier, name = nickName, token = authorization, userId = userId, pushToken = firebaseFCMToken)) { status, response ->
+                            signInUp(SignInUpEntity(loginId = identifier.toString(), name = nickName, token = authorization, userId = userId, pushToken = firebaseFCMToken)) { status, response ->
 
                                 when (status) {
                                     StatusConst.SELECT_SUSSCESS_STATUS -> {

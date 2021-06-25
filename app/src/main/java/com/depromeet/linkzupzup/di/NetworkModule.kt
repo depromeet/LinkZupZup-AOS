@@ -4,6 +4,7 @@ import android.content.Intent
 import com.depromeet.linkzupzup.ApiUrl
 import com.depromeet.linkzupzup.AppConst.AUTHORIZATION_KEY
 import com.depromeet.linkzupzup.AppConst.CONNECTION_TIMEOUT
+import com.depromeet.linkzupzup.AppConst.LOGIN_ID
 import com.depromeet.linkzupzup.AppConst.READ_TIMEOUT
 import com.depromeet.linkzupzup.AppConst.USER_ID_KEY
 import com.depromeet.linkzupzup.AppConst.WRITE_TIMEOUT
@@ -74,6 +75,7 @@ val networkModule = module {
             val newRequest = chain.request().newBuilder().apply {
                 header(AUTHORIZATION_KEY, pref.getAuthorization())
                 header(USER_ID_KEY, pref.getUserId().toString())
+                header(LOGIN_ID, pref.getLoginId().toString())
             }.build()
 
             chain.proceed(newRequest).also { response ->
