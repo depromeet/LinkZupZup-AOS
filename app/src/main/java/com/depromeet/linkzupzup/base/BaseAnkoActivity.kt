@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.depromeet.linkzupzup.R
@@ -22,7 +23,7 @@ import org.koin.android.ext.android.inject
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-abstract class BaseAnkoActivity<VIEW: BaseAnkoView<VIEWMODEL>, VIEWMODEL: BaseViewModel>: ComponentActivity() {
+abstract class BaseAnkoActivity<VIEW: BaseAnkoView<VIEWMODEL>, VIEWMODEL: BaseViewModel>: AppCompatActivity() {
 
     companion object {
         const val DEFAULT_PROGRESS_TIME: Long = 1000L
@@ -49,11 +50,13 @@ abstract class BaseAnkoActivity<VIEW: BaseAnkoView<VIEWMODEL>, VIEWMODEL: BaseVi
         viewModel = onCreateViewModel().apply {
             preference = pref
             lifecycleOwner = this@BaseAnkoActivity
+            fragmentManager = supportFragmentManager
             // 프로그래스 동작 status 구독
             progressStatus.observe(this@BaseAnkoActivity, Observer {
                 DLog.e("Jackson", "progressStatus : $it")
                 if (it) onVisibleProgress() else onInvisibleProgress()
             })
+
 
             this.isLogin = this@BaseAnkoActivity.isLogin
             this.getContext = this@BaseAnkoActivity.getContext
@@ -68,6 +71,7 @@ abstract class BaseAnkoActivity<VIEW: BaseAnkoView<VIEWMODEL>, VIEWMODEL: BaseVi
         }
         with(view) {
             lifecycleOwner = this@BaseAnkoActivity
+            fragmentManager = supportFragmentManager
             vm = viewModel
             setContentView(createView(org.jetbrains.anko.AnkoContext.create(this@BaseAnkoActivity, this@BaseAnkoActivity)))
         }

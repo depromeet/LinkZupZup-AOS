@@ -3,6 +3,7 @@ package com.depromeet.linkzupzup.base
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -20,6 +21,7 @@ open abstract class BaseViewModel : ViewModel() {
 
     var preference: PreferencesManager? = null
     var lifecycleOwner: LifecycleOwner? = null
+    var fragmentManager: FragmentManager? = null
 
     private val _progressStatus: MutableLiveData<Boolean> = MutableLiveData(false)
     val progressStatus: MutableLiveData<Boolean>

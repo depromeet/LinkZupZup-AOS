@@ -9,4 +9,9 @@
     <item name="activity_move" type="id" />
     <item name="link_update" type="id" />
     <item name="link_delete" type="id" />
+    <item name="dialog_close" type="id" />
+    <item name="custom_hashtag_title" type="id" />
+    <item name="custom_hashtag_add" type="id" />
+    <item name="clear_text" type="id" />
+    <item name="main_bottom_sheet" type="id" />
 </resources>
