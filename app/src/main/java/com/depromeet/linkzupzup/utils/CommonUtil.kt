@@ -29,6 +29,11 @@ object CommonUtil {
             return colors[randomNum]
         }
     }
+    fun convertComposeColor(color: Color): Int = with(color) {
+        // Integer.toBinaryString(alpha.toInt())
+        // android.graphics.Color.parseColor(String.format("#%02%02%02%02", alpha, red, green, blue))
+        android.graphics.Color.BLUE
+    }
 
     fun lerp(startValue: Float, endValue: Float, fraction: Float): Float {
         return startValue + fraction * (endValue - startValue)

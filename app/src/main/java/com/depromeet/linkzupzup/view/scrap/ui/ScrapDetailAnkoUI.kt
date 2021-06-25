@@ -6,15 +6,23 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.widget.ImageView
 import androidx.core.content.res.ResourcesCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.architecture.presenterLayer.ScrapDetailViewModel
 import com.depromeet.linkzupzup.base.BaseAnkoView
+import com.depromeet.linkzupzup.view.common.adapter.TagAdapter
 import org.jetbrains.anko.*
 import org.jetbrains.anko.cardview.v7.cardView
+import org.jetbrains.anko.recyclerview.v7.recyclerView
 
 class ScrapDetailAnkoUI(private val clickListener: (Int) -> Unit): BaseAnkoView<ScrapDetailViewModel>() {
 
     lateinit var mTopBannerImg: ImageView
+
+    lateinit var rv: RecyclerView
+
+    var adapter: TagAdapter? = null
 
     override fun createView(ui: AnkoContext<Activity>) = with(ui) {
         relativeLayout {
@@ -115,7 +123,12 @@ class ScrapDetailAnkoUI(private val clickListener: (Int) -> Unit): BaseAnkoView<
                     /**
                      * 링크 해시 태그
                      */
-
+                    rv = recyclerView {
+                        clipToPadding = false
+                        horizontalPadding = dip(24)
+                        // backgroundColor = Color.parseColor("#00aaff")
+                        layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
+                    }.lparams(width= matchParent, height= dip(20))
 
                     view().lparams(width= dip(1), height= wrapContent, weight= 1f)
 

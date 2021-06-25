@@ -28,7 +28,7 @@
         <activity android:name=".view.login.LoginActivity" />
         <activity android:name=".view.main.MainActivity" />
         <activity android:name=".view.scrap.ScrapDetailActivity" />
-        <activity android:name=".view.scrap.ScrapDetailAnkoActivity" />
+        <!--<activity android:name=".view.scrap.ScrapDetailAnkoActivity" />-->
 
         <activity android:name=".view.mypage.MyPageActivity" />
         <activity android:name=".view.mydonut.MyDonutActivity" />
