@@ -60,7 +60,8 @@ object MetaDataManager {
 
     fun getMetaDataFromUrl(url : String) : LinkMetaInfoEntity{
         val metaData = LinkMetaInfoEntity(url = url)
-        try{
+        try {
+            SSLHelper.initSSL()
             val doc : Document = Jsoup.connect(url).userAgent("Mozilla").get()
             metaData.title = doc.select("meta[property=og:title]")?.first()?.attr("content") ?: ""
             metaData.content = doc.select("meta[property=og:description]")?.first()?.attr("content") ?: ""

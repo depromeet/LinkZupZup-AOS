@@ -19,7 +19,6 @@ import com.depromeet.linkzupzup.base.BaseViewModel
 import com.depromeet.linkzupzup.component.MetaDataManager.extractUrlFormText
 import com.depromeet.linkzupzup.component.MetaDataManager.getMetaDataFromUrl
 import com.depromeet.linkzupzup.utils.DLog
-import com.depromeet.linkzupzup.view.scrap.ScrapDetailActivity
 import com.depromeet.linkzupzup.view.scrap.ScrapDetailAnkoActivity
 import com.google.gson.Gson
 import io.reactivex.Observable
