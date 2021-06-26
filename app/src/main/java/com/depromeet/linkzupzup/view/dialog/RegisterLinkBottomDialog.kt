@@ -1,10 +1,8 @@
 package com.depromeet.linkzupzup.view.dialog
 
+import android.app.Dialog
 import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -12,52 +10,103 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import android.widget.LinearLayout.HORIZONTAL
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.marginRight
 import androidx.core.widget.addTextChangedListener
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.depromeet.linkzupzup.R
+import com.depromeet.linkzupzup.architecture.domainLayer.entities.api.LinkRegisterEntity
 import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
-import com.depromeet.linkzupzup.utils.DLog
+import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkHashData
+import com.depromeet.linkzupzup.component.ListDecoration
+import com.depromeet.linkzupzup.extensions.dip
 import com.depromeet.linkzupzup.utils.DeviceUtils
+import com.depromeet.linkzupzup.view.common.adapter.TagAdapter
+import com.depromeet.linkzupzup.view.common.adapter.TagAdapter.Companion.TAG_TYPE_LARGE
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.jetbrains.anko.*
-import org.jetbrains.anko.constraint.layout.constraintLayout
+import org.jetbrains.anko.recyclerview.v7.recyclerView
 import org.jetbrains.anko.support.v4.UI
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class RegisterLinkBottomDialog() : BottomSheetDialogFragment(), View.OnClickListener {
+class RegisterLinkBottomDialog(private val viewModel: ()->MainViewModel)
+    : BottomSheetDialogFragment(), View.OnClickListener {
 
-    private val viewModel: MainViewModel by viewModel()
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<FrameLayout>
 
-    private lateinit var behavior: BottomSheetBehavior<View>
+    private lateinit var mInputLinkEt: EditText
 
-    lateinit var mInputLinkEt: EditText
+    private lateinit var mInputHashTagEt: EditText
 
-    lateinit var mInputHashTagEt: EditText
+    private lateinit var mTextClearBtn: ImageView
 
-    lateinit var mTextClearBtn: ImageView
+    private lateinit var mLinkSaveBtn: Button
 
-    lateinit var mLinkSaveBtn: Button
+    private lateinit var mCustomTagTitleTv: TextView
 
-    lateinit var mCustomTagTitle: TextView
+    private lateinit var mCustomTagLayout: LinearLayout
 
-    lateinit var mCustomTagInput: LinearLayout
+    private lateinit var mTagSizeTv: TextView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        // setStyle(STYLE_NORMAL, custom style 적용)
+    private lateinit var mTagRv1: RecyclerView
 
+    private lateinit var mTagRv2: RecyclerView
+
+    private lateinit var mSelectedTagRv: RecyclerView
+
+    private lateinit var mTagAdapter1: TagAdapter
+
+    private lateinit var mTagAdapter2: TagAdapter
+
+    private lateinit var mSelectedTagAdapter: TagAdapter
+
+
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+
+
+        return super.onCreateDialog(savedInstanceState).apply {
+            (this as BottomSheetDialog).behavior
+                .also { bottomSheetBehavior = it  }
+                .addBottomSheetCallback(object: BottomSheetBehavior.BottomSheetCallback() {
+
+                    override fun onStateChanged(bottomSheet: View, newState: Int) {
+                        when (newState) {
+                            BottomSheetBehavior.STATE_HIDDEN -> {
+                                mInputLinkEt.setText("")
+                                mInputHashTagEt.setText("")
+                                with(mSelectedTagAdapter.list){
+                                    this.removeAll(this)
+                                    mTagSizeTv.text = this.size.toString()
+                                }
+                            }
+                            else -> {}
+                        }
+                    }
+
+                    override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+                })
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        with(view) {
+            mTagRv1.addItemDecoration(ListDecoration(RecyclerView.HORIZONTAL, dip(8)))
+            mTagRv2.addItemDecoration(ListDecoration(RecyclerView.HORIZONTAL, dip(8)))
+            mSelectedTagRv.addItemDecoration(ListDecoration(RecyclerView.HORIZONTAL, dip(8)))
+            mTagAdapter1.initList(LinkHashData.tc1)
+            mTagAdapter2.initList(LinkHashData.tc2)
+            mSelectedTagAdapter.initList(arrayListOf())
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = UI {
         verticalLayout {
-//            id = R.id.main_bottom_sheet
             val sheetHeight = (DeviceUtils.getDeviceSize(context)?.y ?: dip(667)) - dip(52)
             lparams(width= matchParent, height= sheetHeight)
-            backgroundColor = Color.WHITE
 
             /**
              * 닫기 버튼
@@ -154,15 +203,24 @@ class RegisterLinkBottomDialog() : BottomSheetDialogFragment(), View.OnClickList
                     typeface = ResourcesCompat.getFont(context,R.font.spoqa_hansansneo_bold)
                 }.lparams(width= wrapContent, height = wrapContent)
 
-                textView("0/3"){
+                linearLayout{
                     gravity = Gravity.END
-                    textColor = Color.parseColor("#878D91")
-                    setTextSize(TypedValue.COMPLEX_UNIT_PX, dip(12).toFloat())
-                    typeface = ResourcesCompat.getFont(context,R.font.spoqa_hansansneo_regular)
-                }.lparams(height = wrapContent, weight = 1f)
+                    mTagSizeTv = textView("0"){
+                        textColor = Color.parseColor("#878D91")
+                        setTextSize(TypedValue.COMPLEX_UNIT_PX, dip(12).toFloat())
+                        typeface = ResourcesCompat.getFont(context,R.font.spoqa_hansansneo_regular)
+                    }.lparams(height = wrapContent, width = wrapContent)
+
+                    textView("/3"){
+                        textColor = Color.parseColor("#878D91")
+                        setTextSize(TypedValue.COMPLEX_UNIT_PX, dip(12).toFloat())
+                        typeface = ResourcesCompat.getFont(context,R.font.spoqa_hansansneo_regular)
+                    }.lparams(height = wrapContent, width = wrapContent)
+                }.lparams(height = wrapContent, width = wrapContent, weight = 1f)
+
+
 
             }.lparams(width= matchParent, height = dip(56)){
-                bottomMargin = dip(12)
                 horizontalMargin = dip(24)
             }
 
@@ -170,10 +228,34 @@ class RegisterLinkBottomDialog() : BottomSheetDialogFragment(), View.OnClickList
              * 해시태그 리스트 (Recycler)
              */
 
+            mTagRv1 = recyclerView {
+                clipToPadding = false
+                horizontalPadding = dip(24)
+                layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
+                adapter = TagAdapter(requireContext(), TAG_TYPE_LARGE).apply {
+                    setOnClickListener(this@RegisterLinkBottomDialog::updateTag)
+                }.also { mTagAdapter1 = it }
+
+            }.lparams(width = matchParent, height = wrapContent) {
+                bottomMargin = dip(12)
+            }
+
+            mTagRv2 = recyclerView {
+                clipToPadding = false
+                horizontalPadding = dip(24)
+                layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
+                adapter = TagAdapter(requireContext(), TAG_TYPE_LARGE).apply {
+                    setOnClickListener(this@RegisterLinkBottomDialog::updateTag)
+                }.also { mTagAdapter2 = it }
+            }.lparams(width = matchParent, height = wrapContent) {
+                bottomMargin = dip(12)
+            }
+
+
             /**
              * 커스텀 해시태그 Title
              */
-            mCustomTagTitle = textView("원하는 해시태그가 없으신가요?"){
+            mCustomTagTitleTv = textView("원하는 해시태그가 없으신가요?"){
                 id = R.id.custom_hashtag_title
                 textColor = Color.parseColor("#878D91")
                 setTextSize(TypedValue.COMPLEX_UNIT_PX, dip(12).toFloat())
@@ -187,7 +269,7 @@ class RegisterLinkBottomDialog() : BottomSheetDialogFragment(), View.OnClickList
             /**
              * 커스텀 해시태그 입력
              */
-            mCustomTagInput = linearLayout {
+            mCustomTagLayout = linearLayout {
                 orientation = HORIZONTAL
                 gravity = Gravity.CENTER_VERTICAL
                 visibility = View.GONE
@@ -208,7 +290,9 @@ class RegisterLinkBottomDialog() : BottomSheetDialogFragment(), View.OnClickList
                     backgroundColor = Color.parseColor("#878D91")
 
                     gravity = Gravity.CENTER
-                    setOnClickListener(this@RegisterLinkBottomDialog)
+                    setOnClickListener {
+                        updateTag(0, LinkHashData(hashtagName = mInputHashTagEt.text.toString()))
+                    }
 
                     imageView(R.drawable.ic_white_plus)
                         .lparams(width= dip(24), height= dip(24))
@@ -225,10 +309,21 @@ class RegisterLinkBottomDialog() : BottomSheetDialogFragment(), View.OnClickList
             verticalLayout {
                 gravity = Gravity.BOTTOM
 
+                mSelectedTagRv = recyclerView {
+                    clipToPadding = false
+                    horizontalPadding = dip(24)
+                    layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
+                    adapter = TagAdapter(requireContext(), TAG_TYPE_LARGE).apply {
+                        setOnClickListener(this@RegisterLinkBottomDialog::updateTag)
+                    }.also { mSelectedTagAdapter = it }
+
+                }.lparams(width = matchParent, height = wrapContent)
+
             }.lparams(width= matchParent, height = wrapContent, weight = 1f){
                 bottomMargin = dip(4)
-                horizontalMargin = dip(24)
             }
+
+
 
             /**
              * 저장하기 버튼
@@ -250,60 +345,51 @@ class RegisterLinkBottomDialog() : BottomSheetDialogFragment(), View.OnClickList
     }.view
 
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-//        DLog.e("TEST bottom dialog","on View Created")
-//        dialog?.findViewById<LinearLayout>(R.id.main_bottom_sheet)?.let{
-//            DLog.e("TEST bottom dialog","success")
-//            behavior = BottomSheetBehavior.from(it)
-//            behavior.state = BottomSheetBehavior.STATE_EXPANDED
-//            behavior.addBottomSheetCallback(bottomSheetCallback)
-//        }
-    }
-
-    private val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
-        override fun onStateChanged(bottomSheet: View, newState: Int) {
-            if (newState == BottomSheetBehavior.STATE_DRAGGING
-                || newState == BottomSheetBehavior.STATE_HALF_EXPANDED ) {
-                behavior.state = BottomSheetBehavior.STATE_EXPANDED
-            }
-        }
-
-        override fun onSlide(bottomSheet: View, slideOffset: Float) {}
-    }
-
-    override fun onClick(view: View?) = with(viewModel) {
+    override fun onClick(view: View?) = with(viewModel()) {
         when(view?.id) {
-            R.id.dialog_close -> {
-                // dialog?.hide()
-            }
+            R.id.dialog_close -> bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
             R.id.link_save -> {
-                getLinkList()
+                this.registerLink(LinkRegisterEntity(
+                    linkURL = mInputLinkEt.text.toString(),
+                    hashtags = ArrayList(mSelectedTagAdapter.list.map { it.hashtagName} )
+                ))
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                this.getLinkList()
             }
+
             R.id.custom_hashtag_title -> {
-                when(mCustomTagInput.visibility){
+                when(mCustomTagLayout.visibility){
                     View.VISIBLE -> {
-                        mCustomTagInput.visibility = View.GONE
-                        mCustomTagTitle.text = "원하는 해시태그가 없으신가요?"
-                        mCustomTagTitle.textColor = Color.parseColor("#878D91")
+                        mCustomTagLayout.visibility = View.GONE
+                        mCustomTagTitleTv.text = "원하는 해시태그가 없으신가요?"
+                        mCustomTagTitleTv.textColor = Color.parseColor("#878D91")
                     }
                     View.GONE -> {
-                        mCustomTagInput.visibility = View.VISIBLE
-                        mCustomTagTitle.text = "원하는 해시태그가 없다면 적어주세요!"
-                        mCustomTagTitle.textColor = Color.parseColor("#292A2B")
+                        mCustomTagLayout.visibility = View.VISIBLE
+                        mCustomTagTitleTv.text = "원하는 해시태그가 없다면 적어주세요!"
+                        mCustomTagTitleTv.textColor = Color.parseColor("#292A2B")
                     }
                     else -> { }
                 }
             }
+
             R.id.custom_hashtag_add -> {
-                // add hashtag
+
             }
+
             R.id.clear_text -> {
                 mInputLinkEt.setText("")
             }
             else -> {}
         }
+    }
+
+
+    private fun updateTag(position: Int, tag: LinkHashData) {
+        mSelectedTagAdapter.updateHashTags(tag)
+        mSelectedTagAdapter.notifyDataSetChanged()
+        mTagSizeTv.text = mSelectedTagAdapter.list.size.toString()
     }
 
 

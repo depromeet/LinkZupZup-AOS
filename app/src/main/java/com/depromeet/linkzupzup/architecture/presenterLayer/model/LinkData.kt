@@ -97,7 +97,7 @@ data class LinkHashData(
     var tagColor: TagColor = CommonUtil.getRandomeTagColor()): Parcelable {
 
     companion object {
-        val tc1: List<LinkHashData> = listOf(
+        val tc1: ArrayList<LinkHashData> = arrayListOf(
             LinkHashData(0, "디자인", "", TagColor(TagBgColorDefault01, TagTextColorDefault01)),
             LinkHashData(1, "포트폴리오", "", TagColor(TagBgColorDefault02, TagTextColorDefault02)),
             LinkHashData(2, "UX", "", TagColor(TagBgColorDefault03, TagTextColorDefault03)),
@@ -106,7 +106,7 @@ data class LinkHashData(
             LinkHashData(5, "인공지능", "", TagColor(TagBgColorDefault06, TagTextColorDefault06))
         )
 
-        val tc2: List<LinkHashData> = listOf(
+        val tc2: ArrayList<LinkHashData> = arrayListOf(
             LinkHashData(6, "프론트 개발", "", TagColor(TagBgColorDefault07, TagTextColorDefault07)),
             LinkHashData(7, "그로스 해킹", "", TagColor(TagBgColorDefault03, TagTextColorDefault03)),
             LinkHashData(8, "Android", "", TagColor(TagBgColorDefault01, TagTextColorDefault01)),

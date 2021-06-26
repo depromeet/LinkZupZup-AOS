@@ -19,7 +19,7 @@ class TagViewHolder(
     val ui: TagUI,
     val paddingValues: PaddingValues = PaddingValues(padding= parent.context.dip(8)),
     val radiusValue: Float = parent.context.dip(2).toFloat(),
-    val fontSet: FontValues = FontValues(textSizeRes = R.dimen.large_tag_text_size, textLineHeightRes = R.dimen.large_tag_line_height, fontRes = R.font.spoqa_hansansneo_medium),
+    val fontSet: FontValues = FontValues(textSizeRes = R.dimen.large_tag_text_size, textLineHeightRes = R.dimen.large_tag_line_height, fontRes = R.font.spoqa_hansansneo_regular),
     var clickListener: ((Int, LinkHashData) -> Unit)? = null): RecyclerView.ViewHolder(ui.createView(AnkoContext.create(parent.context, parent))) {
 
     fun onBind(list: ArrayList<LinkHashData>, position: Int) = with(ui) {
@@ -45,7 +45,7 @@ class TagViewHolder(
 
             // hashtag
             with(mTv) {
-                text = item.hashtagName
+                text = "#${item.hashtagName}"
                 textColor = item.tagColor.textColor
                 setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(fontSet.textSizeRes))
                 setLineSpacing(resources.getDimension(fontSet.textLineHeightRes), 1.0f)

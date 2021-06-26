@@ -2,7 +2,9 @@ package com.depromeet.linkzupzup.view.common.adapter
 
 import android.content.Context
 import android.view.ViewGroup
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.recyclerview.widget.RecyclerView
+import com.depromeet.linkzupzup.AppConst
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkHashData
 import com.depromeet.linkzupzup.base.BaseAdapter
@@ -20,9 +22,9 @@ class TagAdapter(override val ctx: Context, var tagType: Int = TAG_TYPE_SMALL) :
     }
 
     private val DEFAULT_TAG_PADDING = PaddingValues(verticalPadding = ctx.dip(4), horizontalPadding = ctx.dip(6))
-    private val DEFAULT_TAG_FONT_SET = FontValues(textSizeRes = R.dimen.default_tag_text_size, textLineHeightRes = R.dimen.default_tag_line_height, fontRes = R.font.spoqa_hansansneo_medium)
+    private val DEFAULT_TAG_FONT_SET = FontValues(textSizeRes = R.dimen.default_tag_text_size, textLineHeightRes = R.dimen.default_tag_line_height, fontRes = R.font.spoqa_hansansneo_regular)
     private val LARGE_TAG_PADDING = PaddingValues(padding = ctx.dip(8))
-    private val LARGE_TAG_FONT_SET = FontValues(textSizeRes = R.dimen.large_tag_text_size, textLineHeightRes = R.dimen.large_tag_line_height, fontRes = R.font.spoqa_hansansneo_medium)
+    private val LARGE_TAG_FONT_SET = FontValues(textSizeRes = R.dimen.large_tag_text_size, textLineHeightRes = R.dimen.large_tag_line_height, fontRes = R.font.spoqa_hansansneo_regular)
 
     var list: ArrayList<LinkHashData> = arrayListOf()
     var clickListener: ((Int, LinkHashData) -> Unit)? = null
@@ -48,6 +50,20 @@ class TagAdapter(override val ctx: Context, var tagType: Int = TAG_TYPE_SMALL) :
         this.list.addAll(list)
         setBasicItemCount(this.list.size)
     }
+
+    fun updateHashTags(linkHashData: LinkHashData) {
+        with(this.list) {
+            apply {
+                find { it.hashtagName == linkHashData.hashtagName }?.let {
+                    remove(it)
+                } ?: let {
+                    if (size < AppConst.HASH_TAG_MAX_LIMIT) add(linkHashData)
+                }
+            }
+        }
+        setBasicItemCount(this.list.size)
+    }
+
 
     fun setOnClickListener(onClickListener: (Int, LinkHashData) -> Unit) {
         clickListener = onClickListener
