@@ -22,23 +22,24 @@ import androidx.viewpager2.widget.ViewPager2
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.architecture.presenterLayer.ScrapDetailViewModel
 import com.depromeet.linkzupzup.architecture.presenterLayer.model.LinkData
-import com.depromeet.linkzupzup.extensions.clearMillis
-import com.depromeet.linkzupzup.extensions.getAlarmDateStr
-import com.depromeet.linkzupzup.extensions.viewPager2
+import com.depromeet.linkzupzup.extensions.*
 import com.depromeet.linkzupzup.utils.DLog
 import com.depromeet.linkzupzup.utils.DeviceUtils
 import com.depromeet.linkzupzup.view.common.adapter.DateAdapter
 import com.depromeet.linkzupzup.view.common.adapter.TextSpinnerAdapter
+import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import org.jetbrains.anko.*
+import org.jetbrains.anko.dip
 import org.jetbrains.anko.recyclerview.v7.recyclerView
 import org.jetbrains.anko.support.v4.UI
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 
 /** 이렇게도 호출 가능
 BottomSheetDialog(context, R.style.CustomBottomSheetDialog).apply {
@@ -78,12 +79,6 @@ class LinkAlaramBottomDialog(private val viewModel: ()->ScrapDetailViewModel) : 
     lateinit var rv: RecyclerView
 
     private lateinit var dateAdapter: DateAdapter
-
-    private lateinit var amPmAdapter: TextSpinnerAdapter
-
-    private lateinit var hourAdapter: TextSpinnerAdapter
-
-    private lateinit var minuteAdapter: TextSpinnerAdapter
 
     lateinit var mLinkSaveBtn: Button
 
@@ -139,11 +134,9 @@ class LinkAlaramBottomDialog(private val viewModel: ()->ScrapDetailViewModel) : 
         super.onViewCreated(view, savedInstanceState)
         setCalendar(calendar)
         dateAdapter.notifyDataSetChanged()
-        amPmAdapter.notifyDataSetChanged()
-        hourAdapter.notifyDataSetChanged()
-        minuteAdapter.notifyDataSetChanged()
     }
 
+    @ExperimentalPagerApi
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = UI {
         verticalLayout {
 
@@ -221,96 +214,52 @@ class LinkAlaramBottomDialog(private val viewModel: ()->ScrapDetailViewModel) : 
                 /**
                  * AM or PM
                  */
-                viewPager2 {
-                    orientation = ViewPager2.ORIENTATION_VERTICAL
-                    adapter = TextSpinnerAdapter(requireContext(), arrayListOf("\uD83C\uDF19 오후", "\u2600\uFE0F 오전"))
-                        .apply { setTouchListener { setDraggable(false) } }
-                        .also { amPmAdapter = it }
+                customTextPicker {
+                    backgroundColor = Color.TRANSPARENT
 
-                    registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
-
-                        override fun onPageScrollStateChanged(state: Int) {
-                            super.onPageScrollStateChanged(state)
-                            when (state) {
-                                ViewPager2.SCROLL_STATE_IDLE -> Observable.timer(300, TimeUnit.MILLISECONDS)
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe { setDraggable(true) }
-                                else -> {}
-                            }
-                        }
-                    })
-
-                    setPageTransformer { page, position ->
-                        val myOffset = position * -(2 * dip(100))
-                        when {
-                            position < -1 -> { page.translationX = -myOffset }
-                            position <= 1 -> {
-                                // Paging 시 Y축 Animation 배경색을 약간 연하게 처리
-                                val scaleFactor = 0.8f.coerceAtLeast(1 - Math.abs(position))
-                                page.translationX = myOffset
-                                page.scaleY = scaleFactor
-                                page.alpha = scaleFactor
-                            }
-                            else -> {
-                                page.alpha = 0f
-                                page.translationX = myOffset
-                            }
-                        }
+                    // value = 0 // position
+                    initData(arrayListOf("\uD83C\uDF19 오후", "\u2600\uFE0F 오전"))
+                    setOnValueChangeListener { picker, beforeIdx, afterIdx ->
+                        DLog.e("TEXT_PICKER", "beforeIdx: $beforeIdx, afterIdx: $afterIdx")
                     }
 
-                }.lparams(width= dip(92), height = matchParent)
+                }.lparams(width= dip(92), height= matchParent)
 
                 space().lparams(height= dip(1), weight = 1f)
 
                 /**
                  * HOUR
                  */
-                viewPager2 {
-                    orientation = ViewPager2.ORIENTATION_HORIZONTAL
-                    adapter = TextSpinnerAdapter(requireContext(), arrayListOf<String>().apply {
+                customTextPicker {
+                    backgroundColor = Color.TRANSPARENT
+
+                    // value = 0 // position
+                    initData(arrayListOf<String>().apply {
                         (1..12).forEach { i -> add(String.format("%02d", i)) }
-                    }, "시").also { hourAdapter = it }
-
-                    registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
-
-                        override fun onPageScrollStateChanged(state: Int) {
-                            super.onPageScrollStateChanged(state)
-                            when (state) {
-                                ViewPager2.SCROLL_STATE_IDLE -> Observable.timer(300, TimeUnit.MILLISECONDS)
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe { setDraggable(true) }
-                                else -> {}
-                            }
-                        }
                     })
+                    setOnValueChangeListener { picker, beforeIdx, afterIdx ->
+                        DLog.e("TEXT_PICKER", "beforeIdx: $beforeIdx, afterIdx: $afterIdx")
+                    }
 
-                }.lparams(width= dip(56), height = matchParent)
+                }.lparams(width= dip(56), height= matchParent)
 
                 space().lparams(width= dip(32))
 
                 /**
                  * MINUTE
                  */
-                viewPager2 {
-                    orientation = ViewPager2.ORIENTATION_VERTICAL
-                    adapter = TextSpinnerAdapter(requireContext(), arrayListOf<String>().apply {
+                customTextPicker {
+                    backgroundColor = Color.TRANSPARENT
+
+                    // value = 0 // position
+                    initData(arrayListOf<String>().apply {
                         (0..5).forEach { i -> add("${i}0") }
-                    }, "분").also { minuteAdapter = it }
-
-                    registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
-
-                        override fun onPageScrollStateChanged(state: Int) {
-                            super.onPageScrollStateChanged(state)
-                            when (state) {
-                                ViewPager2.SCROLL_STATE_IDLE -> Observable.timer(300, TimeUnit.MILLISECONDS)
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe { setDraggable(true) }
-                                else -> {}
-                            }
-                        }
                     })
+                    setOnValueChangeListener { picker, beforeIdx, afterIdx ->
+                        DLog.e("TEXT_PICKER", "beforeIdx: $beforeIdx, afterIdx: $afterIdx")
+                    }
 
-                }.lparams(width= dip(56), height = matchParent)
+                }.lparams(width= dip(56), height= matchParent)
 
             }.lparams(width= matchParent, height= dip(210))
 

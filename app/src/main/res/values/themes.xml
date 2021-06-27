@@ -62,6 +62,15 @@
     </style>
 
 
+    <style name="DefaultNumberPickerTheme" parent="Theme.LinkZupZup">
+        <item name="android:textColorPrimary">#292A2B</item>
+        <item name="colorControlNormal">@android:color/transparent</item>
+        <item name="android:textColorHighlight">#33292A2B</item>
+        <item name="android:textSize">18dp</item>
+        <item name="android:fontFamily">@font/spoqa_hansansneo_bold</item>
+    </style>
+
+
     <style name="Theme.LinkZupZup.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
