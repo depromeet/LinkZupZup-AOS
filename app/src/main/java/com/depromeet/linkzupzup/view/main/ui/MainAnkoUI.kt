@@ -2,7 +2,9 @@ package com.depromeet.linkzupzup.view.main.ui
 
 import android.app.Activity
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.util.TypedValue
+import android.view.Gravity
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import com.depromeet.linkzupzup.R
@@ -10,6 +12,7 @@ import com.depromeet.linkzupzup.architecture.presenterLayer.MainViewModel
 import com.depromeet.linkzupzup.base.BaseAnkoView
 import com.depromeet.linkzupzup.view.dialog.RegisterLinkBottomDialog
 import org.jetbrains.anko.*
+import org.jetbrains.anko.appcompat.v7.toolbar
 import org.jetbrains.anko.design.appBarLayout
 
 class MainAnkoUI : BaseAnkoView<MainViewModel>(), View.OnClickListener {
@@ -19,13 +22,38 @@ class MainAnkoUI : BaseAnkoView<MainViewModel>(), View.OnClickListener {
     override fun createView(ui: AnkoContext<Activity>) = with(ui) {
         verticalLayout {
             lparams(width = matchParent, height = matchParent)
+            backgroundColor = Color.parseColor("#E5E5E5")
 
             /**
              * App bar
              */
-            appBarLayout(){
+            toolbar{
+                linearLayout {
+                    gravity = Gravity.CENTER_VERTICAL or Gravity.END
 
-            }
+                    linearLayout {
+                        gravity = Gravity.CENTER
+                        imageView(R.drawable.ic_alram)
+                            .lparams(width = dip(24), height = dip(24))
+                    }.lparams(width = dip(40), height = dip(40))
+
+                    linearLayout {
+                        gravity = Gravity.CENTER
+                        imageView(R.drawable.ic_ranking)
+                            .lparams(width = dip(24), height = dip(24))
+                    }.lparams(width = dip(40), height = dip(40))
+
+                    linearLayout {
+                        gravity = Gravity.CENTER
+                        imageView(R.drawable.ic_mypage)
+                            .lparams(width = dip(24), height = dip(24))
+                    }.lparams(width = dip(40), height = dip(40))
+
+                }.lparams(width = matchParent, height = matchParent){
+                    rightPadding = dip(16)
+                }
+
+            }.lparams(width = matchParent, height = dip(52))
 
             /**
              * Main title
