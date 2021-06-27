@@ -159,11 +159,11 @@ fun MainBodyUI(viewModel : MainViewModel, clickListener: (Int) -> Unit, userName
                     colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Blue50, contentColor = Color.White),
                     modifier = Modifier.fillMaxWidth().height(52.dp),
                     onClick = {
-//                        coroutineScope.launch {
-//                            updateLink(LinkData())
-//                            setSelected(0)
-//                            sheetState.show()
-//                        }
+                        coroutineScope.launch {
+                            updateLink(LinkData())
+                            setSelected(0)
+                            sheetState.show()
+                        }
                         // RegistBottomDialog 열기
 
 

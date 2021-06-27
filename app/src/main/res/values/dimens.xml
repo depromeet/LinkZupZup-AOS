@@ -17,4 +17,7 @@
     <dimen name="date_day_text_size">12dp</dimen>
     <dimen name="date_day_line_height">12dp</dimen>
 
+    <dimen name="spinner_text_size">18dp</dimen>
+    <dimen name="spinner_line_height">18dp</dimen>
+
 </resources>

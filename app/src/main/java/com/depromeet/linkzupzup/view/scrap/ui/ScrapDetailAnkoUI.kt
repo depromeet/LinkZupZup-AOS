@@ -14,12 +14,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.depromeet.linkzupzup.R
 import com.depromeet.linkzupzup.architecture.presenterLayer.ScrapDetailViewModel
 import com.depromeet.linkzupzup.base.BaseAnkoView
-import com.depromeet.linkzupzup.utils.DeviceUtils
 import com.depromeet.linkzupzup.view.common.adapter.TagAdapter
 import com.depromeet.linkzupzup.view.dialog.LinkAlaramBottomDialog
-import com.depromeet.linkzupzup.view.dialog.LinkAlaramBottomDialog.Companion.ALARM_REGIST_TYPE
-import com.depromeet.linkzupzup.view.dialog.LinkAlaramBottomDialog.Companion.ALARM_UPDATE_TYPE
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import org.jetbrains.anko.*
 import org.jetbrains.anko.cardview.v7.cardView
 import org.jetbrains.anko.recyclerview.v7.recyclerView
