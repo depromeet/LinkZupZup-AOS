@@ -2,7 +2,9 @@ package com.depromeet.linkzupzup.view.dialog
 
 import android.app.Dialog
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.text.TextWatcher
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -10,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import android.widget.LinearLayout.HORIZONTAL
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,6 +30,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.jetbrains.anko.*
+import org.jetbrains.anko.cardview.v7.cardView
 import org.jetbrains.anko.recyclerview.v7.recyclerView
 import org.jetbrains.anko.support.v4.UI
 
@@ -41,7 +45,9 @@ class RegisterLinkBottomDialog(private val viewModel: ()->MainViewModel)
 
     private lateinit var mTextClearBtn: ImageView
 
-    private lateinit var mLinkSaveBtn: Button
+    private lateinit var mSaveBtnLayout: LinearLayout
+
+    private lateinit var mSaveBtnTv: TextView
 
     private lateinit var mCustomTagTitleTv: TextView
 
@@ -147,27 +153,34 @@ class RegisterLinkBottomDialog(private val viewModel: ()->MainViewModel)
             relativeLayout {
                 gravity = Gravity.CENTER_VERTICAL
 
-                mInputLinkEt = editText {
-                    textColor = Color.parseColor("#292A2B")
-                    setTextSize(TypedValue.COMPLEX_UNIT_PX, dip(12).toFloat())
-                    typeface = ResourcesCompat.getFont(context,R.font.spoqa_hansansneo_regular)
-                    hint = "\uD83D\uDC49 링크주소를 여기에 붙여넣기 해주세요. "
-                    backgroundColor = Color.parseColor("#F1F2F5")
-                    padding = dip(12)
-                    addTextChangedListener{
-                        it?.let {
-                            if(it.isNotEmpty()){
-                                mTextClearBtn.visibility = View.VISIBLE
-                                mLinkSaveBtn.backgroundColor = Color.parseColor("#4076F6")
-                                mLinkSaveBtn.textColor = Color.parseColor("#ffffff")
-                            }else{
-                                mTextClearBtn.visibility = View.INVISIBLE
-                                mLinkSaveBtn.backgroundColor = Color.parseColor("#CED3D6")
-                                mLinkSaveBtn.textColor = Color.parseColor("#878D91")
-                            }
+                cardView {
+                    radius = dip(4).toFloat()
+                    elevation = 0f
 
+                    mInputLinkEt = editText {
+                        textColor = Color.parseColor("#292A2B")
+                        setTextSize(TypedValue.COMPLEX_UNIT_PX, dip(12).toFloat())
+                        typeface = ResourcesCompat.getFont(context,R.font.spoqa_hansansneo_regular)
+                        hint = "\uD83D\uDC49 링크주소를 여기에 붙여넣기 해주세요. "
+                        backgroundColor = Color.parseColor("#F1F2F5")
+                        padding = dip(12)
+
+
+                        addTextChangedListener {
+                            it?.let {
+                                if(it.isNotEmpty()){
+                                    mTextClearBtn.visibility = View.VISIBLE
+                                    mSaveBtnLayout.backgroundColor = Color.parseColor("#4076F6")
+                                    mSaveBtnTv.textColor = Color.parseColor("#ffffff")
+                                }else{
+                                    mTextClearBtn.visibility = View.INVISIBLE
+                                    mSaveBtnLayout.backgroundColor = Color.parseColor("#CED3D6")
+                                    mSaveBtnTv.textColor = Color.parseColor("#878D91")
+                                }
+
+                            }
                         }
-                    }
+                    }.lparams(width= matchParent, height= matchParent)
                 }.lparams(width= matchParent, height= dip(40)){
                     centerInParent()
                 }
@@ -182,10 +195,9 @@ class RegisterLinkBottomDialog(private val viewModel: ()->MainViewModel)
                     centerInParent()
                 }
 
-
             }.lparams(width= matchParent, height= dip(40)){
                 horizontalMargin = dip(24)
-                bottomMargin = dip(40)
+                bottomMargin = dip(41)
             }
 
 
@@ -216,12 +228,12 @@ class RegisterLinkBottomDialog(private val viewModel: ()->MainViewModel)
                         setTextSize(TypedValue.COMPLEX_UNIT_PX, dip(12).toFloat())
                         typeface = ResourcesCompat.getFont(context,R.font.spoqa_hansansneo_regular)
                     }.lparams(height = wrapContent, width = wrapContent)
+
                 }.lparams(height = wrapContent, width = wrapContent, weight = 1f)
 
-
-
-            }.lparams(width= matchParent, height = dip(56)){
+            }.lparams(width= matchParent, height = wrapContent){
                 horizontalMargin = dip(24)
+                bottomMargin = dip(12)
             }
 
             /**
@@ -235,7 +247,6 @@ class RegisterLinkBottomDialog(private val viewModel: ()->MainViewModel)
                 adapter = TagAdapter(requireContext(), TAG_TYPE_LARGE).apply {
                     setOnClickListener(this@RegisterLinkBottomDialog::updateTag)
                 }.also { mTagAdapter1 = it }
-
             }.lparams(width = matchParent, height = wrapContent) {
                 bottomMargin = dip(12)
             }
@@ -262,7 +273,7 @@ class RegisterLinkBottomDialog(private val viewModel: ()->MainViewModel)
                 typeface = ResourcesCompat.getFont(context,R.font.spoqa_hansansneo_regular)
                 setOnClickListener(this@RegisterLinkBottomDialog)
             }.lparams(width= matchParent, height = wrapContent){
-                bottomMargin = dip(12)
+                verticalMargin = dip(12)
                 horizontalMargin = dip(24)
             }
 
@@ -274,31 +285,43 @@ class RegisterLinkBottomDialog(private val viewModel: ()->MainViewModel)
                 gravity = Gravity.CENTER_VERTICAL
                 visibility = View.GONE
 
-                mInputHashTagEt = editText {
-                    textColor = Color.parseColor("#292A2B")
-                    setTextSize(TypedValue.COMPLEX_UNIT_PX, dip(12).toFloat())
-                    typeface = ResourcesCompat.getFont(context,R.font.spoqa_hansansneo_regular)
-                    hint = "#"
-                    backgroundColor = Color.parseColor("#F1F2F5")
-                    padding = dip(12)
+                cardView {
+                    radius = dip(4).toFloat()
+                    elevation = 0f
+
+                    mInputHashTagEt = editText {
+                        textColor = Color.parseColor("#292A2B")
+                        setTextSize(TypedValue.COMPLEX_UNIT_PX, dip(12).toFloat())
+                        typeface = ResourcesCompat.getFont(context,R.font.spoqa_hansansneo_regular)
+                        hint = "#"
+                        backgroundColor = Color.parseColor("#F1F2F5")
+                        padding = dip(12)
+                    }.lparams(width= matchParent, height= matchParent)
+
                 }.lparams(width= wrapContent, height= matchParent, weight= 1f){
                     rightMargin = dip(8)
                 }
 
-                linearLayout {
-                    id = R.id.custom_hashtag_add
-                    backgroundColor = Color.parseColor("#878D91")
 
-                    gravity = Gravity.CENTER
-                    setOnClickListener {
-                        updateTag(0, LinkHashData(hashtagName = mInputHashTagEt.text.toString()))
-                    }
 
-                    imageView(R.drawable.ic_white_plus)
-                        .lparams(width= dip(24), height= dip(24))
-                }.lparams(width= dip(40), height= dip(40))
+                cardView {
+                    radius = dip(4).toFloat()
+                    elevation = 0f
 
-            }.lparams(width= matchParent, height = dip(40)){
+                    linearLayout {
+                        id = R.id.custom_hashtag_add
+                        backgroundColor = Color.parseColor("#878D91")
+                        gravity = Gravity.CENTER
+                        setOnClickListener(this@RegisterLinkBottomDialog)
+
+                        imageView(R.drawable.ic_white_plus)
+                            .lparams(width= dip(24), height= dip(24))
+
+                    }.lparams(width= dip(40), height= dip(40))
+
+                }.lparams(width= wrapContent, height= wrapContent)
+
+            }.lparams(width= matchParent, height = wrapContent){
                 bottomMargin = dip(12)
                 horizontalMargin = dip(24)
             }
@@ -328,13 +351,24 @@ class RegisterLinkBottomDialog(private val viewModel: ()->MainViewModel)
             /**
              * 저장하기 버튼
              */
-            mLinkSaveBtn = button("저장하기") {
+            cardView {
                 id = R.id.link_save
                 setOnClickListener(this@RegisterLinkBottomDialog)
-                backgroundColor = Color.parseColor("#CED3D6")
-                textColor = Color.parseColor("#878D91")
-                setTextSize(TypedValue.COMPLEX_UNIT_PX, dip(14).toFloat())
-                typeface = ResourcesCompat.getFont(context,R.font.spoqa_hansansneo_bold)
+                radius = dip(4).toFloat()
+                elevation = 0f
+
+                mSaveBtnLayout = linearLayout {
+                    gravity = Gravity.CENTER
+                    backgroundColor = Color.parseColor("#CED3D6")
+
+                    mSaveBtnTv = textView("저장하기") {
+                        textColor = Color.parseColor("#878D91")
+                        setTextSize(TypedValue.COMPLEX_UNIT_PX, dip(14).toFloat())
+                        typeface = ResourcesCompat.getFont(context,R.font.spoqa_hansansneo_bold)
+                    }.lparams(width= wrapContent, height= wrapContent)
+
+                }.lparams(width= matchParent, height= matchParent)
+
             }.lparams(width= matchParent, height= dip(52)){
                 horizontalMargin = dip(24)
                 verticalMargin = dip(16)
@@ -375,7 +409,7 @@ class RegisterLinkBottomDialog(private val viewModel: ()->MainViewModel)
             }
 
             R.id.custom_hashtag_add -> {
-
+                updateTag(0, LinkHashData(hashtagName = mInputHashTagEt.text.toString()))
             }
 
             R.id.clear_text -> {

@@ -14,7 +14,7 @@ import org.jetbrains.anko.design.appBarLayout
 
 class MainAnkoUI : BaseAnkoView<MainViewModel>(), View.OnClickListener {
 
-    val bottomDialog: RegisterLinkBottomDialog = RegisterLinkBottomDialog { vm!! }
+    private val bottomDialog: RegisterLinkBottomDialog = RegisterLinkBottomDialog { vm!! }
 
     override fun createView(ui: AnkoContext<Activity>) = with(ui) {
         verticalLayout {
